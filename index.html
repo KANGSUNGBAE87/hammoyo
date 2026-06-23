@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>함모여 디자인 MVP</title>
+    <title>함모여 기능 MVP</title>
     <link rel="icon" href="data:," />
     <style>
       :root {
@@ -695,6 +695,66 @@
         line-height: 18px;
       }
 
+      .formStack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .inputGroup {
+        display: grid;
+        gap: 7px;
+      }
+
+      .inputLabel {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 18px;
+        font-weight: 700;
+      }
+
+      .textInput {
+        min-height: var(--touch-target);
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        background: var(--surface);
+      }
+
+      .textInput::placeholder {
+        color: var(--text-tertiary);
+      }
+
+      .formGrid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(96px, 0.45fr);
+        gap: 8px;
+      }
+
+      .candidateInputCard {
+        display: grid;
+        gap: 10px;
+        padding: var(--card-padding);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+      }
+
+      .actionStatus {
+        min-height: 20px;
+        color: var(--success);
+        font-size: 13px;
+        line-height: 18px;
+        font-weight: 700;
+      }
+
+      .emptyStateLine {
+        color: var(--text-secondary);
+        font-size: 14px;
+        line-height: 20px;
+      }
+
       .tabsPanel {
         display: grid;
         gap: 16px;
@@ -810,7 +870,8 @@
 
       @media (max-width: 380px) {
         .PreferenceSelector,
-        .metricGrid {
+        .metricGrid,
+        .formGrid {
           grid-template-columns: 1fr;
         }
 
@@ -855,7 +916,7 @@
             <header class="topbar">
               <div class="brand">
                 <strong>함모여</strong>
-                <span class="pill">디자인 MVP</span>
+                <span class="pill">기능 MVP</span>
               </div>
             </header>
             <div id="screen-root" class="screenRoot" aria-live="polite"></div>
@@ -982,6 +1043,8 @@
       const locale = JSON.parse(document.getElementById("locale-ko").textContent);
       const screenRoot = document.getElementById("screen-root");
       const tabsRoot = document.getElementById("screen-tabs");
+      const STORAGE_KEY = "hammoyo:mvp:v1";
+      const APP_VERSION = 1;
       const screenOrder = [
         "scr-00-entry",
         "scr-01-host-room",
@@ -993,70 +1056,259 @@
         "scr-06-room-closed",
       ];
 
-      const fixture = {
-        expectedCount: 7,
-        responseCount: 5,
-        minimumResponses: 5,
-        aiCopyEnabled: false,
-        candidates: [
-          {
-            label: "6.29 토요일",
-            time: "18:30",
-            note: "강남역 근처, 저녁 식사",
-            selected: true,
-            status: "available",
-          },
-          {
-            label: "6.30 일요일",
-            time: "17:00",
-            note: "잠실, 카페 가능",
-            selected: false,
-            status: "adjustable",
-          },
-        ],
-        recommendation: {
-          confidence: "medium",
-          confidenceLabel: "신뢰도 보통",
-          bucket: "ADJUSTMENT",
-          label: "추천 1순위",
-          date: "6.29 토요일",
-          time: "18:30",
-          place: "강남역 근처",
-          reason: "모두 참석할 수 있고, 일부만 조금 조정하면 되는 시간이에요.",
-          chips: [
-            ["success", "5명 응답"],
-            ["brand", "가장 좋아요 3명"],
-            ["warning", "조정 필요 1명"],
-          ],
-          shareCopy:
-            "현재 응답 기준으로는 6.29 토요일 18:30이 가장 현실적인 약속안이에요. 크게 조정할 내용이 없다면 이 시간으로 정리해볼게요.",
-        },
-      };
+      const defaultCandidates = [
+        { id: "slot-1", label: "6.29 토요일", time: "18:30", note: "강남역 근처" },
+        { id: "slot-2", label: "6.30 일요일", time: "17:00", note: "잠실" },
+        { id: "slot-3", label: "7.1 월요일", time: "19:00", note: "홍대" },
+      ];
 
       const statusMeta = {
-        prefer: { icon: "★", className: "brand" },
-        available: { icon: "✓", className: "success" },
-        adjustable: { icon: "≋", className: "warning" },
-        hardNo: { icon: "−", className: "danger" },
+        prefer: { icon: "★", className: "brand", score: 3 },
+        available: { icon: "✓", className: "success", score: 2 },
+        adjustable: { icon: "≋", className: "warning", score: 1 },
+        hardNo: { icon: "−", className: "danger", score: -5 },
       };
 
       const escapeHtml = (value) =>
-        String(value)
+        String(value ?? "")
           .replaceAll("&", "&amp;")
           .replaceAll("<", "&lt;")
           .replaceAll(">", "&gt;")
           .replaceAll('"', "&quot;")
           .replaceAll("'", "&#39;");
 
+      const screenCopy = (id) => locale.screens[id];
+
       const isAiEnabled = () => {
         const params = new URLSearchParams(window.location.search);
         return document.body.dataset.aiCopyEnabled === "true" || params.get("ai") === "on";
       };
 
-      const screenCopy = (id) => locale.screens[id];
+      function normalizeStatus(status) {
+        return Object.prototype.hasOwnProperty.call(statusMeta, status) ? status : "available";
+      }
+
+      function clampNumber(value, min, max, fallback) {
+        const next = Number.parseInt(value, 10);
+        if (!Number.isFinite(next)) return fallback;
+        return Math.min(max, Math.max(min, next));
+      }
+
+      function minimumResponses(expectedCount) {
+        const safeExpected = Number.isFinite(Number(expectedCount)) ? Number(expectedCount) : 4;
+        return Math.min(4, Math.max(3, Math.ceil(safeExpected * 0.5)));
+      }
+
+      function normalizeCandidate(candidate, index) {
+        const fallback = defaultCandidates[index] || defaultCandidates[0];
+        return {
+          id: candidate?.id || `slot-${index + 1}`,
+          label: String(candidate?.label || fallback.label).trim(),
+          time: String(candidate?.time || fallback.time).trim(),
+          note: String(candidate?.note || fallback.note).trim(),
+        };
+      }
+
+      function normalizeResponse(response, index) {
+        const preferences = {};
+        Object.entries(response?.preferences || {}).forEach(([candidateId, status]) => {
+          preferences[candidateId] = normalizeStatus(status);
+        });
+        return {
+          id: response?.id || `response-${index + 1}`,
+          alias: String(response?.alias || `참여자 ${index + 1}`).trim(),
+          preferences,
+          updatedAt: response?.updatedAt || new Date().toISOString(),
+        };
+      }
+
+      function createDemoRoom(options = {}) {
+        const candidates = (options.candidates || defaultCandidates)
+          .slice(0, 3)
+          .map((candidate, index) => normalizeCandidate(candidate, index));
+        const room = {
+          id: options.id || `room-${Date.now().toString(36)}`,
+          title: String(options.title || "대학 동기 모임").trim(),
+          expectedCount: clampNumber(options.expectedCount, 3, 20, 7),
+          deadlineLabel: String(options.deadlineLabel || "6.28 금요일 22:00").trim(),
+          candidates,
+          responses: (options.responses || []).map(normalizeResponse),
+          status: options.status || "collecting",
+          selectedCandidateId: options.selectedCandidateId || null,
+          createdAt: options.createdAt || new Date().toISOString(),
+          closedAt: options.closedAt || null,
+        };
+        return refreshRoomStatus(room);
+      }
+
+      function getDraftPreferences(room) {
+        const draft = { ...(appState?.draftPreferences || {}) };
+        room.candidates.forEach((candidate) => {
+          if (!draft[candidate.id]) draft[candidate.id] = "available";
+        });
+        return draft;
+      }
+
+      function summarizeCandidate(room, candidate, order) {
+        const counts = { prefer: 0, available: 0, adjustable: 0, hardNo: 0 };
+        room.responses.forEach((response) => {
+          const status = normalizeStatus(response.preferences[candidate.id]);
+          counts[status] += 1;
+        });
+        const answered = Object.values(counts).reduce((sum, value) => sum + value, 0);
+        const score =
+          counts.prefer * statusMeta.prefer.score +
+          counts.available * statusMeta.available.score +
+          counts.adjustable * statusMeta.adjustable.score +
+          counts.hardNo * statusMeta.hardNo.score;
+        const hardNoRatio = answered > 0 ? counts.hardNo / answered : 0;
+        const excluded = counts.hardNo >= 2 || hardNoRatio >= 0.34;
+        return {
+          candidate,
+          order,
+          counts,
+          answered,
+          score,
+          hardNoCount: counts.hardNo,
+          hardNoRatio,
+          preferCount: counts.prefer,
+          positiveCount: counts.prefer + counts.available,
+          excluded,
+        };
+      }
+
+      function rankCandidates(room) {
+        const responseCount = room.responses.length;
+        const threshold = minimumResponses(room.expectedCount);
+        const enough = responseCount >= threshold;
+        const items = room.candidates
+          .map((candidate, index) => summarizeCandidate(room, candidate, index))
+          .sort((a, b) => {
+            if (a.excluded !== b.excluded) return Number(a.excluded) - Number(b.excluded);
+            if (a.score !== b.score) return b.score - a.score;
+            if (a.hardNoCount !== b.hardNoCount) return a.hardNoCount - b.hardNoCount;
+            if (a.preferCount !== b.preferCount) return b.preferCount - a.preferCount;
+            if (a.positiveCount !== b.positiveCount) return b.positiveCount - a.positiveCount;
+            return a.order - b.order;
+          });
+        const eligible = items.filter((item) => !item.excluded);
+        const top = enough ? eligible[0] || null : null;
+        const second = top ? eligible.find((item) => item.candidate.id !== top.candidate.id) : null;
+        const scoreGap = top && second ? top.score - second.score : top ? Math.max(0, top.score) : 0;
+        let confidence = "none";
+        if (top) {
+          if (top.hardNoCount === 0 && scoreGap >= 3) confidence = "high";
+          else if (scoreGap >= 1) confidence = "medium";
+          else confidence = "low";
+        }
+        const confidenceLabel = {
+          high: "신뢰도 높음",
+          medium: "신뢰도 보통",
+          low: "신뢰도 낮음",
+          none: "추천 대기",
+        }[confidence];
+        return {
+          responseCount,
+          minimum: threshold,
+          enough,
+          items,
+          top,
+          alternatives: eligible.filter((item) => item.candidate.id !== top?.candidate.id).slice(0, 2),
+          confidence,
+          confidenceLabel,
+          scoreGap,
+        };
+      }
+
+      function refreshRoomStatus(room) {
+        if (room.status === "closed" || room.status === "expired") return room;
+        const ranked = rankCandidates(room);
+        if (ranked.top) room.status = "recommended";
+        else if (room.responses.length > 0) room.status = "low_confidence";
+        else room.status = "collecting";
+        return room;
+      }
+
+      function buildShareText(room, ranked = rankCandidates(room)) {
+        if (!ranked.top) {
+          const need = Math.max(0, ranked.minimum - ranked.responseCount);
+          return `${room.title}은 아직 ${need}명 정도의 응답이 더 필요해요. 지금 링크로 가능한 정도만 골라주시면, 방장이 모두에게 공유할 약속안을 정리할게요.`;
+        }
+        const top = ranked.top;
+        const candidate = top.candidate;
+        return `${room.title}은 현재 응답 기준으로 ${candidate.label} ${candidate.time}이 가장 현실적인 약속안이에요. ${ranked.responseCount}명이 답했고, ${top.counts.prefer}명이 가장 좋아요로 골랐어요. 이 시간으로 정리해볼게요.`;
+      }
+
+      function sampleResponsesFor(room) {
+        const [first, second, third] = room.candidates;
+        return [
+          {
+            alias: "서연",
+            preferences: { [first.id]: "available", [second.id]: "prefer", [third.id]: "hardNo" },
+          },
+          {
+            alias: "지훈",
+            preferences: { [first.id]: "prefer", [second.id]: "adjustable", [third.id]: "hardNo" },
+          },
+          {
+            alias: "하린",
+            preferences: { [first.id]: "available", [second.id]: "adjustable", [third.id]: "available" },
+          },
+          {
+            alias: "도윤",
+            preferences: { [first.id]: "prefer", [second.id]: "available", [third.id]: "available" },
+          },
+        ].map(normalizeResponse);
+      }
+
+      function createDefaultState() {
+        const room = createDemoRoom({
+          responses: sampleResponsesFor({ candidates: defaultCandidates }).slice(0, 4),
+        });
+        return {
+          version: APP_VERSION,
+          room,
+          draftPreferences: {},
+          currentParticipant: "",
+          copyStatus: "",
+        };
+      }
+
+      function normalizeState(raw) {
+        if (!raw || raw.version !== APP_VERSION || !raw.room) return createDefaultState();
+        const room = createDemoRoom(raw.room);
+        room.status = raw.room.status || room.status;
+        room.selectedCandidateId = raw.room.selectedCandidateId || room.selectedCandidateId;
+        room.closedAt = raw.room.closedAt || room.closedAt;
+        return {
+          version: APP_VERSION,
+          room,
+          draftPreferences: raw.draftPreferences || {},
+          currentParticipant: raw.currentParticipant || "",
+          copyStatus: raw.copyStatus || "",
+        };
+      }
+
+      function loadState() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("reset") === "1") localStorage.removeItem(STORAGE_KEY);
+        try {
+          const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          return normalizeState(raw);
+        } catch {
+          return createDefaultState();
+        }
+      }
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      }
+
+      let appState = loadState();
 
       function reasonChip(kind, label) {
-        return `<span class="ReasonChip ${kind}"><span aria-hidden="true">${kind === "success" ? "✓" : kind === "warning" ? "!" : kind === "danger" ? "−" : "•"}</span>${escapeHtml(label)}</span>`;
+        const mark = kind === "success" ? "✓" : kind === "warning" ? "!" : kind === "danger" ? "−" : "•";
+        return `<span class="ReasonChip ${kind}"><span aria-hidden="true">${mark}</span>${escapeHtml(label)}</span>`;
       }
 
       function stateGraphic(variant, label) {
@@ -1075,31 +1327,14 @@
         `;
       }
 
-      function candidateSlotCard(slot, withSelector = false) {
-        const status = statusMeta[slot.status];
-        const chip = reasonChip(status.className, locale.status[slot.status]);
-        const selector = withSelector ? preferenceSelector(slot.status) : "";
-        return `
-          <article class="CandidateSlotCard" data-selected="${slot.selected}" data-disabled="false">
-            <div class="topline">
-              <div class="slotMeta">
-                <strong>${escapeHtml(slot.label)} ${escapeHtml(slot.time)}</strong>
-                <span>${escapeHtml(slot.note)}</span>
-              </div>
-              ${chip}
-            </div>
-            ${selector}
-          </article>
-        `;
-      }
-
-      function preferenceSelector(selected) {
+      function preferenceSelector(candidateId, selected, disabled = false) {
         return `
           <div class="PreferenceSelector" role="group" aria-label="후보 시간 선호 선택">
             ${Object.entries(locale.status)
               .map(([key, label]) => {
                 const meta = statusMeta[key];
-                return `<button class="preferenceOption" type="button" data-status="${key}" data-selected="${selected === key}" aria-pressed="${selected === key}">
+                const pressed = selected === key;
+                return `<button class="preferenceOption" type="button" data-action="set-preference" data-candidate-id="${escapeHtml(candidateId)}" data-status="${key}" data-testid="preference-${escapeHtml(candidateId)}-${key}" data-selected="${pressed}" aria-pressed="${pressed}" ${disabled ? "disabled" : ""}>
                   <span aria-hidden="true">${meta.icon}</span><span>${label}</span>
                 </button>`;
               })
@@ -1108,13 +1343,40 @@
         `;
       }
 
-      function responseCoverage(state = "enough") {
-        const percent = Math.round((fixture.responseCount / fixture.expectedCount) * 100);
-        const need = Math.max(0, fixture.minimumResponses - fixture.responseCount);
+      function candidateSlotCard(slot, options = {}) {
+        const selectedStatus = normalizeStatus(options.selectedStatus || "available");
+        const summary = options.summary;
+        const selected = Boolean(options.selected);
+        const disabled = Boolean(options.disabled);
+        let chip = reasonChip(statusMeta[selectedStatus].className, locale.status[selectedStatus]);
+        if (summary) {
+          if (summary.excluded) chip = reasonChip("danger", "추천 제외");
+          else if (selected) chip = reasonChip("brand", "추천 후보");
+          else chip = reasonChip("success", `${summary.answered}명 응답`);
+        }
+        return `
+          <article class="CandidateSlotCard" data-selected="${selected}" data-disabled="${disabled}">
+            <div class="topline">
+              <div class="slotMeta">
+                <strong>${escapeHtml(slot.label)} ${escapeHtml(slot.time)}</strong>
+                <span>${escapeHtml(slot.note)}</span>
+              </div>
+              ${chip}
+            </div>
+            ${summary ? `<p class="caption">점수 ${summary.score} · 가장 좋아요 ${summary.counts.prefer} · 가능해요 ${summary.counts.available} · 조정 ${summary.counts.adjustable} · 어려워요 ${summary.counts.hardNo}</p>` : ""}
+            ${options.withSelector ? preferenceSelector(slot.id, selectedStatus, disabled) : ""}
+          </article>
+        `;
+      }
+
+      function responseCoverage(room, state = "enough") {
+        const ranked = rankCandidates(room);
+        const percent = Math.min(100, Math.round((ranked.responseCount / room.expectedCount) * 100));
+        const need = Math.max(0, ranked.minimum - ranked.responseCount);
         const label =
           state === "low"
-            ? `${need}명만 더 답하면 추천을 시작해요.`
-            : `${fixture.expectedCount}명 중 ${fixture.responseCount}명이 답했어요.`;
+            ? `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했어요. ${need}명만 더 답하면 추천을 시작해요.`
+            : `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했어요.`;
         const chipLabel = state === "low" ? locale.coverageLabel.collecting : locale.coverageLabel.enough;
         return `
           <section class="ResponseCoverage" aria-label="응답률">
@@ -1136,46 +1398,79 @@
         return `<div class="ParticipantAvatarStack" aria-label="${count}명 응답 집계">${tokens}${count > 8 ? '<span class="avatarToken">+ </span>' : ""}</div>`;
       }
 
-      function shareCopyBox(mode = "template") {
-        const label = isAiEnabled() && mode === "ai" ? locale.shareLabel.ai : locale.shareLabel.template;
+      function shareCopyBox(room, ranked, mode = "template") {
+        const aiMode = isAiEnabled() && mode === "ai";
+        const label = aiMode ? locale.shareLabel.ai : locale.shareLabel.template;
+        const copy = buildShareText(room, ranked);
         return `
           <section class="ShareCopyBox" aria-label="공유 문구">
-            ${reasonChip(isAiEnabled() && mode === "ai" ? "brand" : "success", label)}
-            <p class="copyText">${escapeHtml(fixture.recommendation.shareCopy)}</p>
-            ${isAiEnabled() && mode === "ai" ? '<p class="caption">AI는 집계 정보만 보고 문장 톤을 다듬어요.</p>' : ""}
+            ${reasonChip(aiMode ? "brand" : "success", label)}
+            <p class="copyText">${escapeHtml(copy)}</p>
+            ${aiMode ? '<p class="caption">AI는 집계 정보만 보고 문장 톤을 다듬어요.</p>' : ""}
+            ${appState.copyStatus ? `<p class="actionStatus" data-testid="copy-status">${escapeHtml(appState.copyStatus)}</p>` : ""}
           </section>
         `;
       }
 
+      function actionAttrs(action, testId) {
+        return `${action ? `data-action="${escapeHtml(action)}"` : ""} ${testId ? `data-testid="${escapeHtml(testId)}"` : ""}`;
+      }
+
       function stickyBottomCTA(primary, secondary, options = {}) {
-        const disabled = options.disabled ? "disabled aria-disabled=\"true\"" : "";
+        const disabled = options.disabled ? 'disabled aria-disabled="true"' : "";
         const secondaryButton = secondary
-          ? `<button class="quietButton" type="button">${escapeHtml(secondary)}</button>`
+          ? `<button class="quietButton" type="button" ${actionAttrs(options.secondaryAction, options.secondaryTestId)}>${escapeHtml(secondary)}</button>`
           : "";
         return `
           <div class="StickyBottomCTA">
             <div class="buttonRow ${secondary ? "two" : ""}">
-              <button class="${options.secondaryPrimary ? "secondaryButton" : "primaryButton"}" type="button" ${disabled}>${escapeHtml(primary)}</button>
+              <button class="${options.secondaryPrimary ? "secondaryButton" : "primaryButton"}" type="button" ${disabled} ${actionAttrs(options.primaryAction, options.primaryTestId)}>${escapeHtml(primary)}</button>
               ${secondaryButton}
             </div>
           </div>
         `;
       }
 
-      function standardHeader(id) {
+      function standardHeader(id, titleId) {
         const copy = screenCopy(id);
         return `
           <div class="section">
             <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
-            <h1>${escapeHtml(copy.title)}</h1>
+            <h1 id="${escapeHtml(titleId)}">${escapeHtml(copy.title)}</h1>
             <p>${escapeHtml(copy.description)}</p>
           </div>
         `;
       }
 
+      function renderCandidateInputs(room) {
+        const candidates = [...room.candidates, ...defaultCandidates].slice(0, 3);
+        return candidates
+          .map((candidate, index) => `
+            <div class="candidateInputCard">
+              ${reasonChip(index === 0 ? "brand" : "success", `후보 ${index + 1}`)}
+              <div class="formGrid">
+                <label class="inputGroup">
+                  <span class="inputLabel">날짜</span>
+                  <input class="textInput" data-testid="candidate-label-input-${index}" name="candidate-label-${index}" value="${escapeHtml(candidate.label)}" />
+                </label>
+                <label class="inputGroup">
+                  <span class="inputLabel">시간</span>
+                  <input class="textInput" data-testid="candidate-time-input-${index}" name="candidate-time-${index}" value="${escapeHtml(candidate.time)}" />
+                </label>
+              </div>
+              <label class="inputGroup">
+                <span class="inputLabel">장소/메모</span>
+                <input class="textInput" data-testid="candidate-note-input-${index}" name="candidate-note-${index}" value="${escapeHtml(candidate.note)}" />
+              </label>
+            </div>
+          `)
+          .join("");
+      }
+
       const renderers = {
         "scr-00-entry": () => {
           const copy = screenCopy("scr-00-entry");
+          const ranked = rankCandidates(appState.room);
           return `
             <section id="scr-00-entry" class="screen" aria-labelledby="entry-title">
               <div class="screenBody">
@@ -1188,59 +1483,92 @@
                 <div class="surface compactSection">
                   ${reasonChip("brand", "Converging Orbit")}
                   <p class="caption">가능 시간표보다 먼저, 방장이 공유할 수 있는 결론을 만듭니다.</p>
+                  <p class="emptyStateLine">최근 방: ${escapeHtml(appState.room.title)} · ${ranked.responseCount}명 응답</p>
                 </div>
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary)}
+              ${stickyBottomCTA(copy.primary, copy.secondary, {
+                primaryAction: "start-create-room",
+                primaryTestId: "start-create-room",
+                secondaryAction: "open-existing-room",
+              })}
             </section>
           `;
         },
         "scr-01-host-room": () => {
           const copy = screenCopy("scr-01-host-room");
+          const room = appState.room;
           return `
             <section id="scr-01-host-room" class="screen" aria-labelledby="host-title">
               <div class="screenBody">
-                <div class="section">
-                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
-                  <h1 id="host-title">${escapeHtml(copy.title)}</h1>
-                  <p>${escapeHtml(copy.description)}</p>
-                </div>
-                <div class="fieldList" aria-label="방 만들기 입력 요약">
-                  <div class="fieldRow"><span>모임 이름</span><strong>대학 동기 모임</strong></div>
-                  <div class="fieldRow"><span>날짜 범위</span><strong>6.29 토요일 - 6.30 일요일</strong></div>
-                  <div class="fieldRow"><span>예상 인원</span><strong>7명</strong></div>
-                  <div class="fieldRow"><span>응답 마감</span><strong>6.28 금요일 22:00</strong></div>
-                </div>
-                <div class="compactSection">
-                  ${fixture.candidates.map((slot) => candidateSlotCard(slot)).join("")}
-                </div>
+                ${standardHeader("scr-01-host-room", "host-title")}
+                <form class="formStack" data-room-form>
+                  <label class="inputGroup">
+                    <span class="inputLabel">모임 이름</span>
+                    <input class="textInput" data-testid="room-title-input" name="room-title" value="${escapeHtml(room.title)}" />
+                  </label>
+                  <div class="formGrid">
+                    <label class="inputGroup">
+                      <span class="inputLabel">예상 인원</span>
+                      <input class="textInput" data-testid="expected-count-input" name="expected-count" inputmode="numeric" value="${escapeHtml(room.expectedCount)}" />
+                    </label>
+                    <label class="inputGroup">
+                      <span class="inputLabel">응답 마감</span>
+                      <input class="textInput" data-testid="deadline-input" name="deadline" value="${escapeHtml(room.deadlineLabel)}" />
+                    </label>
+                  </div>
+                  ${renderCandidateInputs(room)}
+                </form>
+                <p class="guideNote">실제 링크 공유, Toss login, Supabase 저장은 아직 연결하지 않고 브라우저 안에만 저장해요.</p>
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary)}
+              ${stickyBottomCTA(copy.primary, copy.secondary, {
+                primaryAction: "create-room",
+                primaryTestId: "create-room-button",
+                secondaryAction: "seed-responses",
+              })}
             </section>
           `;
         },
         "scr-02-participant-input": () => {
           const copy = screenCopy("scr-02-participant-input");
+          const room = appState.room;
+          const ranked = rankCandidates(room);
+          const draft = getDraftPreferences(room);
+          const isClosed = room.status === "closed" || room.status === "expired";
           return `
             <section id="scr-02-participant-input" class="screen" aria-labelledby="participant-title">
               <div class="screenBody">
-                <div class="section">
-                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
-                  <h1 id="participant-title">${escapeHtml(copy.title)}</h1>
-                  <p>${escapeHtml(copy.description)}</p>
-                </div>
-                ${reasonChip("brand", "1/5 선택")}
+                ${standardHeader("scr-02-participant-input", "participant-title")}
+                ${reasonChip("brand", `${room.title} · ${ranked.responseCount}/${room.expectedCount} 응답`)}
+                <label class="inputGroup">
+                  <span class="inputLabel">내 이름 또는 별명</span>
+                  <input class="textInput" data-testid="participant-name-input" value="${escapeHtml(appState.currentParticipant)}" placeholder="예: 민지" ${isClosed ? "disabled" : ""} />
+                </label>
                 <div class="compactSection">
-                  ${candidateSlotCard(fixture.candidates[0], true)}
-                  ${candidateSlotCard({ ...fixture.candidates[1], selected: true }, true)}
+                  ${room.candidates
+                    .map((candidate) =>
+                      candidateSlotCard(candidate, {
+                        withSelector: true,
+                        selectedStatus: draft[candidate.id],
+                        disabled: isClosed,
+                      }),
+                    )
+                    .join("")}
                 </div>
-                <p class="guideNote">처음 고른 조정 가능은 “늦거나 일정을 조금 바꾸면 갈 수 있어요”라는 뜻이에요.</p>
+                <p class="guideNote">조정하면 가능해요는 늦거나 일정을 조금 바꾸면 갈 수 있다는 뜻이에요.</p>
               </div>
-              ${stickyBottomCTA(copy.primary)}
+              ${stickyBottomCTA(isClosed ? "응답이 닫혔어요" : copy.primary, null, {
+                primaryAction: "submit-response",
+                primaryTestId: "submit-response-button",
+                disabled: isClosed,
+              })}
             </section>
           `;
         },
         "scr-02b-response-complete": () => {
           const copy = screenCopy("scr-02b-response-complete");
+          const room = appState.room;
+          const ranked = rankCandidates(room);
+          const coverageState = ranked.enough ? "enough" : "low";
           return `
             <section id="scr-02b-response-complete" class="screen" aria-labelledby="complete-title">
               <div class="screenBody">
@@ -1248,64 +1576,76 @@
                 <div class="section">
                   <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
                   <h1 id="complete-title">${escapeHtml(copy.title)}</h1>
-                  <p>${escapeHtml(copy.description)}</p>
+                  <p>${escapeHtml(room.expectedCount)}명 중 ${escapeHtml(ranked.responseCount)}명이 답했어요. 방이 닫히기 전에는 내 응답을 수정할 수 있어요.</p>
                 </div>
-                ${responseCoverage("enough")}
+                ${responseCoverage(room, coverageState)}
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary)}
+              ${stickyBottomCTA(copy.primary, "샘플 응답으로 결과 보기", {
+                primaryAction: "edit-response",
+                secondaryAction: "seed-responses",
+                secondaryTestId: "seed-responses-button",
+              })}
             </section>
           `;
         },
         "scr-03-result-recommendation": () => {
           const copy = screenCopy("scr-03-result-recommendation");
-          const rec = fixture.recommendation;
+          const room = refreshRoomStatus(appState.room);
+          const ranked = rankCandidates(room);
+          if (!ranked.top) return renderers["scr-04-insufficient-response"]();
+          const top = ranked.top;
+          const rec = top.candidate;
+          const alternatives = ranked.alternatives
+            .map((item) =>
+              candidateSlotCard(item.candidate, {
+                summary: item,
+                selected: false,
+              }),
+            )
+            .join("");
           return `
             <section id="scr-03-result-recommendation" class="screen" aria-labelledby="result-title">
               <div class="screenBody">
-                <div class="section">
-                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
-                  <h1 id="result-title">${escapeHtml(copy.title)}</h1>
-                  <p>${escapeHtml(copy.description)}</p>
-                </div>
-                <article class="RecommendationHeroCard" aria-label="추천 1순위">
+                ${standardHeader("scr-03-result-recommendation", "result-title")}
+                <article class="RecommendationHeroCard" aria-label="추천 1순위" data-testid="recommendation-card">
                   <div class="topline">
-                    ${reasonChip("brand", rec.confidenceLabel)}
-                    ${avatarStack(5)}
+                    ${reasonChip("brand", ranked.confidenceLabel)}
+                    ${avatarStack(ranked.responseCount)}
                   </div>
                   <div class="section">
-                    <span class="microLabel">${escapeHtml(rec.label)}</span>
-                    <h2>${escapeHtml(rec.date)} ${escapeHtml(rec.time)}</h2>
-                    <p>${escapeHtml(rec.place)}</p>
+                    <span class="microLabel">추천 1순위</span>
+                    <h2>${escapeHtml(rec.label)} ${escapeHtml(rec.time)}</h2>
+                    <p>${escapeHtml(rec.note)} · ${escapeHtml(room.title)}</p>
                   </div>
-                  <p class="copyText">${escapeHtml(rec.reason)}</p>
+                  <p class="copyText">${escapeHtml(buildShareText(room, ranked))}</p>
                   <div class="metricGrid">
-                    <div class="metric"><b>5</b><span>응답</span></div>
-                    <div class="metric"><b>3</b><span>가장 좋아요</span></div>
-                    <div class="metric"><b>1</b><span>조정 필요</span></div>
+                    <div class="metric"><b>${ranked.responseCount}</b><span>응답</span></div>
+                    <div class="metric"><b>${top.counts.prefer}</b><span>가장 좋아요</span></div>
+                    <div class="metric"><b>${top.counts.adjustable}</b><span>조정 필요</span></div>
                   </div>
                   <div class="topline" aria-label="추천 이유">
-                    ${rec.chips.map(([kind, label]) => reasonChip(kind, label)).join("")}
+                    ${reasonChip("success", `${ranked.responseCount}명 응답`)}
+                    ${reasonChip("brand", `점수 ${top.score}`)}
+                    ${top.counts.hardNo > 0 ? reasonChip("warning", `어려워요 ${top.counts.hardNo}명`) : reasonChip("success", "어려움 없음")}
                   </div>
                 </article>
                 <div class="compactSection" aria-label="다른 후보 보기">
-                  <article class="CandidateSlotCard compact" data-selected="false" data-disabled="false">
-                    <div class="topline">
-                      <div class="slotMeta">
-                        <strong>6.30 일요일 17:00</strong>
-                        <span>가능 인원은 많지만 조정 필요가 더 많아요.</span>
-                      </div>
-                      ${reasonChip("warning", "차선 후보")}
-                    </div>
-                  </article>
+                  ${alternatives || '<p class="emptyStateLine">현재 비교 가능한 차선 후보가 없어요.</p>'}
                 </div>
-                ${shareCopyBox(isAiEnabled() ? "ai" : "template")}
+                ${shareCopyBox(room, ranked, isAiEnabled() ? "ai" : "template")}
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary)}
+              ${stickyBottomCTA(copy.primary, "약속 확정하기", {
+                primaryAction: "copy-share",
+                primaryTestId: "copy-share-button",
+                secondaryAction: "close-room",
+                secondaryTestId: "close-room-button",
+              })}
             </section>
           `;
         },
         "scr-04-insufficient-response": () => {
           const copy = screenCopy("scr-04-insufficient-response");
+          const room = appState.room;
           return `
             <section id="scr-04-insufficient-response" class="screen" aria-labelledby="low-title">
               <div class="screenBody">
@@ -1313,12 +1653,17 @@
                 <div class="section">
                   <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
                   <h1 id="low-title">${escapeHtml(copy.title)}</h1>
-                  <p>${escapeHtml(copy.description)}</p>
+                  <p>${escapeHtml(room.title)}은 아직 응답이 조금 더 필요해요. 집계가 충분해지면 추천을 보여드려요.</p>
                 </div>
-                ${responseCoverage("low")}
+                ${responseCoverage(room, "low")}
                 <p class="guideNote">조금 더 모이면 방장이 설명하기 쉬운 추천안을 만들 수 있어요.</p>
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary, { secondaryPrimary: true })}
+              ${stickyBottomCTA(copy.primary, "샘플 응답으로 결과 보기", {
+                primaryAction: "copy-invite",
+                secondaryAction: "seed-responses",
+                secondaryTestId: "seed-responses-button",
+                secondaryPrimary: true,
+              })}
             </section>
           `;
         },
@@ -1334,16 +1679,22 @@
                   <p>${escapeHtml(copy.description)}</p>
                 </div>
                 <div class="surface compactSection">
-                  ${reasonChip("danger", "write action 없음")}
+                  ${reasonChip("danger", "응답 닫힘")}
                   <p class="caption">방장이 새 링크를 열면 다시 응답할 수 있어요.</p>
                 </div>
               </div>
-              ${stickyBottomCTA(copy.primary, null, { secondaryPrimary: true })}
+              ${stickyBottomCTA(copy.primary, null, { primaryAction: "go-home", secondaryPrimary: true })}
             </section>
           `;
         },
         "scr-06-room-closed": () => {
           const copy = screenCopy("scr-06-room-closed");
+          const room = appState.room;
+          const ranked = rankCandidates(room);
+          const selected =
+            room.candidates.find((candidate) => candidate.id === room.selectedCandidateId) ||
+            ranked.top?.candidate ||
+            room.candidates[0];
           return `
             <section id="scr-06-room-closed" class="screen" aria-labelledby="closed-title">
               <div class="screenBody">
@@ -1356,21 +1707,32 @@
                 <article class="RecommendationHeroCard" aria-label="확정 카드">
                   ${reasonChip("success", "확정 카드")}
                   <div class="section">
-                    <h2>6.29 토요일 18:30</h2>
-                    <p>강남역 근처 · 대학 동기 모임 · 참여 7명</p>
+                    <h2>${escapeHtml(selected.label)} ${escapeHtml(selected.time)}</h2>
+                    <p>${escapeHtml(selected.note)} · ${escapeHtml(room.title)} · 응답 ${escapeHtml(ranked.responseCount)}명</p>
                   </div>
                   <p class="copyText">모두에게 공유할 결과에는 확정 시간과 전체 응답 흐름만 담아요.</p>
                 </article>
+                ${shareCopyBox(room, ranked)}
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary)}
+              ${stickyBottomCTA(copy.primary, copy.secondary, {
+                primaryAction: "copy-share",
+                primaryTestId: "copy-share-button",
+                secondaryAction: "start-create-room",
+              })}
             </section>
           `;
         },
       };
 
+      function currentScreen() {
+        const params = new URLSearchParams(window.location.search);
+        return screenOrder.includes(params.get("screen")) ? params.get("screen") : "scr-00-entry";
+      }
+
       function selectScreen(nextScreen, replace = false) {
         const screen = screenOrder.includes(nextScreen) ? nextScreen : "scr-00-entry";
         const params = new URLSearchParams(window.location.search);
+        params.delete("reset");
         params.set("screen", screen);
         const nextUrl = `${window.location.pathname}?${params.toString()}`;
         if (replace) window.history.replaceState({}, "", nextUrl);
@@ -1378,11 +1740,11 @@
         render(screen);
       }
 
-      function renderTabs(currentScreen) {
+      function renderTabs(activeScreen) {
         tabsRoot.innerHTML = screenOrder
           .map((screen) => {
             const copy = screenCopy(screen);
-            return `<button class="tabButton" type="button" role="tab" aria-selected="${screen === currentScreen}" aria-controls="${screen}" data-screen="${screen}" data-active="${screen === currentScreen}">
+            return `<button class="tabButton" type="button" role="tab" aria-selected="${screen === activeScreen}" aria-controls="${screen}" data-screen="${screen}" data-active="${screen === activeScreen}">
               <span>${escapeHtml(copy.tab)}</span><span aria-hidden="true">›</span>
             </button>`;
           })
@@ -1399,13 +1761,158 @@
         renderTabs(current);
       }
 
+      function readRoomForm() {
+        const form = screenRoot.querySelector("[data-room-form]");
+        const candidateInputs = [0, 1, 2].map((index) => ({
+          id: `slot-${index + 1}`,
+          label: form?.querySelector(`[name="candidate-label-${index}"]`)?.value || defaultCandidates[index].label,
+          time: form?.querySelector(`[name="candidate-time-${index}"]`)?.value || defaultCandidates[index].time,
+          note: form?.querySelector(`[name="candidate-note-${index}"]`)?.value || defaultCandidates[index].note,
+        }));
+        return {
+          title: form?.querySelector('[name="room-title"]')?.value || "새 모임",
+          expectedCount: form?.querySelector('[name="expected-count"]')?.value || 7,
+          deadlineLabel: form?.querySelector('[name="deadline"]')?.value || "오늘 22:00",
+          candidates: candidateInputs,
+          responses: [],
+          status: "collecting",
+        };
+      }
+
+      function createRoomFromForm() {
+        appState = {
+          version: APP_VERSION,
+          room: createDemoRoom(readRoomForm()),
+          draftPreferences: {},
+          currentParticipant: "",
+          copyStatus: "",
+        };
+        appState.draftPreferences = getDraftPreferences(appState.room);
+        saveState();
+        selectScreen("scr-02-participant-input");
+      }
+
+      function submitResponse() {
+        const room = appState.room;
+        if (room.status === "closed" || room.status === "expired") return;
+        const aliasInput = screenRoot.querySelector('[data-testid="participant-name-input"]');
+        const alias = (aliasInput?.value || appState.currentParticipant || "익명").trim();
+        appState.currentParticipant = alias;
+        const draft = getDraftPreferences(room);
+        room.responses = room.responses.filter((response) => response.alias !== alias);
+        room.responses.push(
+          normalizeResponse({
+            id: `response-${Date.now().toString(36)}`,
+            alias,
+            preferences: draft,
+          }),
+        );
+        refreshRoomStatus(room);
+        appState.copyStatus = "";
+        saveState();
+        selectScreen("scr-02b-response-complete");
+      }
+
+      function seedResponses() {
+        const room = appState.room;
+        if (room.status === "closed" || room.status === "expired") return;
+        const existingAliases = new Set(room.responses.map((response) => response.alias));
+        for (const response of sampleResponsesFor(room)) {
+          if (!existingAliases.has(response.alias)) {
+            room.responses.push(response);
+            existingAliases.add(response.alias);
+          }
+          if (room.responses.length >= minimumResponses(room.expectedCount)) break;
+        }
+        refreshRoomStatus(room);
+        appState.copyStatus = "";
+        saveState();
+        selectScreen(rankCandidates(room).top ? "scr-03-result-recommendation" : "scr-04-insufficient-response");
+      }
+
+      async function copyShareText() {
+        const text = buildShareText(appState.room, rankCandidates(appState.room));
+        try {
+          await navigator.clipboard?.writeText(text);
+        } catch {
+          const holder = document.createElement("textarea");
+          holder.value = text;
+          holder.setAttribute("readonly", "");
+          holder.style.position = "fixed";
+          holder.style.opacity = "0";
+          document.body.appendChild(holder);
+          holder.select();
+          try {
+            document.execCommand("copy");
+          } finally {
+            holder.remove();
+          }
+        }
+        appState.copyStatus = "복사했어요";
+        saveState();
+        render(currentScreen());
+      }
+
+      function closeRoom() {
+        const ranked = rankCandidates(appState.room);
+        appState.room.selectedCandidateId = ranked.top?.candidate.id || appState.room.candidates[0].id;
+        appState.room.status = "closed";
+        appState.room.closedAt = new Date().toISOString();
+        appState.copyStatus = "";
+        saveState();
+        selectScreen("scr-06-room-closed");
+      }
+
+      function handleAction(action, target) {
+        if (!action) return;
+        if (action === "start-create-room") {
+          appState.copyStatus = "";
+          selectScreen("scr-01-host-room");
+        }
+        if (action === "open-existing-room") {
+          const ranked = rankCandidates(appState.room);
+          selectScreen(ranked.top ? "scr-03-result-recommendation" : "scr-02-participant-input");
+        }
+        if (action === "create-room") createRoomFromForm();
+        if (action === "set-preference") {
+          appState.draftPreferences = getDraftPreferences(appState.room);
+          appState.draftPreferences[target.dataset.candidateId] = normalizeStatus(target.dataset.status);
+          appState.copyStatus = "";
+          saveState();
+          render(currentScreen());
+        }
+        if (action === "submit-response") submitResponse();
+        if (action === "edit-response") selectScreen("scr-02-participant-input");
+        if (action === "seed-responses") seedResponses();
+        if (action === "copy-share" || action === "copy-invite") copyShareText();
+        if (action === "close-room") closeRoom();
+        if (action === "go-home") selectScreen("scr-00-entry");
+      }
+
+      screenRoot.addEventListener("click", (event) => {
+        const target = event.target.closest("[data-action]");
+        handleAction(target?.dataset.action, target);
+      });
+
+      screenRoot.addEventListener("input", (event) => {
+        if (event.target.matches('[data-testid="participant-name-input"]')) {
+          appState.currentParticipant = event.target.value;
+        }
+      });
+
+      window.HAMMOYEO_MVP_TESTS = {
+        minimumResponses,
+        rankCandidates,
+        buildShareText,
+        createDemoRoom,
+      };
+
       const initialParams = new URLSearchParams(window.location.search);
       const initialScreen = initialParams.get("screen") || "scr-00-entry";
       selectScreen(initialScreen, true);
 
       window.addEventListener("popstate", () => {
-        const params = new URLSearchParams(window.location.search);
-        render(params.get("screen") || "scr-00-entry");
+        render(currentScreen());
       });
     </script>
   </body>
