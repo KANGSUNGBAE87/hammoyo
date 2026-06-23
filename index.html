@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>함모여 디자인 MVP</title>
+    <style>
+      :root {
+        --brand: #5B5FF5;
+        --brand-pressed: #4F46E5;
+        --brand-soft: #EEF0FF;
+        --background: #F5F7FB;
+        --surface: #FFFFFF;
+        --surface-raised: #FBFCFF;
+        --text-primary: #111827;
+        --text-secondary: #667085;
+        --text-tertiary: #98A2B3;
+        --border: #E7EAF0;
+        --success: #20B87A;
+        --success-soft: #E8F8F1;
+        --warning: #F2A62B;
+        --warning-soft: #FFF6DF;
+        --danger: #EB5757;
+        --danger-soft: #FFF0F0;
+        --info: #4F83F1;
+        --page-padding: 20px;
+        --section-gap: 32px;
+        --card-padding: 16px;
+        --radius-sm: 10px;
+        --radius-md: 14px;
+        --radius-lg: 18px;
+        --radius-xl: 24px;
+        --radius-pill: 999px;
+        --touch-target: 44px;
+        --bottom-cta-height: 56px;
+        --shadow-card: 0 8px 24px rgba(28, 39, 63, 0.08);
+        --shadow-floating: 0 12px 36px rgba(63, 63, 120, 0.14);
+        --shadow-pressed: 0 2px 8px rgba(28, 39, 63, 0.10);
+        --motion-fast: 140ms;
+        --motion-base: 200ms;
+        --motion-slow: 280ms;
+        --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-width: 320px;
+        background: var(--background);
+      }
+
+      body {
+        margin: 0;
+        color: var(--text-primary);
+        background: var(--background);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        letter-spacing: 0;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button:focus-visible,
+      input:focus-visible {
+        outline: 3px solid rgba(91, 95, 245, 0.26);
+        outline-offset: 2px;
+      }
+
+      .page {
+        min-height: 100dvh;
+        padding: 24px;
+      }
+
+      .layout {
+        width: min(1080px, 100%);
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(360px, 390px) minmax(280px, 1fr);
+        gap: 24px;
+        align-items: start;
+      }
+
+      .phone {
+        width: 100%;
+        max-width: 390px;
+        min-height: 740px;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        background: var(--surface);
+        box-shadow: var(--shadow-floating);
+        overflow: hidden;
+      }
+
+      .app {
+        min-height: 740px;
+        display: flex;
+        flex-direction: column;
+        background: var(--background);
+      }
+
+      .topbar {
+        min-height: 60px;
+        padding: 14px var(--page-padding) 10px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .brand {
+        min-height: var(--touch-target);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .brand strong {
+        font-size: 18px;
+        line-height: 26px;
+        font-weight: 700;
+      }
+
+      .screenRoot {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .screen {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--section-gap);
+        padding: var(--page-padding);
+        padding-bottom: calc(var(--page-padding) + env(safe-area-inset-bottom, 0px));
+        animation: screenEnter var(--motion-slow) var(--ease-standard);
+      }
+
+      .screenBody {
+        display: grid;
+        gap: var(--section-gap);
+      }
+
+      .section {
+        display: grid;
+        gap: 12px;
+      }
+
+      .compactSection {
+        display: grid;
+        gap: 10px;
+      }
+
+      .eyebrow,
+      .microLabel {
+        color: var(--brand);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 700;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 28px;
+        line-height: 36px;
+        font-weight: 700;
+      }
+
+      h2 {
+        font-size: 22px;
+        line-height: 30px;
+        font-weight: 700;
+      }
+
+      h3 {
+        font-size: 18px;
+        line-height: 26px;
+        font-weight: 600;
+      }
+
+      p {
+        color: var(--text-secondary);
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+      }
+
+      .caption {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 18px;
+      }
+
+      .topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .pill,
+      .ReasonChip {
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        max-width: 100%;
+        padding: 5px 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        color: var(--text-secondary);
+        background: var(--surface);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 700;
+        white-space: normal;
+      }
+
+      .ReasonChip.success {
+        border-color: transparent;
+        color: #147D55;
+        background: var(--success-soft);
+      }
+
+      .ReasonChip.warning {
+        border-color: transparent;
+        color: #8A5A12;
+        background: var(--warning-soft);
+      }
+
+      .ReasonChip.danger {
+        border-color: transparent;
+        color: #B63B3B;
+        background: var(--danger-soft);
+      }
+
+      .ReasonChip.brand {
+        border-color: transparent;
+        color: var(--brand);
+        background: var(--brand-soft);
+      }
+
+      .surface,
+      .CandidateSlotCard,
+      .RecommendationHeroCard,
+      .ShareCopyBox,
+      .ResponseCoverage {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow-card);
+      }
+
+      .surface,
+      .CandidateSlotCard,
+      .ShareCopyBox,
+      .ResponseCoverage {
+        padding: var(--card-padding);
+      }
+
+      .RecommendationHeroCard {
+        position: relative;
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+        border-radius: var(--radius-xl);
+        background: var(--brand-soft);
+        box-shadow: var(--shadow-floating);
+        overflow: hidden;
+      }
+
+      .RecommendationHeroCard::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        border: 1px solid rgba(91, 95, 245, 0.18);
+      }
+
+      .RecommendationHeroCard > * {
+        position: relative;
+      }
+
+      .CandidateSlotCard {
+        display: grid;
+        gap: 12px;
+        transition:
+          transform var(--motion-base) var(--ease-standard),
+          border-color var(--motion-base) var(--ease-standard),
+          box-shadow var(--motion-base) var(--ease-standard);
+      }
+
+      .CandidateSlotCard[data-selected="true"] {
+        border-color: rgba(91, 95, 245, 0.38);
+        box-shadow: var(--shadow-floating);
+      }
+
+      .CandidateSlotCard[data-disabled="true"] {
+        opacity: 0.66;
+      }
+
+      .CandidateSlotCard.compact {
+        box-shadow: none;
+      }
+
+      .slotMeta {
+        display: grid;
+        gap: 2px;
+      }
+
+      .slotMeta strong,
+      .ShareCopyBox strong {
+        color: var(--text-primary);
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 600;
+      }
+
+      .slotMeta span {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 18px;
+      }
+
+      .PreferenceSelector {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .preferenceOption {
+        min-height: var(--touch-target);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        background: var(--surface);
+        font-size: 13px;
+        line-height: 18px;
+        font-weight: 700;
+        transition:
+          transform var(--motion-fast) var(--ease-standard),
+          box-shadow var(--motion-fast) var(--ease-standard),
+          border-color var(--motion-fast) var(--ease-standard);
+      }
+
+      .preferenceOption[data-selected="true"] {
+        box-shadow: var(--shadow-pressed);
+      }
+
+      .preferenceOption[data-status="prefer"][data-selected="true"] {
+        border-color: var(--brand);
+        color: var(--surface);
+        background: var(--brand);
+      }
+
+      .preferenceOption[data-status="available"][data-selected="true"] {
+        border-color: #BCEBD7;
+        color: #147D55;
+        background: var(--success-soft);
+      }
+
+      .preferenceOption[data-status="adjustable"][data-selected="true"] {
+        border-color: #F7D58A;
+        color: #8A5A12;
+        background: var(--warning-soft);
+      }
+
+      .preferenceOption[data-status="hardNo"][data-selected="true"] {
+        border-color: #F6C2C2;
+        color: #B63B3B;
+        background: var(--danger-soft);
+      }
+
+      .StateGraphic {
+        min-height: 156px;
+        display: grid;
+        place-items: center;
+        isolation: isolate;
+      }
+
+      .gatherScene {
+        position: relative;
+        width: 190px;
+        height: 150px;
+      }
+
+      .personToken,
+      .calendarTile,
+      .hourglassTile,
+      .checkTile {
+        position: absolute;
+        border: 1px solid rgba(17, 24, 39, 0.06);
+        box-shadow: 0 14px 28px rgba(63, 63, 120, 0.13);
+      }
+
+      .personToken {
+        width: 46px;
+        height: 58px;
+        border-radius: 24px 24px 20px 20px;
+        background: var(--brand-soft);
+      }
+
+      .personToken::before {
+        content: "";
+        position: absolute;
+        top: -20px;
+        left: 8px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: inherit;
+        border: inherit;
+      }
+
+      .personToken.one {
+        left: 36px;
+        top: 58px;
+        background: #FFD0B8;
+      }
+
+      .personToken.two {
+        left: 74px;
+        top: 44px;
+        background: #BCEBD7;
+      }
+
+      .personToken.three {
+        left: 112px;
+        top: 60px;
+        background: #C9D6FF;
+      }
+
+      .personToken.four {
+        left: 82px;
+        top: 82px;
+        background: #EEF0FF;
+      }
+
+      .calendarTile,
+      .hourglassTile,
+      .checkTile {
+        display: grid;
+        place-items: center;
+        width: 56px;
+        height: 56px;
+        left: 67px;
+        top: 9px;
+        border-radius: var(--radius-md);
+        color: var(--brand);
+        background: var(--surface);
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      .hourglassTile {
+        color: var(--warning);
+      }
+
+      .checkTile {
+        color: var(--success);
+      }
+
+      .StateGraphic[data-variant="low"] .personToken.two,
+      .StateGraphic[data-variant="low"] .personToken.three {
+        transform: translateX(12px);
+      }
+
+      .StateGraphic[data-variant="expired"] .personToken {
+        opacity: 0.34;
+      }
+
+      .ParticipantAvatarStack {
+        display: flex;
+        align-items: center;
+        min-height: var(--touch-target);
+      }
+
+      .avatarToken {
+        width: 32px;
+        height: 32px;
+        display: grid;
+        place-items: center;
+        margin-left: -6px;
+        border: 2px solid var(--surface);
+        border-radius: 50%;
+        color: var(--brand);
+        background: var(--brand-soft);
+        font-size: 11px;
+        line-height: 1;
+        font-weight: 800;
+      }
+
+      .avatarToken:first-child {
+        margin-left: 0;
+      }
+
+      .avatarToken.success {
+        color: #147D55;
+        background: var(--success-soft);
+      }
+
+      .avatarToken.warning {
+        color: #8A5A12;
+        background: var(--warning-soft);
+      }
+
+      .metricGrid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .metric {
+        min-height: 68px;
+        display: grid;
+        align-content: center;
+        gap: 2px;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface-raised);
+      }
+
+      .metric b {
+        color: var(--text-primary);
+        font-size: 20px;
+        line-height: 26px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .metric span {
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 600;
+      }
+
+      .coverageTrack {
+        height: 8px;
+        border-radius: var(--radius-pill);
+        background: var(--border);
+        overflow: hidden;
+      }
+
+      .coverageFill {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--brand);
+      }
+
+      .ShareCopyBox {
+        display: grid;
+        gap: 10px;
+      }
+
+      .copyText {
+        color: var(--text-primary);
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .StickyBottomCTA {
+        position: sticky;
+        bottom: 0;
+        display: grid;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 12px;
+        background: linear-gradient(
+          rgba(245, 247, 251, 0),
+          var(--background) 18px,
+          var(--background)
+        );
+      }
+
+      .buttonRow {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .buttonRow.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .primaryButton,
+      .secondaryButton,
+      .quietButton {
+        min-height: var(--bottom-cta-height);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 0 14px;
+        border-radius: var(--radius-lg);
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 800;
+        transition:
+          transform var(--motion-fast) var(--ease-standard),
+          box-shadow var(--motion-fast) var(--ease-standard),
+          background var(--motion-base) var(--ease-standard);
+      }
+
+      .primaryButton {
+        border: 0;
+        color: var(--surface);
+        background: var(--brand);
+        box-shadow: 0 10px 20px rgba(91, 95, 245, 0.24);
+      }
+
+      .primaryButton:active,
+      .secondaryButton:active,
+      .quietButton:active,
+      .preferenceOption:active {
+        transform: translateY(1px);
+      }
+
+      .primaryButton:hover {
+        background: var(--brand-pressed);
+      }
+
+      .secondaryButton {
+        border: 1px solid transparent;
+        color: var(--brand);
+        background: var(--brand-soft);
+      }
+
+      .quietButton {
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        background: var(--surface);
+      }
+
+      .fieldList {
+        display: grid;
+        gap: 10px;
+      }
+
+      .fieldRow {
+        min-height: var(--touch-target);
+        display: grid;
+        gap: 4px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+      }
+
+      .fieldRow span {
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 600;
+      }
+
+      .fieldRow strong {
+        color: var(--text-primary);
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .guideNote {
+        padding: 12px 14px;
+        border-radius: var(--radius-md);
+        color: var(--text-secondary);
+        background: var(--surface-raised);
+        font-size: 13px;
+        line-height: 18px;
+      }
+
+      .tabsPanel {
+        display: grid;
+        gap: 16px;
+      }
+
+      .tabsIntro {
+        display: grid;
+        gap: 8px;
+      }
+
+      .tabs {
+        display: grid;
+        gap: 8px;
+      }
+
+      .tabButton {
+        min-height: var(--touch-target);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        background: var(--surface);
+        text-align: left;
+      }
+
+      .tabButton[data-active="true"] {
+        border-color: rgba(91, 95, 245, 0.4);
+        color: var(--brand);
+        background: var(--brand-soft);
+        font-weight: 800;
+      }
+
+      .designPanel {
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        background: var(--surface);
+        box-shadow: var(--shadow-card);
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .swatch {
+        min-height: 52px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+        overflow: hidden;
+      }
+
+      .swatch span {
+        display: block;
+        height: 28px;
+      }
+
+      .swatch b {
+        display: block;
+        padding: 5px 6px;
+        color: var(--text-secondary);
+        font-size: 11px;
+        line-height: 14px;
+      }
+
+      @keyframes screenEnter {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 860px) {
+        .page {
+          padding: 0;
+        }
+
+        .layout {
+          width: 100%;
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+
+        .phone {
+          max-width: none;
+          min-height: 100dvh;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+        }
+
+        .app {
+          min-height: 100dvh;
+        }
+
+        .tabsPanel {
+          display: none;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .PreferenceSelector,
+        .metricGrid {
+          grid-template-columns: 1fr;
+        }
+
+        .buttonRow.two {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 26px;
+          line-height: 34px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-property: opacity, background, border-color, box-shadow !important;
+        }
+
+        .screen,
+        .preferenceOption,
+        .CandidateSlotCard,
+        .primaryButton,
+        .secondaryButton,
+        .quietButton,
+        .StateGraphic[data-variant="low"] .personToken.two,
+        .StateGraphic[data-variant="low"] .personToken.three {
+          transform: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body data-ai-copy-enabled="false">
+    <main class="page">
+      <div class="layout">
+        <section class="phone" aria-label="함모여 모바일 디자인 MVP">
+          <div class="app">
+            <header class="topbar">
+              <div class="brand">
+                <strong>함모여</strong>
+                <span class="pill">디자인 MVP</span>
+              </div>
+            </header>
+            <div id="screen-root" class="screenRoot" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <aside class="tabsPanel" aria-label="샘플 화면 선택">
+          <div class="tabsIntro">
+            <p class="eyebrow">HAMMOYEO_DESIGN_PACKAGE</p>
+            <h2>Converging Orbit 기준 화면</h2>
+            <p>
+              토큰, 카피, 상태 정책은 패키지 문서를 기준으로 재구성했습니다.
+              각 화면은 query parameter로 직접 열 수 있습니다.
+            </p>
+          </div>
+          <nav id="screen-tabs" class="tabs" aria-label="화면 목록" role="tablist"></nav>
+          <section class="designPanel" aria-label="디자인 토큰 요약">
+            <h3>토큰 요약</h3>
+            <div class="swatches" aria-label="주요 색상">
+              <div class="swatch"><span style="background: var(--brand)"></span><b>브랜드</b></div>
+              <div class="swatch"><span style="background: var(--brand-soft)"></span><b>소프트</b></div>
+              <div class="swatch"><span style="background: var(--success)"></span><b>가능</b></div>
+              <div class="swatch"><span style="background: var(--warning)"></span><b>조정</b></div>
+              <div class="swatch"><span style="background: var(--danger)"></span><b>어려움</b></div>
+            </div>
+            <p class="caption">
+              React Bits는 현 정적 HTML 단계에서는 설치하지 않고, StateGraphic과 press motion을
+              DOM/CSS로 직접 구현했습니다.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <script type="application/json" id="locale-ko">
+      {
+        "brand": {
+          "name": "함모여",
+          "tagline": "다 같이 모일 수 있는 시간을 찾아요."
+        },
+        "screens": {
+          "scr-00-entry": {
+            "tab": "SCR-00 직접 진입 홈",
+            "eyebrow": "직접 진입 홈",
+            "title": "다들 되는 시간을 정리해드려요",
+            "description": "가능한 시간을 모으면, 가장 현실적인 약속안을 추천해요.",
+            "primary": "새 모임 만들기",
+            "secondary": "참여 중인 모임 보기"
+          },
+          "scr-01-host-room": {
+            "tab": "SCR-01 방장 방 만들기",
+            "eyebrow": "방장 방 만들기",
+            "title": "60초 안에 초대 링크를 준비해요",
+            "description": "모임 이름과 날짜 범위만 정하면 후보 시간은 함모여가 먼저 제안해요.",
+            "primary": "초대 링크 만들기",
+            "secondary": "후보 시간 만들기"
+          },
+          "scr-02-participant-input": {
+            "tab": "SCR-02 참여자 응답",
+            "eyebrow": "참여자 응답",
+            "title": "가능한 정도만 빠르게 골라요",
+            "description": "다른 사람의 상세 응답은 보이지 않아요. 내 상태만 10~30초 안에 고르면 됩니다.",
+            "primary": "응답 보내기"
+          },
+          "scr-02b-response-complete": {
+            "tab": "SCR-02B 응답 완료",
+            "eyebrow": "응답 완료",
+            "title": "응답을 보냈어요",
+            "description": "현재 7명 중 5명이 답했어요. 방이 닫히기 전에는 내 응답을 수정할 수 있어요.",
+            "primary": "내 응답 수정하기",
+            "secondary": "아직 답하지 않은 친구에게 공유하기"
+          },
+          "scr-03-result-recommendation": {
+            "tab": "SCR-03 추천 결과",
+            "eyebrow": "추천 결과",
+            "title": "추천 1순위를 먼저 확인하세요",
+            "description": "원시 점수 대신 방장이 설명하기 쉬운 이유와 집계만 보여줍니다.",
+            "primary": "이 안으로 공유하기",
+            "secondary": "다른 후보 보기"
+          },
+          "scr-04-insufficient-response": {
+            "tab": "SCR-04 응답 부족",
+            "eyebrow": "응답 부족",
+            "title": "조금만 더 모이면 추천할 수 있어요",
+            "description": "7명 중 3명이 답했어요. 2명만 더 답하면 추천을 시작해요.",
+            "primary": "다시 공유하기",
+            "secondary": "현재 응답 보기"
+          },
+          "scr-05-link-expired": {
+            "tab": "SCR-05 만료 링크",
+            "eyebrow": "만료 링크",
+            "title": "응답 기간이 끝났어요",
+            "description": "이 링크에서는 새 응답을 보낼 수 없어요. 방장에게 새 링크를 받아주세요.",
+            "primary": "홈으로 돌아가기"
+          },
+          "scr-06-room-closed": {
+            "tab": "SCR-06 확정 완료",
+            "eyebrow": "확정 완료",
+            "title": "약속을 확정했어요",
+            "description": "확정 뒤에는 응답 수정과 추천 재계산을 하지 않아요.",
+            "primary": "확정 내용 공유하기",
+            "secondary": "같은 멤버로 새 모임 만들기"
+          }
+        },
+        "status": {
+          "prefer": "가장 좋아요",
+          "available": "가능해요",
+          "adjustable": "조정하면 가능해요",
+          "hardNo": "어려워요"
+        },
+        "shareLabel": {
+          "template": "기본 문구",
+          "ai": "AI로 문장을 다듬었어요",
+          "fallback": "기본 문구로 만들었어요"
+        },
+        "coverageLabel": {
+          "collecting": "응답 수집 중",
+          "enough": "추천 가능"
+        }
+      }
+    </script>
+
+    <script>
+      const locale = JSON.parse(document.getElementById("locale-ko").textContent);
+      const screenRoot = document.getElementById("screen-root");
+      const tabsRoot = document.getElementById("screen-tabs");
+      const screenOrder = [
+        "scr-00-entry",
+        "scr-01-host-room",
+        "scr-02-participant-input",
+        "scr-02b-response-complete",
+        "scr-03-result-recommendation",
+        "scr-04-insufficient-response",
+        "scr-05-link-expired",
+        "scr-06-room-closed",
+      ];
+
+      const fixture = {
+        expectedCount: 7,
+        responseCount: 5,
+        minimumResponses: 5,
+        aiCopyEnabled: false,
+        candidates: [
+          {
+            label: "6.29 토요일",
+            time: "18:30",
+            note: "강남역 근처, 저녁 식사",
+            selected: true,
+            status: "available",
+          },
+          {
+            label: "6.30 일요일",
+            time: "17:00",
+            note: "잠실, 카페 가능",
+            selected: false,
+            status: "adjustable",
+          },
+        ],
+        recommendation: {
+          confidence: "medium",
+          confidenceLabel: "신뢰도 보통",
+          bucket: "ADJUSTMENT",
+          label: "추천 1순위",
+          date: "6.29 토요일",
+          time: "18:30",
+          place: "강남역 근처",
+          reason: "모두 참석할 수 있고, 일부만 조금 조정하면 되는 시간이에요.",
+          chips: [
+            ["success", "5명 응답"],
+            ["brand", "가장 좋아요 3명"],
+            ["warning", "조정 필요 1명"],
+          ],
+          shareCopy:
+            "현재 응답 기준으로는 6.29 토요일 18:30이 가장 현실적인 약속안이에요. 크게 조정할 내용이 없다면 이 시간으로 정리해볼게요.",
+        },
+      };
+
+      const statusMeta = {
+        prefer: { icon: "★", className: "brand" },
+        available: { icon: "✓", className: "success" },
+        adjustable: { icon: "≋", className: "warning" },
+        hardNo: { icon: "−", className: "danger" },
+      };
+
+      const escapeHtml = (value) =>
+        String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+
+      const isAiEnabled = () => {
+        const params = new URLSearchParams(window.location.search);
+        return document.body.dataset.aiCopyEnabled === "true" || params.get("ai") === "on";
+      };
+
+      const screenCopy = (id) => locale.screens[id];
+
+      function reasonChip(kind, label) {
+        return `<span class="ReasonChip ${kind}"><span aria-hidden="true">${kind === "success" ? "✓" : kind === "warning" ? "!" : kind === "danger" ? "−" : "•"}</span>${escapeHtml(label)}</span>`;
+      }
+
+      function stateGraphic(variant, label) {
+        const tile = variant === "expired" ? "hourglassTile" : variant === "closed" ? "checkTile" : "calendarTile";
+        const mark = variant === "expired" ? "!" : variant === "closed" ? "✓" : "25";
+        return `
+          <div class="StateGraphic" data-variant="${variant}" role="img" aria-label="${escapeHtml(label)}">
+            <div class="gatherScene" aria-hidden="true">
+              <div class="${tile}">${mark}</div>
+              <div class="personToken one"></div>
+              <div class="personToken two"></div>
+              <div class="personToken three"></div>
+              <div class="personToken four"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      function candidateSlotCard(slot, withSelector = false) {
+        const status = statusMeta[slot.status];
+        const chip = reasonChip(status.className, locale.status[slot.status]);
+        const selector = withSelector ? preferenceSelector(slot.status) : "";
+        return `
+          <article class="CandidateSlotCard" data-selected="${slot.selected}" data-disabled="false">
+            <div class="topline">
+              <div class="slotMeta">
+                <strong>${escapeHtml(slot.label)} ${escapeHtml(slot.time)}</strong>
+                <span>${escapeHtml(slot.note)}</span>
+              </div>
+              ${chip}
+            </div>
+            ${selector}
+          </article>
+        `;
+      }
+
+      function preferenceSelector(selected) {
+        return `
+          <div class="PreferenceSelector" role="group" aria-label="후보 시간 선호 선택">
+            ${Object.entries(locale.status)
+              .map(([key, label]) => {
+                const meta = statusMeta[key];
+                return `<button class="preferenceOption" type="button" data-status="${key}" data-selected="${selected === key}" aria-pressed="${selected === key}">
+                  <span aria-hidden="true">${meta.icon}</span><span>${label}</span>
+                </button>`;
+              })
+              .join("")}
+          </div>
+        `;
+      }
+
+      function responseCoverage(state = "enough") {
+        const percent = Math.round((fixture.responseCount / fixture.expectedCount) * 100);
+        const need = Math.max(0, fixture.minimumResponses - fixture.responseCount);
+        const label =
+          state === "low"
+            ? `${need}명만 더 답하면 추천을 시작해요.`
+            : `${fixture.expectedCount}명 중 ${fixture.responseCount}명이 답했어요.`;
+        const chipLabel = state === "low" ? locale.coverageLabel.collecting : locale.coverageLabel.enough;
+        return `
+          <section class="ResponseCoverage" aria-label="응답률">
+            <div class="topline">
+              <h3>응답 현황</h3>
+              ${reasonChip(state === "low" ? "warning" : "success", chipLabel)}
+            </div>
+            <div class="coverageTrack" aria-hidden="true"><div class="coverageFill" style="width: ${percent}%"></div></div>
+            <p class="caption">${label}</p>
+          </section>
+        `;
+      }
+
+      function avatarStack(count = 5) {
+        const tokens = Array.from({ length: Math.min(count, 8) }, (_, index) => {
+          const type = index % 3 === 0 ? "success" : index % 3 === 1 ? "warning" : "";
+          return `<span class="avatarToken ${type}" aria-hidden="true">${index + 1}</span>`;
+        }).join("");
+        return `<div class="ParticipantAvatarStack" aria-label="${count}명 응답 집계">${tokens}${count > 8 ? '<span class="avatarToken">+ </span>' : ""}</div>`;
+      }
+
+      function shareCopyBox(mode = "template") {
+        const label = isAiEnabled() && mode === "ai" ? locale.shareLabel.ai : locale.shareLabel.template;
+        return `
+          <section class="ShareCopyBox" aria-label="공유 문구">
+            ${reasonChip(isAiEnabled() && mode === "ai" ? "brand" : "success", label)}
+            <p class="copyText">${escapeHtml(fixture.recommendation.shareCopy)}</p>
+            ${isAiEnabled() && mode === "ai" ? '<p class="caption">AI는 집계 정보만 보고 문장 톤을 다듬어요.</p>' : ""}
+          </section>
+        `;
+      }
+
+      function stickyBottomCTA(primary, secondary, options = {}) {
+        const disabled = options.disabled ? "disabled aria-disabled=\"true\"" : "";
+        const secondaryButton = secondary
+          ? `<button class="quietButton" type="button">${escapeHtml(secondary)}</button>`
+          : "";
+        return `
+          <div class="StickyBottomCTA">
+            <div class="buttonRow ${secondary ? "two" : ""}">
+              <button class="${options.secondaryPrimary ? "secondaryButton" : "primaryButton"}" type="button" ${disabled}>${escapeHtml(primary)}</button>
+              ${secondaryButton}
+            </div>
+          </div>
+        `;
+      }
+
+      function standardHeader(id) {
+        const copy = screenCopy(id);
+        return `
+          <div class="section">
+            <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+            <h1>${escapeHtml(copy.title)}</h1>
+            <p>${escapeHtml(copy.description)}</p>
+          </div>
+        `;
+      }
+
+      const renderers = {
+        "scr-00-entry": () => {
+          const copy = screenCopy("scr-00-entry");
+          return `
+            <section id="scr-00-entry" class="screen" aria-labelledby="entry-title">
+              <div class="screenBody">
+                ${stateGraphic("entry", "둥근 참여자 토큰이 중앙의 캘린더로 모이는 그래픽")}
+                <div class="section">
+                  <span class="eyebrow">${escapeHtml(locale.brand.name)}</span>
+                  <h1 id="entry-title">${escapeHtml(copy.title)}</h1>
+                  <p>${escapeHtml(copy.description)}</p>
+                </div>
+                <div class="surface compactSection">
+                  ${reasonChip("brand", "Converging Orbit")}
+                  <p class="caption">가능 시간표보다 먼저, 방장이 공유할 수 있는 결론을 만듭니다.</p>
+                </div>
+              </div>
+              ${stickyBottomCTA(copy.primary, copy.secondary)}
+            </section>
+          `;
+        },
+        "scr-01-host-room": () => {
+          const copy = screenCopy("scr-01-host-room");
+          return `
+            <section id="scr-01-host-room" class="screen" aria-labelledby="host-title">
+              <div class="screenBody">
+                <div class="section">
+                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+                  <h1 id="host-title">${escapeHtml(copy.title)}</h1>
+                  <p>${escapeHtml(copy.description)}</p>
+                </div>
+                <div class="fieldList" aria-label="방 만들기 입력 요약">
+                  <div class="fieldRow"><span>모임 이름</span><strong>대학 동기 모임</strong></div>
+                  <div class="fieldRow"><span>날짜 범위</span><strong>6.29 토요일 - 6.30 일요일</strong></div>
+                  <div class="fieldRow"><span>예상 인원</span><strong>7명</strong></div>
+                  <div class="fieldRow"><span>응답 마감</span><strong>6.28 금요일 22:00</strong></div>
+                </div>
+                <div class="compactSection">
+                  ${fixture.candidates.map((slot) => candidateSlotCard(slot)).join("")}
+                </div>
+              </div>
+              ${stickyBottomCTA(copy.primary, copy.secondary)}
+            </section>
+          `;
+        },
+        "scr-02-participant-input": () => {
+          const copy = screenCopy("scr-02-participant-input");
+          return `
+            <section id="scr-02-participant-input" class="screen" aria-labelledby="participant-title">
+              <div class="screenBody">
+                <div class="section">
+                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+                  <h1 id="participant-title">${escapeHtml(copy.title)}</h1>
+                  <p>${escapeHtml(copy.description)}</p>
+                </div>
+                ${reasonChip("brand", "1/5 선택")}
+                <div class="compactSection">
+                  ${candidateSlotCard(fixture.candidates[0], true)}
+                  ${candidateSlotCard({ ...fixture.candidates[1], selected: true }, true)}
+                </div>
+                <p class="guideNote">처음 고른 조정 가능은 “늦거나 일정을 조금 바꾸면 갈 수 있어요”라는 뜻이에요.</p>
+              </div>
+              ${stickyBottomCTA(copy.primary)}
+            </section>
+          `;
+        },
+        "scr-02b-response-complete": () => {
+          const copy = screenCopy("scr-02b-response-complete");
+          return `
+            <section id="scr-02b-response-complete" class="screen" aria-labelledby="complete-title">
+              <div class="screenBody">
+                ${stateGraphic("closed", "응답 완료를 나타내는 체크 그래픽")}
+                <div class="section">
+                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+                  <h1 id="complete-title">${escapeHtml(copy.title)}</h1>
+                  <p>${escapeHtml(copy.description)}</p>
+                </div>
+                ${responseCoverage("enough")}
+              </div>
+              ${stickyBottomCTA(copy.primary, copy.secondary)}
+            </section>
+          `;
+        },
+        "scr-03-result-recommendation": () => {
+          const copy = screenCopy("scr-03-result-recommendation");
+          const rec = fixture.recommendation;
+          return `
+            <section id="scr-03-result-recommendation" class="screen" aria-labelledby="result-title">
+              <div class="screenBody">
+                <div class="section">
+                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+                  <h1 id="result-title">${escapeHtml(copy.title)}</h1>
+                  <p>${escapeHtml(copy.description)}</p>
+                </div>
+                <article class="RecommendationHeroCard" aria-label="추천 1순위">
+                  <div class="topline">
+                    ${reasonChip("brand", rec.confidenceLabel)}
+                    ${avatarStack(5)}
+                  </div>
+                  <div class="section">
+                    <span class="microLabel">${escapeHtml(rec.label)}</span>
+                    <h2>${escapeHtml(rec.date)} ${escapeHtml(rec.time)}</h2>
+                    <p>${escapeHtml(rec.place)}</p>
+                  </div>
+                  <p class="copyText">${escapeHtml(rec.reason)}</p>
+                  <div class="metricGrid">
+                    <div class="metric"><b>5</b><span>응답</span></div>
+                    <div class="metric"><b>3</b><span>가장 좋아요</span></div>
+                    <div class="metric"><b>1</b><span>조정 필요</span></div>
+                  </div>
+                  <div class="topline" aria-label="추천 이유">
+                    ${rec.chips.map(([kind, label]) => reasonChip(kind, label)).join("")}
+                  </div>
+                </article>
+                <div class="compactSection" aria-label="다른 후보 보기">
+                  <article class="CandidateSlotCard compact" data-selected="false" data-disabled="false">
+                    <div class="topline">
+                      <div class="slotMeta">
+                        <strong>6.30 일요일 17:00</strong>
+                        <span>가능 인원은 많지만 조정 필요가 더 많아요.</span>
+                      </div>
+                      ${reasonChip("warning", "차선 후보")}
+                    </div>
+                  </article>
+                </div>
+                ${shareCopyBox(isAiEnabled() ? "ai" : "template")}
+              </div>
+              ${stickyBottomCTA(copy.primary, copy.secondary)}
+            </section>
+          `;
+        },
+        "scr-04-insufficient-response": () => {
+          const copy = screenCopy("scr-04-insufficient-response");
+          return `
+            <section id="scr-04-insufficient-response" class="screen" aria-labelledby="low-title">
+              <div class="screenBody">
+                ${stateGraphic("low", "아직 완전히 모이지 않은 참여자 토큰 그래픽")}
+                <div class="section">
+                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+                  <h1 id="low-title">${escapeHtml(copy.title)}</h1>
+                  <p>${escapeHtml(copy.description)}</p>
+                </div>
+                ${responseCoverage("low")}
+                <p class="guideNote">조금 더 모이면 방장이 설명하기 쉬운 추천안을 만들 수 있어요.</p>
+              </div>
+              ${stickyBottomCTA(copy.primary, copy.secondary, { secondaryPrimary: true })}
+            </section>
+          `;
+        },
+        "scr-05-link-expired": () => {
+          const copy = screenCopy("scr-05-link-expired");
+          return `
+            <section id="scr-05-link-expired" class="screen" aria-labelledby="expired-title">
+              <div class="screenBody">
+                ${stateGraphic("expired", "응답 기간 종료를 나타내는 만료 그래픽")}
+                <div class="section">
+                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+                  <h1 id="expired-title">${escapeHtml(copy.title)}</h1>
+                  <p>${escapeHtml(copy.description)}</p>
+                </div>
+                <div class="surface compactSection">
+                  ${reasonChip("danger", "write action 없음")}
+                  <p class="caption">방장이 새 링크를 열면 다시 응답할 수 있어요.</p>
+                </div>
+              </div>
+              ${stickyBottomCTA(copy.primary, null, { secondaryPrimary: true })}
+            </section>
+          `;
+        },
+        "scr-06-room-closed": () => {
+          const copy = screenCopy("scr-06-room-closed");
+          return `
+            <section id="scr-06-room-closed" class="screen" aria-labelledby="closed-title">
+              <div class="screenBody">
+                ${stateGraphic("closed", "캘린더와 체크로 약속 확정을 나타내는 그래픽")}
+                <div class="section">
+                  <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
+                  <h1 id="closed-title">${escapeHtml(copy.title)}</h1>
+                  <p>${escapeHtml(copy.description)}</p>
+                </div>
+                <article class="RecommendationHeroCard" aria-label="확정 카드">
+                  ${reasonChip("success", "확정 카드")}
+                  <div class="section">
+                    <h2>6.29 토요일 18:30</h2>
+                    <p>강남역 근처 · 대학 동기 모임 · 참여 7명</p>
+                  </div>
+                  <p class="copyText">모두에게 공유할 결과에는 확정 시간과 전체 응답 흐름만 담아요.</p>
+                </article>
+              </div>
+              ${stickyBottomCTA(copy.primary, copy.secondary)}
+            </section>
+          `;
+        },
+      };
+
+      function selectScreen(nextScreen, replace = false) {
+        const screen = screenOrder.includes(nextScreen) ? nextScreen : "scr-00-entry";
+        const params = new URLSearchParams(window.location.search);
+        params.set("screen", screen);
+        const nextUrl = `${window.location.pathname}?${params.toString()}`;
+        if (replace) window.history.replaceState({}, "", nextUrl);
+        else window.history.pushState({}, "", nextUrl);
+        render(screen);
+      }
+
+      function renderTabs(currentScreen) {
+        tabsRoot.innerHTML = screenOrder
+          .map((screen) => {
+            const copy = screenCopy(screen);
+            return `<button class="tabButton" type="button" role="tab" aria-selected="${screen === currentScreen}" aria-controls="${screen}" data-screen="${screen}" data-active="${screen === currentScreen}">
+              <span>${escapeHtml(copy.tab)}</span><span aria-hidden="true">›</span>
+            </button>`;
+          })
+          .join("");
+
+        tabsRoot.querySelectorAll("[data-screen]").forEach((button) => {
+          button.addEventListener("click", () => selectScreen(button.dataset.screen));
+        });
+      }
+
+      function render(screen) {
+        const current = screenOrder.includes(screen) ? screen : "scr-00-entry";
+        screenRoot.innerHTML = renderers[current]();
+        renderTabs(current);
+      }
+
+      const initialParams = new URLSearchParams(window.location.search);
+      const initialScreen = initialParams.get("screen") || "scr-00-entry";
+      selectScreen(initialScreen, true);
+
+      window.addEventListener("popstate", () => {
+        const params = new URLSearchParams(window.location.search);
+        render(params.get("screen") || "scr-00-entry");
+      });
+    </script>
+  </body>
+</html>
