@@ -93,14 +93,18 @@
       }
 
       .phone {
+        position: sticky;
+        top: 24px;
         width: 100%;
         max-width: 390px;
+        max-height: calc(100dvh - 48px);
         min-height: 740px;
         border: 1px solid var(--border);
         border-radius: 30px;
         background: var(--surface);
         box-shadow: var(--shadow-floating);
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
 
       .app {
@@ -125,11 +129,60 @@
         gap: 12px;
       }
 
+      .brandHomeButton,
+      .topbarButton {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: 0;
+        border-radius: var(--radius-pill);
+        background: transparent;
+      }
+
+      .brandHomeButton {
+        min-width: 0;
+        padding: 0;
+        color: var(--text-primary);
+      }
+
       .brand strong {
         font-size: 18px;
         line-height: 26px;
         font-weight: 700;
       }
+
+      .brandHomeButton span {
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 800;
+      }
+
+      .topbarActions {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .topbarButton {
+        padding: 0 10px;
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        background: var(--surface);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 800;
+      }
+
+      .topbarButton:hover,
+      .brandHomeButton:hover {
+        background: var(--surface-raised);
+      }
+
 
       .screenRoot {
         flex: 1;
@@ -584,13 +637,40 @@
         line-height: 24px;
       }
 
+      .settingsList {
+        display: grid;
+        gap: 10px;
+      }
+
+      .settingsItem {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+      }
+
+      .settingsItem strong {
+        color: var(--text-primary);
+        font-size: 15px;
+        line-height: 22px;
+      }
+
+      .settingsItem span {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 18px;
+      }
+
       .StickyBottomCTA {
         position: sticky;
-        bottom: 0;
+        bottom: 12px;
         display: grid;
         gap: 8px;
         margin-top: auto;
         padding-top: 12px;
+        padding-bottom: 12px;
         background: linear-gradient(
           rgba(245, 247, 251, 0),
           var(--background) 18px,
@@ -852,15 +932,40 @@
         }
 
         .phone {
+          position: static;
+          top: auto;
           max-width: none;
+          max-height: none;
           min-height: 100dvh;
           border: 0;
           border-radius: 0;
           box-shadow: none;
+          overflow: visible;
         }
 
         .app {
           min-height: 100dvh;
+        }
+
+        .screen {
+          min-height: calc(100dvh - 60px);
+          padding-bottom: calc(var(--bottom-cta-height) + 44px + env(safe-area-inset-bottom, 0px));
+          animation: none;
+        }
+
+        .StickyBottomCTA {
+          position: fixed;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          z-index: 20;
+          padding: 12px var(--page-padding) calc(12px + env(safe-area-inset-bottom, 0px));
+          border-top: 1px solid rgba(231, 234, 240, 0.86);
+          background: linear-gradient(
+            rgba(245, 247, 251, 0),
+            var(--background) 14px,
+            var(--background)
+          );
         }
 
         .tabsPanel {
@@ -874,9 +979,21 @@
         .formGrid {
           grid-template-columns: 1fr;
         }
+      }
 
+      @media (max-width: 430px) {
+        .formGrid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 380px) {
         .buttonRow.two {
           grid-template-columns: 1fr;
+        }
+
+        .topbarButton {
+          padding: 0 8px;
         }
 
         h1 {
@@ -915,8 +1032,14 @@
           <div class="app">
             <header class="topbar">
               <div class="brand">
-                <strong>함모여</strong>
-                <span class="pill">기능 MVP</span>
+                <button class="brandHomeButton" type="button" data-action="go-home" data-testid="topbar-home-button" aria-label="홈으로 이동">
+                  <strong>함모여</strong><span>홈</span>
+                </button>
+                <div class="topbarActions">
+                  <button class="topbarButton" type="button" data-action="open-settings" data-testid="privacy-settings-button">개인정보</button>
+                  <button class="topbarButton" type="button" data-action="toggle-locale" data-testid="language-toggle-button" aria-label="언어 전환">EN</button>
+                  <span class="pill">기능 MVP</span>
+                </div>
               </div>
             </header>
             <div id="screen-root" class="screenRoot" aria-live="polite"></div>
@@ -969,9 +1092,9 @@
           "scr-01-host-room": {
             "tab": "SCR-01 방장 방 만들기",
             "eyebrow": "방장 방 만들기",
-            "title": "60초 안에 초대 링크를 준비해요",
-            "description": "모임 이름과 날짜 범위만 정하면 후보 시간은 함모여가 먼저 제안해요.",
-            "primary": "초대 링크 만들기",
+            "title": "60초 안에 초대 문구를 준비해요",
+            "description": "모임 이름과 날짜 범위만 정하면 후보 시간과 공유 문구를 먼저 정리해요.",
+            "primary": "초대 문구 만들기",
             "secondary": "후보 시간 만들기"
           },
           "scr-02-participant-input": {
@@ -994,7 +1117,7 @@
             "eyebrow": "추천 결과",
             "title": "추천 1순위를 먼저 확인하세요",
             "description": "원시 점수 대신 방장이 설명하기 쉬운 이유와 집계만 보여줍니다.",
-            "primary": "이 안으로 공유하기",
+            "primary": "공유 문구 복사하기",
             "secondary": "다른 후보 보기"
           },
           "scr-04-insufficient-response": {
@@ -1002,7 +1125,7 @@
             "eyebrow": "응답 부족",
             "title": "조금만 더 모이면 추천할 수 있어요",
             "description": "7명 중 3명이 답했어요. 2명만 더 답하면 추천을 시작해요.",
-            "primary": "다시 공유하기",
+            "primary": "초대 문구 복사하기",
             "secondary": "현재 응답 보기"
           },
           "scr-05-link-expired": {
@@ -1017,8 +1140,16 @@
             "eyebrow": "확정 완료",
             "title": "약속을 확정했어요",
             "description": "확정 뒤에는 응답 수정과 추천 재계산을 하지 않아요.",
-            "primary": "확정 내용 공유하기",
-            "secondary": "같은 멤버로 새 모임 만들기"
+            "primary": "확정 문구 복사하기",
+            "secondary": "홈으로 가기"
+          },
+          "scr-07-settings": {
+            "tab": "SCR-07 개인정보",
+            "eyebrow": "개인정보와 데이터",
+            "title": "저장되는 내용을 확인해요",
+            "description": "현재 MVP는 서버 전송 없이 이 브라우저 안에만 방 정보와 응답을 저장해요.",
+            "primary": "로컬 데이터 지우기",
+            "secondary": "홈으로 돌아가기"
           }
         },
         "status": {
@@ -1029,22 +1160,228 @@
         },
         "shareLabel": {
           "template": "기본 문구",
-          "ai": "AI로 문장을 다듬었어요",
           "fallback": "기본 문구로 만들었어요"
         },
         "coverageLabel": {
           "collecting": "응답 수집 중",
           "enough": "추천 가능"
+        },
+        "ui": {
+          "homeShort": "홈",
+          "privacyButton": "개인정보",
+          "mvpPill": "기능 MVP",
+          "languageToggle": "EN",
+          "entryCaption": "가능 시간표보다 먼저, 방장이 공유할 수 있는 결론을 만듭니다.",
+          "emptyRoom": "저장된 모임이 아직 없어요. 새 모임을 만들면 이 브라우저에만 저장돼요.",
+          "roomUnavailable": "저장된 모임 없음",
+          "draftOnlyGuide": "실제 링크 공유, Toss login, Supabase 저장은 아직 연결하지 않고 브라우저 안에만 저장해요.",
+          "invitePreviewText": "preview 전용 초대 문구입니다. 실제 참여 링크는 ShareAdapter와 Supabase 연결 후 생성됩니다. 지금은 같은 기기에서 흐름 확인용으로만 사용해 주세요.",
+          "inviteText": "{title} 가능한 시간 응답을 부탁드려요.\n{preview}",
+          "recommendationBlocked": "{title}은 현재 후보 시간에서 어려움 응답이 많아 바로 확정하기 어려워요. 방장이 새 후보 시간을 열면 다시 고를 수 있게 정리할게요.",
+          "recommendationWait": "아직 {need}명 정도의 응답이 더 필요해요. preview에서는 실제 참여 링크를 만들지 않으니, 같은 기기에서 응답 흐름만 확인해 주세요.",
+          "recommendationText": "{title}은 현재 응답 기준으로 {label} {time}이 가장 현실적인 약속안이에요. {responses}명이 답했고, {prefer}명이 가장 좋아요로 골랐어요. 이 시간으로 정리해볼게요.",
+          "confirmedText": "{title} 약속이 {label} {time}로 확정됐어요. 장소/메모는 {note}입니다. 확정 뒤에는 응답 수정과 추천 재계산을 하지 않아요.",
+          "copySucceeded": "복사했어요",
+          "copyFailed": "복사하지 못했어요. 문구를 길게 눌러 직접 복사해 주세요.",
+          "confidenceHigh": "신뢰도 높음",
+          "confidenceMedium": "신뢰도 보통",
+          "confidenceLow": "신뢰도 낮음",
+          "confidenceNone": "추천 대기",
+          "candidateExcluded": "추천 제외",
+          "candidateRecommended": "추천 후보",
+          "responseCount": "{count}명 응답",
+          "score": "점수 {score}",
+          "recommendationFirst": "추천 1순위",
+          "recommendationReason": "추천 이유",
+          "responsesMetric": "응답",
+          "preferMetric": "가장 좋아요",
+          "adjustMetric": "조정 필요",
+          "hardNoMetric": "어려워요 {count}명",
+          "noHardNo": "어려움 없음",
+          "otherOptions": "다른 후보 보기",
+          "noAlternatives": "현재 비교 가능한 차선 후보가 없어요.",
+          "confirmedCard": "확정 카드",
+          "confirmedResultSummary": "모두에게 공유할 결과에는 확정 시간과 전체 응답 흐름만 담아요.",
+          "closedResponse": "응답이 닫혔어요",
+          "sampleResult": "샘플 응답으로 결과 보기",
+          "goHome": "홈으로 가기",
+          "localStorageTitle": "로컬 저장",
+          "localStorageBody": "방 제목, 후보 시간, 별명, 응답은 현재 브라우저의 localStorage에만 저장돼요. 보관 기간은 사용자가 로컬 데이터를 지우거나 브라우저 저장소를 삭제할 때까지예요.",
+          "serverlessTitle": "서버 전송 없음",
+          "serverlessBody": "이 MVP 화면은 Toss login, Supabase, AI API, 광고, 결제를 아직 호출하지 않아요.",
+          "privacyPolicyTitle": "개인정보처리방침",
+          "privacyPolicyBody": "개인정보처리방침에서 수집 항목, 보관, 삭제, 문의 방법을 확인할 수 있어요.",
+          "deleteTitle": "삭제",
+          "deleteBody": "아래 버튼을 누르면 이 브라우저에 저장된 함모여 MVP 데이터를 지워요.",
+          "contactTitle": "문의",
+          "contactBody": "배포 전 preview 문의는 프로젝트 관리자에게 전달하고, 정식 제출 전 공개 문의 이메일을 정책 문서에 연결해야 해요.",
+          "futureDeletionTitle": "계정 삭제는 아직 없음",
+          "futureDeletionBody": "현재는 계정이 없어서 서버 계정 삭제 대상도 없어요. Toss login이나 Supabase를 연결하면 로컬 삭제와 계정/서버 데이터 삭제 요청을 분리해 제공해야 해요."
+        }
+      }
+    </script>
+
+    <script type="application/json" id="locale-en">
+      {
+        "brand": {
+          "name": "Hammoyo",
+          "tagline": "Find a time that works for everyone."
+        },
+        "screens": {
+          "scr-00-entry": {
+            "tab": "SCR-00 Entry",
+            "eyebrow": "Direct Entry",
+            "title": "Find a time that works",
+            "description": "Collect availability and turn it into a host-friendly plan.",
+            "primary": "Create a meetup",
+            "secondary": "Open saved meetup"
+          },
+          "scr-01-host-room": {
+            "tab": "SCR-01 Host Setup",
+            "eyebrow": "Host Setup",
+            "title": "Prepare invite copy in under a minute",
+            "description": "Set the meetup name and candidate times before sharing.",
+            "primary": "Create invite copy",
+            "secondary": "Create time options"
+          },
+          "scr-02-participant-input": {
+            "tab": "SCR-02 Participant Input",
+            "eyebrow": "Participant Input",
+            "title": "Pick what works for you",
+            "description": "Detailed answers from others stay hidden. Choose your own status quickly.",
+            "primary": "Submit response"
+          },
+          "scr-02b-response-complete": {
+            "tab": "SCR-02B Response Complete",
+            "eyebrow": "Response Complete",
+            "title": "Your response was saved",
+            "description": "You can edit your response until the host closes the room.",
+            "primary": "Edit my response",
+            "secondary": "Copy reminder copy"
+          },
+          "scr-03-result-recommendation": {
+            "tab": "SCR-03 Recommendation",
+            "eyebrow": "Recommendation",
+            "title": "Check the top recommendation first",
+            "description": "The host sees a explainable summary instead of raw scores.",
+            "primary": "Copy result copy",
+            "secondary": "See other options"
+          },
+          "scr-04-insufficient-response": {
+            "tab": "SCR-04 Not Enough Responses",
+            "eyebrow": "Not Enough Responses",
+            "title": "A few more responses are needed",
+            "description": "Hammoyo will recommend a time after enough people answer.",
+            "primary": "Copy invite copy",
+            "secondary": "View current responses"
+          },
+          "scr-05-link-expired": {
+            "tab": "SCR-05 Expired Link",
+            "eyebrow": "Expired Link",
+            "title": "The response window has ended",
+            "description": "New responses cannot be submitted from this link.",
+            "primary": "Go home"
+          },
+          "scr-06-room-closed": {
+            "tab": "SCR-06 Closed",
+            "eyebrow": "Closed",
+            "title": "The meetup is confirmed",
+            "description": "After confirmation, responses and recommendations stay locked.",
+            "primary": "Copy confirmed copy",
+            "secondary": "Go home"
+          },
+          "scr-07-settings": {
+            "tab": "SCR-07 Privacy",
+            "eyebrow": "Privacy and Data",
+            "title": "Check what is stored",
+            "description": "This MVP stores room data only inside this browser.",
+            "primary": "Clear local data",
+            "secondary": "Go home"
+          }
+        },
+        "status": {
+          "prefer": "Best for me",
+          "available": "Available",
+          "adjustable": "Can adjust",
+          "hardNo": "Difficult"
+        },
+        "shareLabel": {
+          "template": "Template copy",
+          "fallback": "Template fallback"
+        },
+        "coverageLabel": {
+          "collecting": "Collecting responses",
+          "enough": "Ready to recommend"
+        },
+        "ui": {
+          "homeShort": "Home",
+          "privacyButton": "Privacy",
+          "mvpPill": "Functional MVP",
+          "languageToggle": "KO",
+          "entryCaption": "Before building a full availability table, Hammoyo helps the host share a clear next step.",
+          "emptyRoom": "No meetup is saved yet. Create one to store it in this browser only.",
+          "roomUnavailable": "No saved meetup",
+          "draftOnlyGuide": "Real link sharing, Toss login, and Supabase storage are not connected yet. This preview stores data only in this browser.",
+          "invitePreviewText": "Preview-only invite copy. A real participant link will be generated after ShareAdapter and Supabase are connected. For now, use this only to inspect the flow on the same device.",
+          "inviteText": "Please share your availability for {title}.\n{preview}",
+          "recommendationBlocked": "{title} has too many difficult responses for the current options, so it should not be confirmed yet. The host can add new candidate times and collect again.",
+          "recommendationWait": "About {need} more responses are needed. This preview does not create a real participant link, so use it only to inspect the same-device flow.",
+          "recommendationText": "{title}: {label} {time} is the most workable option so far. {responses} people responded, and {prefer} picked it as best. I will use this time as the plan.",
+          "confirmedText": "{title} is confirmed for {label} {time}. Place/note: {note}. Responses and recommendations stay locked after confirmation.",
+          "copySucceeded": "Copied",
+          "copyFailed": "Could not copy. Long-press the text and copy it manually.",
+          "confidenceHigh": "High confidence",
+          "confidenceMedium": "Medium confidence",
+          "confidenceLow": "Low confidence",
+          "confidenceNone": "Waiting for recommendation",
+          "candidateExcluded": "Excluded",
+          "candidateRecommended": "Recommended option",
+          "responseCount": "{count} responses",
+          "score": "Score {score}",
+          "recommendationFirst": "Top recommendation",
+          "recommendationReason": "Why this option",
+          "responsesMetric": "Responses",
+          "preferMetric": "Best",
+          "adjustMetric": "Need adjustment",
+          "hardNoMetric": "Difficult for {count}",
+          "noHardNo": "No hard conflicts",
+          "otherOptions": "Other options",
+          "noAlternatives": "There are no comparable backup options yet.",
+          "confirmedCard": "Confirmed card",
+          "confirmedResultSummary": "The shared result includes only the confirmed time and the overall response flow.",
+          "closedResponse": "Responses are closed",
+          "sampleResult": "View sample result",
+          "goHome": "Go home",
+          "localStorageTitle": "Local storage",
+          "localStorageBody": "Room title, candidate times, nickname, and responses are stored only in this browser's localStorage until you clear local data or browser storage.",
+          "serverlessTitle": "No server transfer",
+          "serverlessBody": "This MVP does not call Toss login, Supabase, AI APIs, ads, or payments.",
+          "privacyPolicyTitle": "Privacy policy",
+          "privacyPolicyBody": "The privacy policy explains data fields, retention, deletion, and contact paths.",
+          "deleteTitle": "Deletion",
+          "deleteBody": "The button below removes Hammoyo MVP data saved in this browser.",
+          "contactTitle": "Contact",
+          "contactBody": "Preview questions go to the project owner. A public contact email must be connected before store submission.",
+          "futureDeletionTitle": "No account deletion yet",
+          "futureDeletionBody": "There is no account in this preview. When Toss login or Supabase is connected, local reset and account/server data deletion requests must be separated."
         }
       }
     </script>
 
     <script>
-      const locale = JSON.parse(document.getElementById("locale-ko").textContent);
+      const locales = {
+        ko: JSON.parse(document.getElementById("locale-ko").textContent),
+        en: JSON.parse(document.getElementById("locale-en").textContent),
+      };
       const screenRoot = document.getElementById("screen-root");
       const tabsRoot = document.getElementById("screen-tabs");
+      const appRoot = document.querySelector(".app");
       const STORAGE_KEY = "hammoyo:mvp:v1";
+      const DEMO_STORAGE_KEY = "hammoyo:mvp:demo:v1";
+      const LOCALE_KEY = "hammoyo:mvp:locale";
       const APP_VERSION = 1;
+      let activeLocale = "ko";
+      let locale = locales.ko;
       const screenOrder = [
         "scr-00-entry",
         "scr-01-host-room",
@@ -1054,13 +1391,39 @@
         "scr-04-insufficient-response",
         "scr-05-link-expired",
         "scr-06-room-closed",
+        "scr-07-settings",
       ];
 
-      const defaultCandidates = [
-        { id: "slot-1", label: "6.29 토요일", time: "18:30", note: "강남역 근처" },
-        { id: "slot-2", label: "6.30 일요일", time: "17:00", note: "잠실" },
-        { id: "slot-3", label: "7.1 월요일", time: "19:00", note: "홍대" },
-      ];
+      const demoFixtures = {
+        ko: {
+          title: "대학 동기 모임",
+          deadlineLabel: "6.28 금요일 22:00",
+          candidates: [
+            { id: "slot-1", label: "6.29 토요일", time: "18:30", note: "강남역 근처" },
+            { id: "slot-2", label: "6.30 일요일", time: "17:00", note: "잠실" },
+            { id: "slot-3", label: "7.1 월요일", time: "19:00", note: "홍대" },
+          ],
+        },
+        en: {
+          title: "College friends meetup",
+          deadlineLabel: "Fri Jun 28, 22:00",
+          candidates: [
+            { id: "slot-1", label: "Sat Jun 29", time: "18:30", note: "Near Gangnam Station" },
+            { id: "slot-2", label: "Sun Jun 30", time: "17:00", note: "Jamsil" },
+            { id: "slot-3", label: "Mon Jul 1", time: "19:00", note: "Hongdae" },
+          ],
+        },
+      };
+
+      const defaultCandidates = demoFixtures.ko.candidates;
+
+      function localizedDemoFixture() {
+        return demoFixtures[activeLocale] || demoFixtures.ko;
+      }
+
+      function localizedDefaultCandidates() {
+        return localizedDemoFixture().candidates;
+      }
 
       const statusMeta = {
         prefer: { icon: "★", className: "brand", score: 3 },
@@ -1077,12 +1440,54 @@
           .replaceAll('"', "&quot;")
           .replaceAll("'", "&#39;");
 
+      function formatTemplate(template, values = {}) {
+        return String(template || "").replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ""));
+      }
+
+      function currentStorageKey() {
+        return isDemoMode() ? DEMO_STORAGE_KEY : STORAGE_KEY;
+      }
+
+      function getInitialLocale() {
+        const params = new URLSearchParams(window.location.search);
+        const fromUrl = params.get("lang");
+        if (Object.prototype.hasOwnProperty.call(locales, fromUrl)) return fromUrl;
+        const stored = localStorage.getItem(LOCALE_KEY);
+        return Object.prototype.hasOwnProperty.call(locales, stored) ? stored : "ko";
+      }
+
+      function applyLocale(nextLocale) {
+        activeLocale = Object.prototype.hasOwnProperty.call(locales, nextLocale) ? nextLocale : "ko";
+        locale = locales[activeLocale];
+        document.documentElement.lang = activeLocale;
+        const privacyButton = document.querySelector('[data-testid="privacy-settings-button"]');
+        const languageButton = document.querySelector('[data-testid="language-toggle-button"]');
+        const homeLabel = document.querySelector(".brandHomeButton span");
+        const pill = document.querySelector(".pill");
+        if (privacyButton) privacyButton.textContent = locale.ui.privacyButton;
+        if (languageButton) languageButton.textContent = locale.ui.languageToggle;
+        if (homeLabel) homeLabel.textContent = locale.ui.homeShort;
+        if (pill) pill.textContent = locale.ui.mvpPill;
+      }
+
+      function setLocale(nextLocale) {
+        applyLocale(nextLocale);
+        localStorage.setItem(LOCALE_KEY, activeLocale);
+        render(currentScreen());
+      }
+
       const screenCopy = (id) => locale.screens[id];
 
       const isAiEnabled = () => {
-        const params = new URLSearchParams(window.location.search);
-        return document.body.dataset.aiCopyEnabled === "true" || params.get("ai") === "on";
+        return document.body.dataset.aiCopyEnabled === "true";
       };
+
+      const isDemoMode = () => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("demo") === "1";
+      };
+
+      const isTerminalRoom = (room) => room.status === "closed" || room.status === "expired";
 
       function normalizeStatus(status) {
         return Object.prototype.hasOwnProperty.call(statusMeta, status) ? status : "available";
@@ -1100,7 +1505,7 @@
       }
 
       function normalizeCandidate(candidate, index) {
-        const fallback = defaultCandidates[index] || defaultCandidates[0];
+        const fallback = localizedDefaultCandidates()[index] || localizedDefaultCandidates()[0];
         return {
           id: candidate?.id || `slot-${index + 1}`,
           label: String(candidate?.label || fallback.label).trim(),
@@ -1123,14 +1528,15 @@
       }
 
       function createDemoRoom(options = {}) {
-        const candidates = (options.candidates || defaultCandidates)
+        const fixture = localizedDemoFixture();
+        const candidates = (options.candidates || fixture.candidates)
           .slice(0, 3)
           .map((candidate, index) => normalizeCandidate(candidate, index));
         const room = {
           id: options.id || `room-${Date.now().toString(36)}`,
-          title: String(options.title || "대학 동기 모임").trim(),
+          title: String(options.title || fixture.title).trim(),
           expectedCount: clampNumber(options.expectedCount, 3, 20, 7),
-          deadlineLabel: String(options.deadlineLabel || "6.28 금요일 22:00").trim(),
+          deadlineLabel: String(options.deadlineLabel || fixture.deadlineLabel).trim(),
           candidates,
           responses: (options.responses || []).map(normalizeResponse),
           status: options.status || "collecting",
@@ -1202,10 +1608,10 @@
           else confidence = "low";
         }
         const confidenceLabel = {
-          high: "신뢰도 높음",
-          medium: "신뢰도 보통",
-          low: "신뢰도 낮음",
-          none: "추천 대기",
+          high: locale.ui.confidenceHigh,
+          medium: locale.ui.confidenceMedium,
+          low: locale.ui.confidenceLow,
+          none: locale.ui.confidenceNone,
         }[confidence];
         return {
           responseCount,
@@ -1224,19 +1630,59 @@
         if (room.status === "closed" || room.status === "expired") return room;
         const ranked = rankCandidates(room);
         if (ranked.top) room.status = "recommended";
+        else if (ranked.enough) room.status = "needs_new_options";
         else if (room.responses.length > 0) room.status = "low_confidence";
         else room.status = "collecting";
         return room;
       }
 
-      function buildShareText(room, ranked = rankCandidates(room)) {
+      function buildInviteText(room) {
+        return formatTemplate(locale.ui.inviteText, {
+          title: room.title,
+          preview: locale.ui.invitePreviewText,
+        });
+      }
+
+      function buildRecommendationText(room, ranked = rankCandidates(room)) {
         if (!ranked.top) {
+          if (ranked.enough) {
+            return formatTemplate(locale.ui.recommendationBlocked, { title: room.title });
+          }
           const need = Math.max(0, ranked.minimum - ranked.responseCount);
-          return `${room.title}은 아직 ${need}명 정도의 응답이 더 필요해요. 지금 링크로 가능한 정도만 골라주시면, 방장이 모두에게 공유할 약속안을 정리할게요.`;
+          return formatTemplate(locale.ui.recommendationWait, { need, title: room.title });
         }
         const top = ranked.top;
         const candidate = top.candidate;
-        return `${room.title}은 현재 응답 기준으로 ${candidate.label} ${candidate.time}이 가장 현실적인 약속안이에요. ${ranked.responseCount}명이 답했고, ${top.counts.prefer}명이 가장 좋아요로 골랐어요. 이 시간으로 정리해볼게요.`;
+        return formatTemplate(locale.ui.recommendationText, {
+          title: room.title,
+          label: candidate.label,
+          time: candidate.time,
+          responses: ranked.responseCount,
+          prefer: top.counts.prefer,
+        });
+      }
+
+      function buildConfirmedText(room, ranked = rankCandidates(room)) {
+        const selected =
+          room.candidates.find((candidate) => candidate.id === room.selectedCandidateId) ||
+          ranked.top?.candidate ||
+          room.candidates[0];
+        return formatTemplate(locale.ui.confirmedText, {
+          title: room.title,
+          label: selected.label,
+          time: selected.time,
+          note: selected.note,
+        });
+      }
+
+      function buildCopyTextForAction(room, action, ranked = rankCandidates(room)) {
+        if (action === "copy-invite") return buildInviteText(room);
+        if (room.status === "closed") return buildConfirmedText(room, ranked);
+        return buildRecommendationText(room, ranked);
+      }
+
+      function buildShareText(room, ranked = rankCandidates(room)) {
+        return buildRecommendationText(room, ranked);
       }
 
       function sampleResponsesFor(room) {
@@ -1262,8 +1708,14 @@
       }
 
       function createDefaultState() {
+        return createFreshState();
+      }
+
+      function createDemoState() {
+        const fixture = localizedDemoFixture();
         const room = createDemoRoom({
-          responses: sampleResponsesFor({ candidates: defaultCandidates }).slice(0, 4),
+          candidates: fixture.candidates,
+          responses: sampleResponsesFor({ candidates: fixture.candidates }).slice(0, 4),
         });
         return {
           version: APP_VERSION,
@@ -1271,29 +1723,58 @@
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
+          lastSubmittedAt: null,
         };
       }
 
+      function createFreshState() {
+        return {
+          version: APP_VERSION,
+          room: null,
+          draftPreferences: {},
+          currentParticipant: "",
+          copyStatus: "",
+          lastSubmittedAt: null,
+        };
+      }
+
+      function createDraftRoom() {
+        return createDemoRoom({ responses: [] });
+      }
+
+      function hasSavedRoom() {
+        return Boolean(appState.room);
+      }
+
+      function roomOrDraft() {
+        return appState.room || createDraftRoom();
+      }
+
       function normalizeState(raw) {
-        if (!raw || raw.version !== APP_VERSION || !raw.room) return createDefaultState();
-        const room = createDemoRoom(raw.room);
-        room.status = raw.room.status || room.status;
-        room.selectedCandidateId = raw.room.selectedCandidateId || room.selectedCandidateId;
-        room.closedAt = raw.room.closedAt || room.closedAt;
+        if (!raw || raw.version !== APP_VERSION) return createDefaultState();
+        const room = raw.room ? createDemoRoom(raw.room) : null;
+        if (room) {
+          room.status = raw.room.status || room.status;
+          room.selectedCandidateId = raw.room.selectedCandidateId || room.selectedCandidateId;
+          room.closedAt = raw.room.closedAt || room.closedAt;
+        }
         return {
           version: APP_VERSION,
           room,
           draftPreferences: raw.draftPreferences || {},
           currentParticipant: raw.currentParticipant || "",
           copyStatus: raw.copyStatus || "",
+          lastSubmittedAt: raw.lastSubmittedAt || null,
         };
       }
 
       function loadState() {
         const params = new URLSearchParams(window.location.search);
-        if (params.get("reset") === "1") localStorage.removeItem(STORAGE_KEY);
+        if (params.get("reset") === "1") localStorage.removeItem(currentStorageKey());
         try {
-          const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          const stored = localStorage.getItem(currentStorageKey());
+          if (!stored) return isDemoMode() ? createDemoState() : createDefaultState();
+          const raw = JSON.parse(stored);
           return normalizeState(raw);
         } catch {
           return createDefaultState();
@@ -1301,10 +1782,50 @@
       }
 
       function saveState() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        localStorage.setItem(currentStorageKey(), JSON.stringify(appState));
       }
 
+      activeLocale = getInitialLocale();
+      applyLocale(activeLocale);
+
       let appState = loadState();
+
+      function applyRouteState(screen) {
+        let changed = false;
+        const roomRequiredScreens = [
+          "scr-02-participant-input",
+          "scr-03-result-recommendation",
+          "scr-04-insufficient-response",
+          "scr-06-room-closed",
+        ];
+        if (!appState.room && roomRequiredScreens.includes(screen)) return "scr-00-entry";
+        if (screen === "scr-05-link-expired" && appState.room && isDemoMode() && appState.room.status !== "expired") {
+          appState.room.status = "expired";
+          changed = true;
+        }
+        if (screen === "scr-02b-response-complete" && !isDemoMode() && !appState.lastSubmittedAt) {
+          return appState.room ? "scr-02-participant-input" : "scr-00-entry";
+        }
+        if (screen === "scr-06-room-closed" && appState.room.status !== "closed") {
+          if (!isDemoMode()) {
+            return appState.room.status === "recommended" ? "scr-03-result-recommendation" : "scr-00-entry";
+          }
+          const ranked = rankCandidates(appState.room);
+          appState.room.selectedCandidateId = appState.room.selectedCandidateId || ranked.top?.candidate.id || appState.room.candidates[0].id;
+          appState.room.status = "closed";
+          appState.room.closedAt = appState.room.closedAt || new Date().toISOString();
+          changed = true;
+        }
+        if (changed) saveState();
+        return screen;
+      }
+
+      function clearLocalData() {
+        localStorage.removeItem(currentStorageKey());
+        appState = createFreshState();
+        appState.copyStatus = "";
+        selectScreen("scr-00-entry");
+      }
 
       function reasonChip(kind, label) {
         const mark = kind === "success" ? "✓" : kind === "warning" ? "!" : kind === "danger" ? "−" : "•";
@@ -1350,9 +1871,9 @@
         const disabled = Boolean(options.disabled);
         let chip = reasonChip(statusMeta[selectedStatus].className, locale.status[selectedStatus]);
         if (summary) {
-          if (summary.excluded) chip = reasonChip("danger", "추천 제외");
-          else if (selected) chip = reasonChip("brand", "추천 후보");
-          else chip = reasonChip("success", `${summary.answered}명 응답`);
+          if (summary.excluded) chip = reasonChip("danger", locale.ui.candidateExcluded);
+          else if (selected) chip = reasonChip("brand", locale.ui.candidateRecommended);
+          else chip = reasonChip("success", formatTemplate(locale.ui.responseCount, { count: summary.answered }));
         }
         return `
           <article class="CandidateSlotCard" data-selected="${selected}" data-disabled="${disabled}">
@@ -1363,7 +1884,7 @@
               </div>
               ${chip}
             </div>
-            ${summary ? `<p class="caption">점수 ${summary.score} · 가장 좋아요 ${summary.counts.prefer} · 가능해요 ${summary.counts.available} · 조정 ${summary.counts.adjustable} · 어려워요 ${summary.counts.hardNo}</p>` : ""}
+            ${summary ? `<p class="caption">${escapeHtml(formatTemplate(locale.ui.score, { score: summary.score }))} · ${escapeHtml(locale.status.prefer)} ${summary.counts.prefer} · ${escapeHtml(locale.status.available)} ${summary.counts.available} · ${escapeHtml(locale.status.adjustable)} ${summary.counts.adjustable} · ${escapeHtml(locale.status.hardNo)} ${summary.counts.hardNo}</p>` : ""}
             ${options.withSelector ? preferenceSelector(slot.id, selectedStatus, disabled) : ""}
           </article>
         `;
@@ -1373,16 +1894,17 @@
         const ranked = rankCandidates(room);
         const percent = Math.min(100, Math.round((ranked.responseCount / room.expectedCount) * 100));
         const need = Math.max(0, ranked.minimum - ranked.responseCount);
-        const label =
-          state === "low"
+        const label = state === "blocked"
+          ? `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했지만, 추천 가능한 후보가 남지 않았어요.`
+          : state === "low"
             ? `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했어요. ${need}명만 더 답하면 추천을 시작해요.`
             : `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했어요.`;
-        const chipLabel = state === "low" ? locale.coverageLabel.collecting : locale.coverageLabel.enough;
+        const chipLabel = state === "blocked" ? "새 후보 필요" : state === "low" ? locale.coverageLabel.collecting : locale.coverageLabel.enough;
         return `
           <section class="ResponseCoverage" aria-label="응답률">
             <div class="topline">
               <h3>응답 현황</h3>
-              ${reasonChip(state === "low" ? "warning" : "success", chipLabel)}
+              ${reasonChip(state === "blocked" ? "danger" : state === "low" ? "warning" : "success", chipLabel)}
             </div>
             <div class="coverageTrack" aria-hidden="true"><div class="coverageFill" style="width: ${percent}%"></div></div>
             <p class="caption">${label}</p>
@@ -1398,15 +1920,13 @@
         return `<div class="ParticipantAvatarStack" aria-label="${count}명 응답 집계">${tokens}${count > 8 ? '<span class="avatarToken">+ </span>' : ""}</div>`;
       }
 
-      function shareCopyBox(room, ranked, mode = "template") {
-        const aiMode = isAiEnabled() && mode === "ai";
-        const label = aiMode ? locale.shareLabel.ai : locale.shareLabel.template;
-        const copy = buildShareText(room, ranked);
+      function shareCopyBox(room, ranked) {
+        const label = room.status === "closed" ? "확정 문구" : locale.shareLabel.template;
+        const copy = room.status === "closed" ? buildConfirmedText(room, ranked) : buildRecommendationText(room, ranked);
         return `
           <section class="ShareCopyBox" aria-label="공유 문구">
-            ${reasonChip(aiMode ? "brand" : "success", label)}
+            ${reasonChip(room.status === "closed" ? "success" : "success", label)}
             <p class="copyText">${escapeHtml(copy)}</p>
-            ${aiMode ? '<p class="caption">AI는 집계 정보만 보고 문장 톤을 다듬어요.</p>' : ""}
             ${appState.copyStatus ? `<p class="actionStatus" data-testid="copy-status">${escapeHtml(appState.copyStatus)}</p>` : ""}
           </section>
         `;
@@ -1418,8 +1938,9 @@
 
       function stickyBottomCTA(primary, secondary, options = {}) {
         const disabled = options.disabled ? 'disabled aria-disabled="true"' : "";
+        const secondaryDisabled = options.secondaryDisabled ? 'disabled aria-disabled="true"' : "";
         const secondaryButton = secondary
-          ? `<button class="quietButton" type="button" ${actionAttrs(options.secondaryAction, options.secondaryTestId)}>${escapeHtml(secondary)}</button>`
+          ? `<button class="quietButton" type="button" ${secondaryDisabled} ${actionAttrs(options.secondaryAction, options.secondaryTestId)}>${escapeHtml(secondary)}</button>`
           : "";
         return `
           <div class="StickyBottomCTA">
@@ -1443,7 +1964,7 @@
       }
 
       function renderCandidateInputs(room) {
-        const candidates = [...room.candidates, ...defaultCandidates].slice(0, 3);
+        const candidates = [...room.candidates, ...localizedDefaultCandidates()].slice(0, 3);
         return candidates
           .map((candidate, index) => `
             <div class="candidateInputCard">
@@ -1470,7 +1991,10 @@
       const renderers = {
         "scr-00-entry": () => {
           const copy = screenCopy("scr-00-entry");
-          const ranked = rankCandidates(appState.room);
+          const ranked = appState.room ? rankCandidates(appState.room) : null;
+          const savedRoomLine = appState.room
+            ? `최근 방: ${escapeHtml(appState.room.title)} · ${ranked.responseCount}명 응답`
+            : locale.ui.emptyRoom;
           return `
             <section id="scr-00-entry" class="screen" aria-labelledby="entry-title">
               <div class="screenBody">
@@ -1482,21 +2006,22 @@
                 </div>
                 <div class="surface compactSection">
                   ${reasonChip("brand", "Converging Orbit")}
-                  <p class="caption">가능 시간표보다 먼저, 방장이 공유할 수 있는 결론을 만듭니다.</p>
-                  <p class="emptyStateLine">최근 방: ${escapeHtml(appState.room.title)} · ${ranked.responseCount}명 응답</p>
+                  <p class="caption">${escapeHtml(locale.ui.entryCaption)}</p>
+                  <p class="emptyStateLine">${savedRoomLine}</p>
                 </div>
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary, {
+              ${stickyBottomCTA(copy.primary, appState.room ? copy.secondary : locale.ui.roomUnavailable, {
                 primaryAction: "start-create-room",
                 primaryTestId: "start-create-room",
-                secondaryAction: "open-existing-room",
+                secondaryAction: appState.room ? "open-existing-room" : null,
+                secondaryDisabled: !appState.room,
               })}
             </section>
           `;
         },
         "scr-01-host-room": () => {
           const copy = screenCopy("scr-01-host-room");
-          const room = appState.room;
+          const room = roomOrDraft();
           return `
             <section id="scr-01-host-room" class="screen" aria-labelledby="host-title">
               <div class="screenBody">
@@ -1518,12 +2043,11 @@
                   </div>
                   ${renderCandidateInputs(room)}
                 </form>
-                <p class="guideNote">실제 링크 공유, Toss login, Supabase 저장은 아직 연결하지 않고 브라우저 안에만 저장해요.</p>
+                <p class="guideNote">${escapeHtml(locale.ui.draftOnlyGuide)}</p>
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary, {
+              ${stickyBottomCTA(copy.primary, null, {
                 primaryAction: "create-room",
                 primaryTestId: "create-room-button",
-                secondaryAction: "seed-responses",
               })}
             </section>
           `;
@@ -1531,6 +2055,7 @@
         "scr-02-participant-input": () => {
           const copy = screenCopy("scr-02-participant-input");
           const room = appState.room;
+          if (!room) return renderers["scr-00-entry"]();
           const ranked = rankCandidates(room);
           const draft = getDraftPreferences(room);
           const isClosed = room.status === "closed" || room.status === "expired";
@@ -1567,8 +2092,10 @@
         "scr-02b-response-complete": () => {
           const copy = screenCopy("scr-02b-response-complete");
           const room = appState.room;
+          if (!room) return renderers["scr-00-entry"]();
           const ranked = rankCandidates(room);
           const coverageState = ranked.enough ? "enough" : "low";
+          const secondaryLabel = isDemoMode() ? locale.ui.sampleResult : locale.ui.goHome;
           return `
             <section id="scr-02b-response-complete" class="screen" aria-labelledby="complete-title">
               <div class="screenBody">
@@ -1580,16 +2107,17 @@
                 </div>
                 ${responseCoverage(room, coverageState)}
               </div>
-              ${stickyBottomCTA(copy.primary, "샘플 응답으로 결과 보기", {
+              ${stickyBottomCTA(copy.primary, secondaryLabel, {
                 primaryAction: "edit-response",
-                secondaryAction: "seed-responses",
-                secondaryTestId: "seed-responses-button",
+                secondaryAction: isDemoMode() ? "seed-responses" : "go-home",
+                secondaryTestId: isDemoMode() ? "seed-responses-button" : "response-complete-home-button",
               })}
             </section>
           `;
         },
         "scr-03-result-recommendation": () => {
           const copy = screenCopy("scr-03-result-recommendation");
+          if (!appState.room) return renderers["scr-00-entry"]();
           const room = refreshRoomStatus(appState.room);
           const ranked = rankCandidates(room);
           if (!ranked.top) return renderers["scr-04-insufficient-response"]();
@@ -1613,28 +2141,28 @@
                     ${avatarStack(ranked.responseCount)}
                   </div>
                   <div class="section">
-                    <span class="microLabel">추천 1순위</span>
-                    <h2>${escapeHtml(rec.label)} ${escapeHtml(rec.time)}</h2>
-                    <p>${escapeHtml(rec.note)} · ${escapeHtml(room.title)}</p>
+                  <span class="microLabel">${escapeHtml(locale.ui.recommendationFirst)}</span>
+                  <h2>${escapeHtml(rec.label)} ${escapeHtml(rec.time)}</h2>
+                  <p>${escapeHtml(rec.note)} · ${escapeHtml(room.title)}</p>
+                </div>
+                <p class="copyText">${escapeHtml(buildShareText(room, ranked))}</p>
+                <div class="metricGrid">
+                    <div class="metric"><b>${ranked.responseCount}</b><span>${escapeHtml(locale.ui.responsesMetric)}</span></div>
+                    <div class="metric"><b>${top.counts.prefer}</b><span>${escapeHtml(locale.ui.preferMetric)}</span></div>
+                    <div class="metric"><b>${top.counts.adjustable}</b><span>${escapeHtml(locale.ui.adjustMetric)}</span></div>
                   </div>
-                  <p class="copyText">${escapeHtml(buildShareText(room, ranked))}</p>
-                  <div class="metricGrid">
-                    <div class="metric"><b>${ranked.responseCount}</b><span>응답</span></div>
-                    <div class="metric"><b>${top.counts.prefer}</b><span>가장 좋아요</span></div>
-                    <div class="metric"><b>${top.counts.adjustable}</b><span>조정 필요</span></div>
-                  </div>
-                  <div class="topline" aria-label="추천 이유">
-                    ${reasonChip("success", `${ranked.responseCount}명 응답`)}
-                    ${reasonChip("brand", `점수 ${top.score}`)}
-                    ${top.counts.hardNo > 0 ? reasonChip("warning", `어려워요 ${top.counts.hardNo}명`) : reasonChip("success", "어려움 없음")}
+                  <div class="topline" aria-label="${escapeHtml(locale.ui.recommendationReason)}">
+                    ${reasonChip("success", formatTemplate(locale.ui.responseCount, { count: ranked.responseCount }))}
+                    ${reasonChip("brand", formatTemplate(locale.ui.score, { score: top.score }))}
+                    ${top.counts.hardNo > 0 ? reasonChip("warning", formatTemplate(locale.ui.hardNoMetric, { count: top.counts.hardNo })) : reasonChip("success", locale.ui.noHardNo)}
                   </div>
                 </article>
-                <div class="compactSection" aria-label="다른 후보 보기">
-                  ${alternatives || '<p class="emptyStateLine">현재 비교 가능한 차선 후보가 없어요.</p>'}
+                <div class="compactSection" aria-label="${escapeHtml(locale.ui.otherOptions)}">
+                  ${alternatives || `<p class="emptyStateLine">${escapeHtml(locale.ui.noAlternatives)}</p>`}
                 </div>
-                ${shareCopyBox(room, ranked, isAiEnabled() ? "ai" : "template")}
+                ${shareCopyBox(room, ranked)}
               </div>
-              ${stickyBottomCTA(copy.primary, "약속 확정하기", {
+              ${stickyBottomCTA(copy.primary, activeLocale === "ko" ? "약속 확정하기" : "Confirm meetup", {
                 primaryAction: "copy-share",
                 primaryTestId: "copy-share-button",
                 secondaryAction: "close-room",
@@ -1646,22 +2174,32 @@
         "scr-04-insufficient-response": () => {
           const copy = screenCopy("scr-04-insufficient-response");
           const room = appState.room;
+          if (!room) return renderers["scr-00-entry"]();
+          const ranked = rankCandidates(room);
+          const needsNewOptions = ranked.enough && !ranked.top;
+          const title = needsNewOptions ? "새 후보 시간이 필요해요" : copy.title;
+          const description = needsNewOptions
+            ? `${room.title}은 현재 후보 시간마다 어려움 응답이 많아요. 방장이 새 후보를 열면 다시 고를 수 있어요.`
+            : `${room.title}은 아직 응답이 조금 더 필요해요. 집계가 충분해지면 추천을 보여드려요.`;
+          const secondaryLabel = isDemoMode() ? locale.ui.sampleResult : locale.ui.goHome;
           return `
             <section id="scr-04-insufficient-response" class="screen" aria-labelledby="low-title">
               <div class="screenBody">
                 ${stateGraphic("low", "아직 완전히 모이지 않은 참여자 토큰 그래픽")}
                 <div class="section">
                   <span class="eyebrow">${escapeHtml(copy.eyebrow)}</span>
-                  <h1 id="low-title">${escapeHtml(copy.title)}</h1>
-                  <p>${escapeHtml(room.title)}은 아직 응답이 조금 더 필요해요. 집계가 충분해지면 추천을 보여드려요.</p>
+                  <h1 id="low-title">${escapeHtml(title)}</h1>
+                  <p>${escapeHtml(description)}</p>
                 </div>
-                ${responseCoverage(room, "low")}
-                <p class="guideNote">조금 더 모이면 방장이 설명하기 쉬운 추천안을 만들 수 있어요.</p>
+                ${responseCoverage(room, needsNewOptions ? "blocked" : "low")}
+                ${shareCopyBox(room, ranked)}
+                <p class="guideNote">${needsNewOptions ? "관계 안전을 위해 어려움이 많은 후보는 밀어붙이지 않아요." : "조금 더 모이면 방장이 설명하기 쉬운 추천안을 만들 수 있어요."}</p>
               </div>
-              ${stickyBottomCTA(copy.primary, "샘플 응답으로 결과 보기", {
+              ${stickyBottomCTA(copy.primary, secondaryLabel, {
                 primaryAction: "copy-invite",
-                secondaryAction: "seed-responses",
-                secondaryTestId: "seed-responses-button",
+                primaryTestId: "copy-invite-button",
+                secondaryAction: isDemoMode() ? "seed-responses" : "go-home",
+                secondaryTestId: isDemoMode() ? "seed-responses-button" : "insufficient-home-button",
                 secondaryPrimary: true,
               })}
             </section>
@@ -1679,7 +2217,7 @@
                   <p>${escapeHtml(copy.description)}</p>
                 </div>
                 <div class="surface compactSection">
-                  ${reasonChip("danger", "응답 닫힘")}
+                  ${reasonChip("danger", locale.ui.closedResponse)}
                   <p class="caption">방장이 새 링크를 열면 다시 응답할 수 있어요.</p>
                 </div>
               </div>
@@ -1705,19 +2243,60 @@
                   <p>${escapeHtml(copy.description)}</p>
                 </div>
                 <article class="RecommendationHeroCard" aria-label="확정 카드">
-                  ${reasonChip("success", "확정 카드")}
+                  ${reasonChip("success", locale.ui.confirmedCard)}
                   <div class="section">
                     <h2>${escapeHtml(selected.label)} ${escapeHtml(selected.time)}</h2>
-                    <p>${escapeHtml(selected.note)} · ${escapeHtml(room.title)} · 응답 ${escapeHtml(ranked.responseCount)}명</p>
+                    <p>${escapeHtml(selected.note)} · ${escapeHtml(room.title)} · ${escapeHtml(formatTemplate(locale.ui.responseCount, { count: ranked.responseCount }))}</p>
                   </div>
-                  <p class="copyText">모두에게 공유할 결과에는 확정 시간과 전체 응답 흐름만 담아요.</p>
+                  <p class="copyText">${escapeHtml(locale.ui.confirmedResultSummary)}</p>
                 </article>
                 ${shareCopyBox(room, ranked)}
               </div>
               ${stickyBottomCTA(copy.primary, copy.secondary, {
                 primaryAction: "copy-share",
                 primaryTestId: "copy-share-button",
-                secondaryAction: "start-create-room",
+                secondaryAction: "go-home",
+              })}
+            </section>
+          `;
+        },
+        "scr-07-settings": () => {
+          const copy = screenCopy("scr-07-settings");
+          return `
+            <section id="scr-07-settings" class="screen" aria-labelledby="settings-title" data-testid="settings-screen">
+              <div class="screenBody">
+                ${standardHeader("scr-07-settings", "settings-title")}
+                <div class="settingsList" aria-label="개인정보와 저장 안내">
+                  <div class="settingsItem">
+                    <strong>${escapeHtml(locale.ui.localStorageTitle)}</strong>
+                    <span>${escapeHtml(locale.ui.localStorageBody)}</span>
+                  </div>
+                  <div class="settingsItem">
+                    <strong>${escapeHtml(locale.ui.serverlessTitle)}</strong>
+                    <span>${escapeHtml(locale.ui.serverlessBody)}</span>
+                  </div>
+                  <div class="settingsItem">
+                    <strong>${escapeHtml(locale.ui.privacyPolicyTitle)}</strong>
+                    <span><a data-testid="privacy-policy-link" href="privacy.html">${escapeHtml(locale.ui.privacyPolicyTitle)}</a> · ${escapeHtml(locale.ui.privacyPolicyBody)}</span>
+                  </div>
+                  <div class="settingsItem">
+                    <strong>${escapeHtml(locale.ui.deleteTitle)}</strong>
+                    <span>${escapeHtml(locale.ui.deleteBody)}</span>
+                  </div>
+                  <div class="settingsItem">
+                    <strong>${escapeHtml(locale.ui.futureDeletionTitle)}</strong>
+                    <span>${escapeHtml(locale.ui.futureDeletionBody)}</span>
+                  </div>
+                  <div class="settingsItem">
+                    <strong>${escapeHtml(locale.ui.contactTitle)}</strong>
+                    <span>${escapeHtml(locale.ui.contactBody)}</span>
+                  </div>
+                </div>
+              </div>
+              ${stickyBottomCTA(copy.primary, copy.secondary, {
+                primaryAction: "clear-local-data",
+                primaryTestId: "clear-local-data-button",
+                secondaryAction: "go-home",
               })}
             </section>
           `;
@@ -1756,18 +2335,26 @@
       }
 
       function render(screen) {
-        const current = screenOrder.includes(screen) ? screen : "scr-00-entry";
+        const requested = screenOrder.includes(screen) ? screen : "scr-00-entry";
+        const current = applyRouteState(requested);
+        if (current !== requested) {
+          const params = new URLSearchParams(window.location.search);
+          params.set("screen", current);
+          window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+        }
+        applyLocale(activeLocale);
         screenRoot.innerHTML = renderers[current]();
         renderTabs(current);
       }
 
       function readRoomForm() {
         const form = screenRoot.querySelector("[data-room-form]");
+        const fallbackCandidates = localizedDefaultCandidates();
         const candidateInputs = [0, 1, 2].map((index) => ({
           id: `slot-${index + 1}`,
-          label: form?.querySelector(`[name="candidate-label-${index}"]`)?.value || defaultCandidates[index].label,
-          time: form?.querySelector(`[name="candidate-time-${index}"]`)?.value || defaultCandidates[index].time,
-          note: form?.querySelector(`[name="candidate-note-${index}"]`)?.value || defaultCandidates[index].note,
+          label: form?.querySelector(`[name="candidate-label-${index}"]`)?.value || fallbackCandidates[index].label,
+          time: form?.querySelector(`[name="candidate-time-${index}"]`)?.value || fallbackCandidates[index].time,
+          note: form?.querySelector(`[name="candidate-note-${index}"]`)?.value || fallbackCandidates[index].note,
         }));
         return {
           title: form?.querySelector('[name="room-title"]')?.value || "새 모임",
@@ -1786,15 +2373,20 @@
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
+          lastSubmittedAt: null,
         };
         appState.draftPreferences = getDraftPreferences(appState.room);
         saveState();
-        selectScreen("scr-02-participant-input");
+        selectScreen("scr-04-insufficient-response");
       }
 
       function submitResponse() {
         const room = appState.room;
-        if (room.status === "closed" || room.status === "expired") return;
+        if (!room) {
+          selectScreen("scr-00-entry");
+          return;
+        }
+        if (isTerminalRoom(room)) return;
         const aliasInput = screenRoot.querySelector('[data-testid="participant-name-input"]');
         const alias = (aliasInput?.value || appState.currentParticipant || "익명").trim();
         appState.currentParticipant = alias;
@@ -1809,13 +2401,15 @@
         );
         refreshRoomStatus(room);
         appState.copyStatus = "";
+        appState.lastSubmittedAt = new Date().toISOString();
         saveState();
         selectScreen("scr-02b-response-complete");
       }
 
       function seedResponses() {
         const room = appState.room;
-        if (room.status === "closed" || room.status === "expired") return;
+        if (!room) return;
+        if (isTerminalRoom(room) || !isDemoMode()) return;
         const existingAliases = new Set(room.responses.map((response) => response.alias));
         for (const response of sampleResponsesFor(room)) {
           if (!existingAliases.has(response.alias)) {
@@ -1830,11 +2424,19 @@
         selectScreen(rankCandidates(room).top ? "scr-03-result-recommendation" : "scr-04-insufficient-response");
       }
 
-      async function copyShareText() {
-        const text = buildShareText(appState.room, rankCandidates(appState.room));
-        try {
-          await navigator.clipboard?.writeText(text);
-        } catch {
+      async function copyShareText(action = "copy-share") {
+        if (!appState.room) return;
+        const text = buildCopyTextForAction(appState.room, action, rankCandidates(appState.room));
+        let copied = false;
+        if (navigator.clipboard?.writeText) {
+          try {
+            await navigator.clipboard.writeText(text);
+            copied = true;
+          } catch {
+            copied = false;
+          }
+        }
+        if (!copied) {
           const holder = document.createElement("textarea");
           holder.value = text;
           holder.setAttribute("readonly", "");
@@ -1843,17 +2445,28 @@
           document.body.appendChild(holder);
           holder.select();
           try {
-            document.execCommand("copy");
+            copied = document.execCommand("copy");
+          } catch {
+            copied = false;
           } finally {
             holder.remove();
           }
         }
-        appState.copyStatus = "복사했어요";
+        appState.copyStatus = copied ? locale.ui.copySucceeded : locale.ui.copyFailed;
         saveState();
         render(currentScreen());
       }
 
       function closeRoom() {
+        if (!appState.room) return;
+        if (appState.room.status === "expired") {
+          selectScreen("scr-05-link-expired");
+          return;
+        }
+        if (appState.room.status === "closed") {
+          selectScreen("scr-06-room-closed");
+          return;
+        }
         const ranked = rankCandidates(appState.room);
         appState.room.selectedCandidateId = ranked.top?.candidate.id || appState.room.candidates[0].id;
         appState.room.status = "closed";
@@ -1865,16 +2478,28 @@
 
       function handleAction(action, target) {
         if (!action) return;
+        if (target?.disabled) return;
         if (action === "start-create-room") {
           appState.copyStatus = "";
           selectScreen("scr-01-host-room");
         }
         if (action === "open-existing-room") {
+          if (!appState.room) return;
+          if (appState.room.status === "expired") {
+            selectScreen("scr-05-link-expired");
+            return;
+          }
+          if (appState.room.status === "closed") {
+            selectScreen("scr-06-room-closed");
+            return;
+          }
           const ranked = rankCandidates(appState.room);
           selectScreen(ranked.top ? "scr-03-result-recommendation" : "scr-02-participant-input");
         }
         if (action === "create-room") createRoomFromForm();
         if (action === "set-preference") {
+          if (!appState.room) return;
+          if (isTerminalRoom(appState.room)) return;
           appState.draftPreferences = getDraftPreferences(appState.room);
           appState.draftPreferences[target.dataset.candidateId] = normalizeStatus(target.dataset.status);
           appState.copyStatus = "";
@@ -1884,12 +2509,15 @@
         if (action === "submit-response") submitResponse();
         if (action === "edit-response") selectScreen("scr-02-participant-input");
         if (action === "seed-responses") seedResponses();
-        if (action === "copy-share" || action === "copy-invite") copyShareText();
+        if (action === "copy-share" || action === "copy-invite") copyShareText(action);
         if (action === "close-room") closeRoom();
         if (action === "go-home") selectScreen("scr-00-entry");
+        if (action === "open-settings") selectScreen("scr-07-settings");
+        if (action === "clear-local-data") clearLocalData();
+        if (action === "toggle-locale") setLocale(activeLocale === "ko" ? "en" : "ko");
       }
 
-      screenRoot.addEventListener("click", (event) => {
+      appRoot.addEventListener("click", (event) => {
         const target = event.target.closest("[data-action]");
         handleAction(target?.dataset.action, target);
       });
@@ -1904,6 +2532,7 @@
         minimumResponses,
         rankCandidates,
         buildShareText,
+        buildCopyTextForAction,
         createDemoRoom,
       };
 
