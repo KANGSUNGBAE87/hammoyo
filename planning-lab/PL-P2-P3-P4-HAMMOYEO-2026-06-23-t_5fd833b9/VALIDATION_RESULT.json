@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "root": "/Users/kangsungbae/Documents/지식저장소/planning-lab/20_RUNS/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/P4_HAMMOYEO",
+  "stage": "P4_FINAL_PACKAGE",
+  "missing_files": [],
+  "missing_headings": {},
+  "status_issues": [],
+  "extra_issues": [],
+  "note": "Structural validation only; Chair/Verifier must judge content quality.",
+  "command": "python3 /Users/kangsungbae/Documents/지식저장소/planning-lab/00_SYSTEM/validate_stage_artifacts.py /Users/kangsungbae/Documents/지식저장소/planning-lab/20_RUNS/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/P4_HAMMOYEO --stage P4_FINAL_PACKAGE"
+}

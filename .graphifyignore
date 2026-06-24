@@ -1,0 +1,11 @@
+.git/
+.codex/
+.claude/
+node_modules/
+dist/
+build/
+coverage/
+graphify-out/
+.understand-anything/
+.DS_Store
+*.log

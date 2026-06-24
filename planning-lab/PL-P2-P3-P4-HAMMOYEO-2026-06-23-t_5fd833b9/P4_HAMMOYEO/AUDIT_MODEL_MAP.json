@@ -1,0 +1,30 @@
+{
+  "run_id": "PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9",
+  "stage": "P2_CONCEPT_VALIDATION + P3_INCUBATION + P4_FINAL_PACKAGE",
+  "checked_at": "2026-06-23 12:20:16 KST",
+  "profiles": [
+    {
+      "profile": "planning-chair",
+      "intended_route": "Hermes Planning Chair",
+      "configured_provider": "openai-codex",
+      "configured_model": "gpt-5.5",
+      "observed_runtime_provider": "openai-codex",
+      "observed_runtime_model": "gpt-5.5",
+      "auth_status": "active in current Kanban run",
+      "fallback_status": "none observed",
+      "evidence_path": "RUN_BRIEF.md; SOURCE_NOTES.md"
+    },
+    {
+      "profile": "prior P2/P3 Council routes",
+      "intended_route": "four-model Council in prior official runs",
+      "configured_provider": "see prior audit_model_map artifacts",
+      "configured_model": "see prior audit_model_map artifacts",
+      "observed_runtime_provider": "not re-run in this corrective package",
+      "observed_runtime_model": "not re-run",
+      "auth_status": "reused official prior artifacts",
+      "fallback_status": "prior caveats preserved",
+      "evidence_path": "SOURCE_NOTES.md"
+    }
+  ],
+  "note": "Do not treat this file as proof of a fresh 4-model Council round; it records corrective packaging route and prior-artifact reuse."
+}

@@ -1,0 +1,46 @@
+# Run Brief
+
+- Run ID: `PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9`
+- Idea ID: `HAMMOYEO`
+- Stage: `P2_CONCEPT_VALIDATION + P3_INCUBATION + P4_FINAL_PACKAGE` corrective artifact production
+- Owner 승인 기록: Slack thread `함모여 p4 진행 확인 >>`, 2026-06-23 03:20 KST 맥락. Owner는 P1 생략 및 P2→P3→P4를 중간 승인 없이 산출물 제작까지 진행하도록 승인했습니다.
+- Kanban task: `t_5fd833b9` on `planning-lab` board / `planning-lab` tenant
+- 주제: 함모여 — 전원 가능 시간이 없거나 선호가 갈릴 때 방장이 fallback 타협안과 관계 안전 확정 문구를 얻는 경량 모임 합의 엔진
+- 이번 단계에서 결정할 질문:
+  - [FACT] 기존 P2/P3/pre-P4/live-pre-P4 근거를 새 stage artifact contract에 맞춰 실제 파일 패키지로 재구성할 수 있는가?
+  - [INFERENCE] P4 패키지는 구조적으로 production inspection이 가능하지만 evidence 상태는 unvalidated로 분리해야 하는가?
+  - [UNKNOWN] 실제 방장/참여자가 추천안과 공유 문구를 받아들이는지, 참여자가 10~30초 내 입력을 완료하는지는 아직 live 응답 0건이므로 알 수 없습니다.
+- 포함 범위:
+  - refreshed P2 artifacts, P3 artifacts, P4 final planning package
+  - renderable HTML/SVG/PNG design samples
+  - acceptance criteria, traceability matrix, implementation handoff, evidence log, verifier report
+  - official Planning Lab indexes and project-local derived docs update
+- 제외 범위:
+  - production implementation, Studio handoff, release, deployment
+  - respondent quote, WTP, completion rate, conversion rate fabrication
+  - `FINAL_APPROVED` 설정
+- 참조할 기존 논의:
+  - `PL-P2-HAMMOYEO-2026-06-22-t_bc2fbb9a/report.md`
+  - `PL-P3-HAMMOYEO-2026-06-22-t_3d1486ff/report.md`
+  - `PL-PRE-P4-HAMMOYEO-2026-06-23-t_a499bbf7/report.md`
+  - `PL-LIVE-PRE-P4-HAMMOYEO-2026-06-23-t_1093f4ab/report.md`
+  - `PL-LIVE-PRE-P4-HAMMOYEO-2026-06-23-t_1093f4ab/issue_rediscussion.md`
+  - Parent task `t_961aed7c` handoff: independent UX/design opinion only; no files created.
+- 필수 산출물:
+  - `P2_CONCEPT_BRIEF.md`, `P2_SCOPE_AND_FLOW.md`, `P2_VALIDATION_MATRIX.md`
+  - `P3_INCUBATION_REPORT.md`, `P3_OPTION_MATRIX.md`, `P3_VALIDATION_GATES.md`, `P3_TO_P4_BRIEF.md`
+  - `P4_HAMMOYEO/00_PACKAGE_MANIFEST.yaml` through `P4_HAMMOYEO/VERIFIER_REPORT.md`
+  - `STATUS.yaml`, `SOURCE_NOTES.md`, `AUDIT_MODEL_MAP.json`, owner report, index updates
+- 완료 조건:
+  - required files exist and non-empty
+  - major claims carry FACT/INFERENCE/HYPOTHESIS/UNKNOWN labels
+  - strongest objection is visible
+  - live external validation 0 responses caveat is preserved
+  - structural validator passes or defects are explicitly reported
+  - Slack Owner report delivered or `[대기]` delivery issue recorded
+- 사용할 Council:
+  - [FACT] 이번 보정 run은 새 4-model Council 의견 생산이 아니라 prior P2/P3/pre-P4 Council 및 parent UX opinion을 stage artifact contract에 맞춰 재패키징하는 corrective production입니다.
+  - [FACT] 이전 P2/P3 Council outputs and senior verifier artifacts are cited in `SOURCE_NOTES.md`.
+- Chair: `planning-chair`
+- Verifier 조건:
+  - P4 hard gates, evidence labels, design sample reality, acceptance criteria testability, traceability completeness, owner_state separation.

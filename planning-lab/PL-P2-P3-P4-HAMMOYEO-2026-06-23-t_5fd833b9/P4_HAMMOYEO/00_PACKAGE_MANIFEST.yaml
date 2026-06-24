@@ -1,0 +1,39 @@
+package_id: P4_HAMMOYEO
+idea_id: HAMMOYEO
+stage: P4_FINAL_PACKAGE
+package_completeness: PACKAGE_COMPLETE
+evidence_status: EVIDENCE_UNVALIDATED
+implementation_readiness: IMPLEMENTATION_CONDITIONAL
+owner_state: OWNER_UNREVIEWED
+required_files:
+  - 01_P4_FINAL_REPORT.md
+  - 02_PRODUCT_PLAN.md
+  - 03_DESIGN_PLAN.md
+  - 04_DESIGN_SAMPLES/README.md
+  - 05_ACCEPTANCE_CRITERIA.md
+  - 06_IMPLEMENTATION_HANDOFF.md
+  - 07_TRACEABILITY_MATRIX.md
+  - 08_DECISION_EVIDENCE_LOG.md
+  - VERIFIER_REPORT.md
+conditional_files:
+  - APPENDICES/COPY_PACK.md
+  - APPENDICES/RECOMMENDATION_LOGIC.md
+  - APPENDICES/VALIDATION_PLAN.md
+project_correction_files:
+  - 09_CORRECTION_PLAN.md
+design_samples:
+  - SCR-01-host-room.html
+  - SCR-02-participant-input.html
+  - SCR-03-result-recommendation.html
+  - SCR-04-empty-error-state.svg
+  - SCR-03-result-recommendation.png
+acceptance_criteria:
+  count: 10
+  file: 05_ACCEPTANCE_CRITERIA.md
+traceability_matrix: 07_TRACEABILITY_MATRIX.md
+verifier_report: VERIFIER_REPORT.md
+updated_at: '2026-06-23 12:20:16 KST'
+notes:
+  - 'No FINAL_APPROVED. Owner review required.'
+  - 'Live external validation responses remain 0.'
+  - 'Project-local correction added on 2026-06-24; see 09_CORRECTION_PLAN.md.'

@@ -1,0 +1,45 @@
+run_id: PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/P4_HAMMOYEO
+idea_id: HAMMOYEO
+stage: P4_FINAL_PACKAGE
+stage_status: COMPLETE
+ai_grade: AI_GRADE_B
+ai_recommendation: AI_RECOMMEND_OBTAIN_LIVE_RESPONDENTS_BEFORE_P4
+owner_state: OWNER_UNREVIEWED
+package_completeness: PACKAGE_COMPLETE
+evidence_status: EVIDENCE_UNVALIDATED
+implementation_readiness: IMPLEMENTATION_CONDITIONAL
+required_artifacts:
+  - RUN_BRIEF.md
+  - P2_CONCEPT_BRIEF.md
+  - P2_SCOPE_AND_FLOW.md
+  - P2_VALIDATION_MATRIX.md
+  - P3_INCUBATION_REPORT.md
+  - P3_OPTION_MATRIX.md
+  - P3_VALIDATION_GATES.md
+  - P3_TO_P4_BRIEF.md
+  - P4_HAMMOYEO/00_PACKAGE_MANIFEST.yaml
+  - P4_HAMMOYEO/01_P4_FINAL_REPORT.md
+  - P4_HAMMOYEO/02_PRODUCT_PLAN.md
+  - P4_HAMMOYEO/03_DESIGN_PLAN.md
+  - P4_HAMMOYEO/04_DESIGN_SAMPLES/README.md
+  - P4_HAMMOYEO/04_DESIGN_SAMPLES/SCR-01-host-room.html
+  - P4_HAMMOYEO/04_DESIGN_SAMPLES/SCR-02-participant-input.html
+  - P4_HAMMOYEO/04_DESIGN_SAMPLES/SCR-03-result-recommendation.html
+  - P4_HAMMOYEO/04_DESIGN_SAMPLES/SCR-04-empty-error-state.svg
+  - P4_HAMMOYEO/05_ACCEPTANCE_CRITERIA.md
+  - P4_HAMMOYEO/06_IMPLEMENTATION_HANDOFF.md
+  - P4_HAMMOYEO/07_TRACEABILITY_MATRIX.md
+  - P4_HAMMOYEO/08_DECISION_EVIDENCE_LOG.md
+  - P4_HAMMOYEO/VERIFIER_REPORT.md
+missing_artifacts: []
+project_correction_status: PROJECT_COPY_CORRECTED
+project_correction_files:
+  - P4_HAMMOYEO/09_CORRECTION_PLAN.md
+  - /Users/kangsungbae/Documents/hammoyo/ai/plans/implementation-plan.md
+  - /Users/kangsungbae/Documents/hammoyo/ai/plans/design-plan.md
+  - /Users/kangsungbae/Documents/hammoyo/docs/mvp/index.html
+updated_at: '2026-06-24 00:00:00 KST'
+notes:
+  - 'FINAL_APPROVED is not set; Owner review is still required.'
+  - 'Live external validation responses remain 0 due to missing recruitment/contact path.'
+  - 'Project-local correction added on 2026-06-24; official Planning Lab source remains audit archive.'

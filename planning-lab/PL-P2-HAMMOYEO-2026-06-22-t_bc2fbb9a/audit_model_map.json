@@ -1,0 +1,6 @@
+{
+  "Opinion A": "council-deepseek",
+  "Opinion B": "council-gemini",
+  "Opinion C": "council-claude",
+  "Opinion D": "council-gpt"
+}

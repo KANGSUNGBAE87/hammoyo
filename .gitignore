@@ -1,0 +1,22 @@
+
+# Local environment values
+.env.local
+.env.*.local
+.env.server.local
+.gstack/
+
+# OS/editor noise
+.DS_Store
+
+# Local agent/runtime state
+.agents/
+.codex/
+.claude/settings.local.json
+.claude/skills/
+supabase/.temp/
+
+# Generated knowledge graph artifacts
+graphify-out/
+.understand-anything/*
+!.understand-anything/config.json
+!.understand-anything/.understandignore

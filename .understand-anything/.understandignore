@@ -1,0 +1,14 @@
+# Built-in-style project ignores for Understand-Anything.
+.git/
+node_modules/
+dist/
+build/
+coverage/
+graphify-out/
+.understand-anything/intermediate/
+.understand-anything/tmp/
+.understand-anything/knowledge-graph.json
+.understand-anything/meta.json
+.understand-anything/fingerprints.json
+.DS_Store
+*.log
