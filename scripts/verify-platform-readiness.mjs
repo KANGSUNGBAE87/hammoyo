@@ -123,17 +123,23 @@ for (const docToken of [
   assert(releaseDoc.includes(docToken), `release readiness doc missing: ${docToken}`);
 }
 
-for (const docToken of ["문의", "PUBLIC_CONTACT_EMAIL", "Apps in Toss", "Google Play"]) {
+for (const docToken of ["문의", "공개 문의 이메일은 정식 제출 전 확정", "Apps in Toss", "Google Play"]) {
   assert(contactDoc.includes(docToken), `contact page missing: ${docToken}`);
+}
+
+for (const forbiddenPublicToken of ["PUBLIC_CONTACT_EMAIL", "PUBLIC_PRIVACY_URL", "PUBLIC_DATA_DELETION_URL"]) {
+  assert(!contactDoc.includes(forbiddenPublicToken), `contact page should not expose env placeholder token: ${forbiddenPublicToken}`);
 }
 
 for (const docToken of ["정적 MVP preview 전용", "English Summary", "데이터 삭제 요청 URL", "contact.html", "delete-data.html"]) {
   assert(privacyDoc.includes(docToken), `privacy page missing: ${docToken}`);
 }
 
-for (const docToken of ["데이터 삭제", "PUBLIC_DATA_DELETION_URL", "로컬 삭제", "서버 데이터 삭제"]) {
+for (const docToken of ["데이터 삭제", "공개 데이터 삭제 요청 URL은 정식 제출 전 확정", "로컬 삭제", "서버 데이터 삭제"]) {
   assert(deleteDataDoc.includes(docToken), `data deletion page missing: ${docToken}`);
 }
+
+assert(!deleteDataDoc.includes("PUBLIC_DATA_DELETION_URL"), "data deletion page should not expose env placeholder token: PUBLIC_DATA_DELETION_URL");
 
 const contracts = await import(pathToFileURL(`${process.cwd()}/${contractsPath}`).href);
 const preview = await import(pathToFileURL(`${process.cwd()}/${previewAdaptersPath}`).href);

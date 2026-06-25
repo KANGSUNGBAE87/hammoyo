@@ -69,6 +69,23 @@ async function assertButtonInInitialViewport(page, testId, message) {
   assert(result.visible && result.top >= 0 && result.bottom <= result.viewportHeight, message);
 }
 
+async function assertStickyCtaDoesNotCoverBody(page, message) {
+  const result = await page.evaluate(() => {
+    const screenBody = document.querySelector(".screenBody");
+    const cta = document.querySelector(".StickyBottomCTA");
+    if (!screenBody || !cta) return { ok: false, reason: "missing screen body or CTA" };
+    window.scrollTo(0, document.documentElement.scrollHeight);
+    const bodyRect = screenBody.getBoundingClientRect();
+    const ctaRect = cta.getBoundingClientRect();
+    return {
+      ok: bodyRect.bottom <= ctaRect.top - 8,
+      bodyBottom: Math.round(bodyRect.bottom),
+      ctaTop: Math.round(ctaRect.top),
+    };
+  });
+  assert(result.ok, `${message}: ${JSON.stringify(result)}`);
+}
+
 async function main() {
   const browser = await chromium.launch({
     headless: true,
@@ -94,6 +111,14 @@ async function main() {
   const cleanEntryStorage = await page.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
   assert(cleanEntryStorage === null, "clean entry should not persist a placeholder room");
   assert(await page.getByTestId("language-toggle-button").isVisible(), "entry should expose a language switcher");
+
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto(baseFileUrl, { waitUntil: "load" });
+  assert(!(await page.locator(".tabsPanel").isVisible()), "desktop debug screen panel should be hidden by default");
+  await page.goto(`${baseFileUrl}?debug=1`, { waitUntil: "load" });
+  assert(await page.locator(".tabsPanel").isVisible(), "desktop debug screen panel should be visible only with debug=1");
+  await page.setViewportSize({ width: 390, height: 740 });
+  await page.goto(pageUrl, { waitUntil: "load" });
 
   const algorithmChecks = await page.evaluate(() => {
     const api = window.HAMMOYEO_MVP_TESTS;
@@ -183,6 +208,43 @@ async function main() {
   assert(inviteCopyStatus.includes("복사했어요"), "insufficient response invite copy should show copy feedback");
 
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
+  await page.getByTestId("participant-name-input").fill("   ");
+  await page.getByTestId("submit-response-button").click();
+  const blankAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  assert(blankAliasState?.room?.responses?.[0]?.alias === "익명", "blank participant name should be explicitly saved as anonymous");
+  await page.getByTestId("edit-response-button").click();
+  await page.getByTestId("participant-name-input").fill("민지");
+  await page.getByTestId("submit-response-button").click();
+  const editedAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  assert(
+    editedAliasState?.room?.responses?.length === 1 && editedAliasState.room.responses[0].alias === "민지",
+    "editing my response should update the existing response instead of adding a new one",
+  );
+  await page.evaluate(() => {
+    const key = "hammoyo:mvp:v1";
+    const state = JSON.parse(localStorage.getItem(key));
+    state.currentParticipant = "";
+    state.lastResponseId = null;
+    localStorage.setItem(key, JSON.stringify(state));
+  });
+  await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
+  await page.getByTestId("participant-name-input").fill(" ");
+  await page.getByTestId("submit-response-button").click();
+  const secondBlankAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const anonymousAliases = secondBlankAliasState?.room?.responses
+    ?.map((response) => response.alias)
+    .filter((alias) => alias.startsWith("익명"));
+  assert(
+    secondBlankAliasState?.room?.responses?.some((response) => response.alias === "민지") &&
+      anonymousAliases?.length === 1,
+    "a new blank participant should not overwrite an existing named response",
+  );
+  await page.getByTestId("copy-reminder-button").click();
+  await page.waitForSelector("[data-testid='copy-status']");
+  const reminderCopyStatus = await page.getByTestId("copy-status").innerText();
+  assert(reminderCopyStatus.includes("복사했어요"), "response-complete reminder copy should show copy feedback");
+
+  await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
   await page.getByTestId("participant-name-input").fill("민지");
   await page.getByTestId("preference-slot-1-prefer").click();
   await page.getByTestId("preference-slot-2-available").click();
@@ -190,7 +252,10 @@ async function main() {
   await page.getByTestId("submit-response-button").click();
 
   const storedAfterResponse = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
-  assert(storedAfterResponse?.room?.responses?.length === 1, "participant response should be saved");
+  assert(
+    storedAfterResponse?.room?.responses?.some((response) => response.alias === "민지"),
+    "participant response should be saved",
+  );
 
   await page.goto(`${baseFileUrl}?demo=1&screen=scr-02b-response-complete`, { waitUntil: "load" });
   await page.getByTestId("seed-responses-button").click();
@@ -311,6 +376,10 @@ async function main() {
   assert(settingsText.includes("개인정보처리방침") && settingsText.includes("문의") && settingsText.includes("보관"), "settings screen should include privacy policy, contact, and retention details");
   const privacyHref = await page.getByTestId("privacy-policy-link").getAttribute("href");
   assert(privacyHref?.includes("privacy.html"), "settings screen should link to a privacy policy document");
+  const contactHref = await page.getByTestId("contact-link").getAttribute("href");
+  assert(contactHref?.includes("contact.html"), "settings screen should expose a contact path");
+  const deletionHref = await page.getByTestId("data-deletion-link").getAttribute("href");
+  assert(deletionHref?.includes("delete-data.html"), "settings screen should expose a data deletion request path");
   await page.getByTestId("clear-local-data-button").click();
   const storageAfterClear = await page.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
   assert(storageAfterClear === null, "clear local data action should remove MVP localStorage");
@@ -351,6 +420,14 @@ async function main() {
   assert((await page.locator("html").getAttribute("lang")) === "en", "lang=en should set the document language");
   const englishEntryText = await page.locator("body").innerText();
   assert(englishEntryText.includes("Find a time that works"), "English locale should render entry headline");
+  assert(
+    (await page.getByTestId("topbar-home-button").getAttribute("aria-label")) === "Go to home",
+    "English locale should localize the topbar home aria-label",
+  );
+  assert(
+    (await page.getByTestId("language-toggle-button").getAttribute("aria-label")) === "Switch language to Korean",
+    "English locale should localize the language toggle aria-label",
+  );
   await page.goto(`${baseFileUrl}?reset=1&demo=1&lang=en&screen=scr-03-result-recommendation`, { waitUntil: "load" });
   const englishResultText = await page.locator("body").innerText();
   assert(englishResultText.includes("Copy result copy"), "English result screen should render the localized CTA");
@@ -386,6 +463,71 @@ async function main() {
   await page.goto(`${baseFileUrl}?reset=1&lang=en`, { waitUntil: "load" });
   await page.getByTestId("language-toggle-button").click();
   assert((await page.locator("html").getAttribute("lang")) === "ko", "language toggle should switch back to Korean");
+
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto(`${baseFileUrl}?reset=1&screen=scr-01-host-room`, { waitUntil: "load" });
+  await page.getByTestId("room-title-input").fill("작성 중인 모임");
+  let dismissedLocaleDialog = false;
+  page.once("dialog", async (dialog) => {
+    dismissedLocaleDialog = dialog.message().includes("작성 중");
+    await dialog.dismiss();
+  });
+  await page.getByTestId("language-toggle-button").click();
+  await page.waitForTimeout(100);
+  assert(dismissedLocaleDialog, "dirty host setup should guard language switching");
+  assert((await page.getByTestId("room-title-input").inputValue()) === "작성 중인 모임", "dismissing language switch should preserve host draft input");
+  let dismissedDirtyDialog = false;
+  page.once("dialog", async (dialog) => {
+    dismissedDirtyDialog = dialog.message().includes("작성 중");
+    await dialog.dismiss();
+  });
+  await page.getByTestId("topbar-home-button").click();
+  await page.waitForTimeout(100);
+  assert(dismissedDirtyDialog, "dirty host setup should show an exit confirmation");
+  assert(await page.locator("#scr-01-host-room").isVisible(), "dismissing dirty exit confirmation should keep the host setup screen");
+  page.once("dialog", async (dialog) => {
+    await dialog.accept();
+  });
+  await page.getByTestId("topbar-home-button").click();
+  await page.waitForSelector("#scr-00-entry");
+  await page.getByTestId("start-create-room").click();
+  await page.getByTestId("room-title-input").fill("뒤로가기 작성 중");
+  let dismissedHistoryDialog = false;
+  page.once("dialog", async (dialog) => {
+    dismissedHistoryDialog = dialog.message().includes("작성 중");
+    await dialog.dismiss();
+  });
+  await page.goBack();
+  await page.waitForTimeout(100);
+  assert(dismissedHistoryDialog, "browser history navigation should guard dirty host setup");
+  assert(await page.locator("#scr-01-host-room").isVisible(), "dismissing history dirty confirmation should keep the host setup screen");
+  await page.goto(`${baseFileUrl}?reset=1&screen=scr-01-host-room`, { waitUntil: "load" });
+  await assertStickyCtaDoesNotCoverBody(page, "host setup mobile CTA should not cover the last input");
+  await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-02-participant-input`, { waitUntil: "load" });
+  const preferenceAria = await page.getByTestId("preference-slot-1-prefer").getAttribute("aria-label");
+  assert(preferenceAria?.includes("6.29 토요일") && preferenceAria.includes("가장 좋아요"), "preference buttons should name the candidate and status");
+  await assertStickyCtaDoesNotCoverBody(page, "participant mobile CTA should not cover preference controls");
+  await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-02b-response-complete`, { waitUntil: "load" });
+  await assertStickyCtaDoesNotCoverBody(page, "response-complete mobile CTA should not cover status content");
+  await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-03-result-recommendation`, { waitUntil: "load" });
+  await assertStickyCtaDoesNotCoverBody(page, "recommendation mobile CTA should not cover trust content");
+  await page.goto(`${baseFileUrl}?reset=1&screen=scr-07-settings`, { waitUntil: "load" });
+  await assertStickyCtaDoesNotCoverBody(page, "settings mobile CTA should not cover policy links");
+
+  const readyReminderText = await page.evaluate(() => {
+    const api = window.HAMMOYEO_MVP_TESTS;
+    const room = api.createDemoRoom({
+      expectedCount: 3,
+      responses: [
+        { alias: "A", preferences: { "slot-1": "prefer", "slot-2": "available", "slot-3": "hardNo" } },
+        { alias: "B", preferences: { "slot-1": "available", "slot-2": "prefer", "slot-3": "hardNo" } },
+        { alias: "C", preferences: { "slot-1": "prefer", "slot-2": "adjustable", "slot-3": "available" } },
+      ],
+    });
+    return api.buildCopyTextForAction(room, "copy-reminder", api.rankCandidates(room));
+  });
+  assert(!readyReminderText.includes("0명"), "ready reminder copy should not mention zero remaining responses");
+  assert(readyReminderText.includes("충분히"), "ready reminder copy should switch to a ready-state message");
 
   const privacyDocument = readFileSync(resolve("docs/mvp/privacy.html"), "utf8");
   assert(privacyDocument.includes("English Summary"), "privacy policy should include an English summary");
