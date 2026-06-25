@@ -110,7 +110,8 @@ for (const forbiddenEnv of ["VITE_DEEPSEEK", "NEXT_PUBLIC_DEEPSEEK", "PUBLIC_DEE
 assert(!/^SUPABASE_SERVICE_ROLE_KEY=/m.test(envExample), ".env.example must not expose SUPABASE_SERVICE_ROLE_KEY=");
 
 for (const docToken of [
-  "원격 Supabase 적용 금지",
+  "원격 Supabase 적용 상태",
+  "npm run smoke:remote",
   "Apps in Toss",
   "Google Play",
   "BackendAdapter",
@@ -131,11 +132,11 @@ for (const forbiddenPublicToken of ["PUBLIC_CONTACT_EMAIL", "PUBLIC_PRIVACY_URL"
   assert(!contactDoc.includes(forbiddenPublicToken), `contact page should not expose env placeholder token: ${forbiddenPublicToken}`);
 }
 
-for (const docToken of ["정적 MVP preview 전용", "English Summary", "데이터 삭제 요청 URL", "contact.html", "delete-data.html"]) {
+for (const docToken of ["브라우저 저장 앱 화면", "English Summary", "데이터 삭제 요청 URL", "contact.html", "delete-data.html"]) {
   assert(privacyDoc.includes(docToken), `privacy page missing: ${docToken}`);
 }
 
-for (const docToken of ["데이터 삭제", "공개 데이터 삭제 요청 URL은 정식 제출 전 확정", "로컬 삭제", "서버 데이터 삭제"]) {
+for (const docToken of ["데이터 삭제", "공개 데이터 삭제 요청 URL은 정식 제출 전 확정", "로컬 삭제", "서버 데이터 삭제", "일반 공유 링크"]) {
   assert(deleteDataDoc.includes(docToken), `data deletion page missing: ${docToken}`);
 }
 

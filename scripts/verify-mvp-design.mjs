@@ -16,6 +16,7 @@ const requiredScreens = [
   "scr-05-link-expired",
   "scr-06-room-closed",
   "scr-07-settings",
+  "scr-08-my-meetups",
 ];
 
 const requiredLabels = [
@@ -27,8 +28,10 @@ const requiredLabels = [
   "공유 문구 복사하기",
   "개인정보",
   "로컬 데이터 지우기",
+  "일반 공유 링크",
+  "내가 만든 모임",
   "Find a time that works",
-  "preview 전용",
+  "General share link",
 ];
 
 const requiredComponentMarkers = [
@@ -39,6 +42,7 @@ const requiredComponentMarkers = [
   "ResponseCoverage",
   "ParticipantAvatarStack",
   "ShareCopyBox",
+  "HostStatusCard",
   "StateGraphic",
   "StickyBottomCTA",
 ];
@@ -108,9 +112,9 @@ if (!html.includes('data-testid="language-toggle-button"')) {
 }
 
 if (failures.length) {
-  console.error("HAMMOYEO MVP design verification failed:");
+  console.error("HAMMOYEO app design verification failed:");
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
-console.log("HAMMOYEO MVP design verification passed.");
+console.log("HAMMOYEO app design verification passed.");

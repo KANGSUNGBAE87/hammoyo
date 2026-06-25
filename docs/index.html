@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>함모여 기능 MVP</title>
+    <title>함모여</title>
     <link rel="icon" href="data:," />
     <style>
       :root {
@@ -823,6 +823,55 @@
         background: var(--surface);
       }
 
+      .candidateInputHeader,
+      .HostStatusCard {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .candidateActionButton {
+        min-height: 34px;
+        padding: 0 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-pill);
+        color: var(--text-secondary);
+        background: var(--surface-raised);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 800;
+      }
+
+      .candidateActionButton:disabled {
+        color: var(--text-tertiary);
+        opacity: 0.55;
+      }
+
+      .linkField {
+        display: grid;
+        gap: 8px;
+        padding: 14px;
+        border: 1px solid rgba(91, 95, 245, 0.2);
+        border-radius: var(--radius-lg);
+        background: var(--brand-soft);
+      }
+
+      .linkField input {
+        font-size: 13px;
+      }
+
+      .HostStatusCard {
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+      }
+
+      .HostStatusCard .slotMeta {
+        min-width: 0;
+      }
+
       .actionStatus {
         min-height: 20px;
         color: var(--success);
@@ -1083,7 +1132,7 @@
   <body data-ai-copy-enabled="false">
     <main class="page">
       <div class="layout">
-        <section class="phone" aria-label="함모여 모바일 디자인 MVP">
+        <section class="phone" aria-label="함모여 모바일 앱">
           <div class="app">
             <header class="topbar">
               <div class="brand">
@@ -1093,7 +1142,7 @@
                 <div class="topbarActions">
                   <button class="topbarButton" type="button" data-action="open-settings" data-testid="privacy-settings-button">개인정보</button>
                   <button class="topbarButton" type="button" data-action="toggle-locale" data-testid="language-toggle-button" aria-label="언어 전환">EN</button>
-                  <span class="pill">기능 MVP</span>
+                  <span class="pill">앱 준비</span>
                 </div>
               </div>
             </header>
@@ -1202,8 +1251,16 @@
             "tab": "SCR-07 개인정보",
             "eyebrow": "개인정보와 데이터",
             "title": "저장되는 내용을 확인해요",
-            "description": "현재 MVP는 서버 전송 없이 이 브라우저 안에만 방 정보와 응답을 저장해요.",
+            "description": "현재 화면은 이 브라우저에 저장된 모임과 일반 공유 링크를 우선 사용해요.",
             "primary": "로컬 데이터 지우기",
+            "secondary": "홈으로 돌아가기"
+          },
+          "scr-08-my-meetups": {
+            "tab": "SCR-08 내가 만든 모임",
+            "eyebrow": "내가 만든 모임",
+            "title": "모임 상태를 계속 확인해요",
+            "description": "내 브라우저에 저장된 모임의 응답 수, 추천 상태, 공유 링크를 바로 확인해요.",
+            "primary": "새 모임 만들기",
             "secondary": "홈으로 돌아가기"
           }
         },
@@ -1226,16 +1283,24 @@
           "homeButtonLabel": "홈으로 이동",
           "privacyButton": "개인정보",
           "privacyButtonLabel": "개인정보와 데이터 설정으로 이동",
-          "mvpPill": "기능 MVP",
+          "appPill": "앱 준비",
           "languageToggle": "EN",
           "languageButtonLabel": "언어를 영어로 전환",
-          "phoneLabel": "함모여 기능 MVP",
+          "phoneLabel": "함모여 앱",
           "entryCaption": "가능 시간표보다 먼저, 방장이 공유할 수 있는 결론을 만듭니다.",
           "emptyRoom": "저장된 모임이 아직 없어요. 새 모임을 만들면 이 브라우저에만 저장돼요.",
           "roomUnavailable": "저장된 모임 없음",
-          "draftOnlyGuide": "실제 링크 공유, Toss login, Supabase 저장은 아직 연결하지 않고 브라우저 안에만 저장해요.",
-          "invitePreviewText": "preview 전용 초대 문구입니다. 실제 참여 링크는 ShareAdapter와 Supabase 연결 후 생성됩니다. 지금은 같은 기기에서 흐름 확인용으로만 사용해 주세요.",
-          "inviteText": "{title} 가능한 시간 응답을 부탁드려요.\n{preview}",
+          "draftOnlyGuide": "날짜와 시간을 고르면 일반 공유 링크가 만들어져요. 로그인 전에는 이 브라우저의 저장소를 기준으로 상태를 확인해요.",
+          "generalShareLink": "일반 공유 링크",
+          "generalShareHint": "이 링크를 복사해 메신저에 보내면 참여자가 바로 응답 화면으로 들어올 수 있어요.",
+          "inviteText": "{title} 가능한 시간 응답을 부탁드려요.\n{url}",
+          "savedMeetupsTitle": "내가 만든 모임",
+          "savedMeetupsEmpty": "아직 만든 모임이 없어요.",
+          "openStatus": "상태 보기",
+          "copyLink": "링크 복사",
+          "addCandidate": "후보 시간 추가",
+          "removeCandidate": "삭제",
+          "candidateLabel": "후보 {index}",
           "recommendationBlocked": "{title}은 현재 후보 시간에서 어려움 응답이 많아 바로 확정하기 어려워요. 방장이 새 후보 시간을 열면 다시 고를 수 있게 정리할게요.",
           "recommendationWait": "아직 {need}명 정도의 응답이 더 필요해요. preview에서는 실제 참여 링크를 만들지 않으니, 같은 기기에서 응답 흐름만 확인해 주세요.",
           "recommendationText": "{title}은 현재 응답 기준으로 {label} {time}이 가장 현실적인 약속안이에요. {reason} {responses}명이 답했고, {prefer}명이 가장 좋아요로 골랐어요. 이 시간으로 정리해볼게요.",
@@ -1281,11 +1346,11 @@
           "localStorageTitle": "로컬 저장",
           "localStorageBody": "방 제목, 후보 시간, 별명, 응답은 현재 브라우저의 localStorage에만 저장돼요. 보관 기간은 사용자가 로컬 데이터를 지우거나 브라우저 저장소를 삭제할 때까지예요.",
           "serverlessTitle": "서버 전송 없음",
-          "serverlessBody": "이 MVP 화면은 Toss login, Supabase, AI API, 광고, 결제를 아직 호출하지 않아요.",
+          "serverlessBody": "GitHub Pages 화면은 브라우저 저장과 일반 공유 링크를 우선 사용해요. Supabase/DeepSeek는 서버 함수로 연결되어 있고, Toss login과 정식 계정 흐름을 붙이면 원격 상태 동기화로 전환합니다.",
           "privacyPolicyTitle": "개인정보처리방침",
           "privacyPolicyBody": "개인정보처리방침에서 수집 항목, 보관, 삭제, 문의 방법을 확인할 수 있어요.",
           "deleteTitle": "삭제",
-          "deleteBody": "아래 버튼을 누르면 이 브라우저에 저장된 함모여 MVP 데이터를 지워요.",
+          "deleteBody": "아래 버튼을 누르면 이 브라우저에 저장된 함모여 데이터를 지워요.",
           "contactTitle": "문의",
           "contactBody": "배포 전 preview 문의는 프로젝트 관리자에게 전달하고, 정식 제출 전 공개 문의 이메일을 정책 문서에 연결해야 해요.",
           "futureDeletionTitle": "계정 삭제는 아직 없음",
@@ -1369,8 +1434,16 @@
             "tab": "SCR-07 Privacy",
             "eyebrow": "Privacy and Data",
             "title": "Check what is stored",
-            "description": "This MVP stores room data only inside this browser.",
+            "description": "This screen prioritizes saved browser data and general share links.",
             "primary": "Clear local data",
+            "secondary": "Go home"
+          },
+          "scr-08-my-meetups": {
+            "tab": "SCR-08 My Meetups",
+            "eyebrow": "My Meetups",
+            "title": "Keep checking meetup status",
+            "description": "Review saved host rooms, response counts, recommendation status, and share links.",
+            "primary": "Create a meetup",
             "secondary": "Go home"
           }
         },
@@ -1393,16 +1466,24 @@
           "homeButtonLabel": "Go to home",
           "privacyButton": "Privacy",
           "privacyButtonLabel": "Open privacy and data settings",
-          "mvpPill": "Functional MVP",
+          "appPill": "App ready",
           "languageToggle": "KO",
           "languageButtonLabel": "Switch language to Korean",
-          "phoneLabel": "Hammoyo functional MVP",
+          "phoneLabel": "Hammoyo app",
           "entryCaption": "Before building a full availability table, Hammoyo helps the host share a clear next step.",
           "emptyRoom": "No meetup is saved yet. Create one to store it in this browser only.",
           "roomUnavailable": "No saved meetup",
-          "draftOnlyGuide": "Real link sharing, Toss login, and Supabase storage are not connected yet. This preview stores data only in this browser.",
-          "invitePreviewText": "Preview-only invite copy. A real participant link will be generated after ShareAdapter and Supabase are connected. For now, use this only to inspect the flow on the same device.",
-          "inviteText": "Please share your availability for {title}.\n{preview}",
+          "draftOnlyGuide": "Pick dates and times to generate a general share link. Before login, status is tracked from this browser's saved data.",
+          "generalShareLink": "General share link",
+          "generalShareHint": "Copy this link into your messenger so participants can open the response screen directly.",
+          "inviteText": "Please share your availability for {title}.\n{url}",
+          "savedMeetupsTitle": "My meetups",
+          "savedMeetupsEmpty": "No hosted meetup has been created yet.",
+          "openStatus": "View status",
+          "copyLink": "Copy link",
+          "addCandidate": "Add time option",
+          "removeCandidate": "Remove",
+          "candidateLabel": "Option {index}",
           "recommendationBlocked": "{title} has too many difficult responses for the current options, so it should not be confirmed yet. The host can add new candidate times and collect again.",
           "recommendationWait": "About {need} more responses are needed. This preview does not create a real participant link, so use it only to inspect the same-device flow.",
           "recommendationText": "{title}: {label} {time} is the most workable option so far. {reason} {responses} people responded, and {prefer} picked it as best. I will use this time as the plan.",
@@ -1448,11 +1529,11 @@
           "localStorageTitle": "Local storage",
           "localStorageBody": "Room title, candidate times, nickname, and responses are stored only in this browser's localStorage until you clear local data or browser storage.",
           "serverlessTitle": "No server transfer",
-          "serverlessBody": "This MVP does not call Toss login, Supabase, AI APIs, ads, or payments.",
+          "serverlessBody": "The GitHub Pages screen starts with browser storage and general share links. Supabase and DeepSeek are connected through server functions, and remote status sync can be enabled when Toss login/account flow is attached.",
           "privacyPolicyTitle": "Privacy policy",
           "privacyPolicyBody": "The privacy policy explains data fields, retention, deletion, and contact paths.",
           "deleteTitle": "Deletion",
-          "deleteBody": "The button below removes Hammoyo MVP data saved in this browser.",
+          "deleteBody": "The button below removes Hammoyo data saved in this browser.",
           "contactTitle": "Contact",
           "contactBody": "Preview questions go to the project owner. A public contact email must be connected before store submission.",
           "futureDeletionTitle": "No account deletion yet",
@@ -1489,6 +1570,7 @@
         "scr-05-link-expired",
         "scr-06-room-closed",
         "scr-07-settings",
+        "scr-08-my-meetups",
       ];
 
       const demoFixtures = {
@@ -1513,6 +1595,7 @@
       };
 
       const defaultCandidates = demoFixtures.ko.candidates;
+      const MAX_CANDIDATES = 8;
 
       function localizedDemoFixture() {
         return demoFixtures[activeLocale] || demoFixtures.ko;
@@ -1539,6 +1622,78 @@
 
       function formatTemplate(template, values = {}) {
         return String(template || "").replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ""));
+      }
+
+      function toBase64Url(value) {
+        const bytes = new TextEncoder().encode(JSON.stringify(value));
+        let binary = "";
+        bytes.forEach((byte) => {
+          binary += String.fromCharCode(byte);
+        });
+        return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      }
+
+      function fromBase64Url(value) {
+        try {
+          const normalized = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
+          const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+          const binary = atob(padded);
+          const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+          return JSON.parse(new TextDecoder().decode(bytes));
+        } catch {
+          return null;
+        }
+      }
+
+      function weekdayLabel(dateValue) {
+        if (!dateValue) return "";
+        const date = new Date(`${dateValue}T00:00:00`);
+        if (Number.isNaN(date.getTime())) return "";
+        if (activeLocale === "en") {
+          return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+        }
+        const weekdays = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+        return `${date.getMonth() + 1}.${date.getDate()} ${weekdays[date.getDay()]}`;
+      }
+
+      function createShareSnapshot(room) {
+        return {
+          v: 1,
+          id: room.id,
+          title: room.title,
+          expectedCount: room.expectedCount,
+          deadlineLabel: room.deadlineLabel,
+          candidates: room.candidates.map((candidate) => ({
+            id: candidate.id,
+            date: candidate.date || "",
+            label: candidate.label,
+            time: candidate.time,
+            note: candidate.note,
+          })),
+        };
+      }
+
+      function buildGeneralShareUrl(room) {
+        const url = new URL(window.location.href);
+        url.search = "";
+        url.hash = "";
+        url.searchParams.set("screen", "scr-02-participant-input");
+        url.searchParams.set("join", toBase64Url(createShareSnapshot(room)));
+        return url.toString();
+      }
+
+      function publicRoomFromShareSnapshot(snapshot) {
+        if (!snapshot || snapshot.v !== 1 || !Array.isArray(snapshot.candidates)) return null;
+        return createDemoRoom({
+          id: snapshot.id || `shared-${Date.now().toString(36)}`,
+          title: snapshot.title || localizedDemoFixture().title,
+          expectedCount: snapshot.expectedCount || 4,
+          deadlineLabel: snapshot.deadlineLabel || localizedDemoFixture().deadlineLabel,
+          candidates: snapshot.candidates.slice(0, MAX_CANDIDATES),
+          responses: [],
+          status: "collecting",
+          isSharedLink: true,
+        });
       }
 
       function currentStorageKey() {
@@ -1570,7 +1725,7 @@
         if (languageButton) languageButton.textContent = locale.ui.languageToggle;
         if (languageButton) languageButton.setAttribute("aria-label", locale.ui.languageButtonLabel);
         if (homeLabel) homeLabel.textContent = locale.ui.homeShort;
-        if (pill) pill.textContent = locale.ui.mvpPill;
+        if (pill) pill.textContent = locale.ui.appPill;
       }
 
       function setLocale(nextLocale) {
@@ -1618,9 +1773,12 @@
 
       function normalizeCandidate(candidate, index) {
         const fallback = localizedDefaultCandidates()[index] || localizedDefaultCandidates()[0];
+        const date = String(candidate?.date || "").trim();
+        const label = String(candidate?.label || weekdayLabel(date) || fallback.label).trim();
         return {
           id: candidate?.id || `slot-${index + 1}`,
-          label: String(candidate?.label || fallback.label).trim(),
+          date,
+          label,
           time: String(candidate?.time || fallback.time).trim(),
           note: String(candidate?.note || fallback.note).trim(),
         };
@@ -1642,7 +1800,7 @@
       function createDemoRoom(options = {}) {
         const fixture = localizedDemoFixture();
         const candidates = (options.candidates || fixture.candidates)
-          .slice(0, 3)
+          .slice(0, MAX_CANDIDATES)
           .map((candidate, index) => normalizeCandidate(candidate, index));
         const room = {
           id: options.id || `room-${Date.now().toString(36)}`,
@@ -1653,9 +1811,12 @@
           responses: (options.responses || []).map(normalizeResponse),
           status: options.status || "collecting",
           selectedCandidateId: options.selectedCandidateId || null,
+          shareUrl: options.shareUrl || "",
+          isSharedLink: Boolean(options.isSharedLink),
           createdAt: options.createdAt || new Date().toISOString(),
           closedAt: options.closedAt || null,
         };
+        if (!room.shareUrl && !room.isSharedLink) room.shareUrl = buildGeneralShareUrl(room);
         return refreshRoomStatus(room);
       }
 
@@ -1739,7 +1900,7 @@
       }
 
       function refreshRoomStatus(room) {
-        if (room.status === "closed" || room.status === "expired") return room;
+        if (room.status === "draft" || room.status === "closed" || room.status === "expired") return room;
         const ranked = rankCandidates(room);
         if (ranked.top) room.status = "recommended";
         else if (ranked.enough) room.status = "needs_new_options";
@@ -1749,9 +1910,10 @@
       }
 
       function buildInviteText(room) {
+        const shareUrl = room.shareUrl || buildGeneralShareUrl(room);
         return formatTemplate(locale.ui.inviteText, {
           title: room.title,
-          preview: locale.ui.invitePreviewText,
+          url: shareUrl,
         });
       }
 
@@ -1854,6 +2016,8 @@
         return {
           version: APP_VERSION,
           room,
+          hostRooms: [room],
+          hostDraft: null,
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
@@ -1866,6 +2030,8 @@
         return {
           version: APP_VERSION,
           room: null,
+          hostRooms: [],
+          hostDraft: null,
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
@@ -1875,7 +2041,12 @@
       }
 
       function createDraftRoom() {
-        return createDemoRoom({ responses: [] });
+        return createDemoRoom({
+          id: `draft-${Date.now().toString(36)}`,
+          responses: [],
+          candidates: localizedDefaultCandidates().slice(0, 3),
+          status: "draft",
+        });
       }
 
       function hasSavedRoom() {
@@ -1883,6 +2054,7 @@
       }
 
       function roomOrDraft() {
+        if (appState.hostDraft) return createDemoRoom(appState.hostDraft);
         return appState.room || createDraftRoom();
       }
 
@@ -1894,9 +2066,16 @@
           room.selectedCandidateId = raw.room.selectedCandidateId || room.selectedCandidateId;
           room.closedAt = raw.room.closedAt || room.closedAt;
         }
+        const hostRooms = Array.isArray(raw.hostRooms)
+          ? raw.hostRooms.map((savedRoom) => createDemoRoom(savedRoom))
+          : room && !room.isSharedLink
+            ? [room]
+            : [];
         return {
           version: APP_VERSION,
           room,
+          hostRooms,
+          hostDraft: raw.hostDraft ? createDemoRoom(raw.hostDraft) : null,
           draftPreferences: raw.draftPreferences || {},
           currentParticipant: raw.currentParticipant || "",
           copyStatus: raw.copyStatus || "",
@@ -1908,6 +2087,14 @@
       function loadState() {
         const params = new URLSearchParams(window.location.search);
         if (params.get("reset") === "1") localStorage.removeItem(currentStorageKey());
+        const sharedRoom = publicRoomFromShareSnapshot(fromBase64Url(params.get("join")));
+        if (sharedRoom) {
+          return {
+            ...createFreshState(),
+            room: sharedRoom,
+            draftPreferences: {},
+          };
+        }
         try {
           const stored = localStorage.getItem(currentStorageKey());
           if (!stored) return isDemoMode() ? createDemoState() : createDefaultState();
@@ -1967,7 +2154,7 @@
 
       function shouldConfirmNavigation(action) {
         if (!hasUnsavedEdits) return false;
-        if (!["go-home", "open-settings", "open-existing-room", "start-create-room", "toggle-locale", "history"].includes(action)) return false;
+        if (!["go-home", "open-settings", "open-existing-room", "open-host-dashboard", "start-create-room", "toggle-locale", "history"].includes(action)) return false;
         return ["scr-01-host-room", "scr-02-participant-input"].includes(renderedScreen);
       }
 
@@ -2099,6 +2286,38 @@
         `;
       }
 
+      function generalShareLinkBox(room) {
+        const shareUrl = room.shareUrl || buildGeneralShareUrl(room);
+        return `
+          <section class="linkField" aria-label="${escapeHtml(locale.ui.generalShareLink)}">
+            ${reasonChip("brand", locale.ui.generalShareLink)}
+            <input class="textInput" data-testid="general-share-link" value="${escapeHtml(shareUrl)}" readonly />
+            <p class="helperText">${escapeHtml(locale.ui.generalShareHint)}</p>
+          </section>
+        `;
+      }
+
+      function hostStatusCard(room, index) {
+        const ranked = rankCandidates(room);
+        const statusLabel = room.status === "closed"
+          ? screenCopy("scr-06-room-closed").eyebrow
+          : ranked.top
+            ? screenCopy("scr-03-result-recommendation").eyebrow
+            : screenCopy("scr-04-insufficient-response").eyebrow;
+        return `
+          <article class="HostStatusCard">
+            <div class="slotMeta">
+              <strong>${escapeHtml(room.title)}</strong>
+              <span>${escapeHtml(formatTemplate(locale.ui.responseCount, { count: ranked.responseCount }))} · ${escapeHtml(statusLabel)}</span>
+            </div>
+            <div class="buttonRow">
+              <button class="candidateActionButton" type="button" data-action="open-room-status" data-room-id="${escapeHtml(room.id)}" data-testid="open-room-status-${index}">${escapeHtml(locale.ui.openStatus)}</button>
+              <button class="candidateActionButton" type="button" data-action="copy-room-link" data-room-id="${escapeHtml(room.id)}" data-testid="copy-room-link-${index}">${escapeHtml(locale.ui.copyLink)}</button>
+            </div>
+          </article>
+        `;
+      }
+
       function actionAttrs(action, testId) {
         return `${action ? `data-action="${escapeHtml(action)}"` : ""} ${testId ? `data-testid="${escapeHtml(testId)}"` : ""}`;
       }
@@ -2131,19 +2350,22 @@
       }
 
       function renderCandidateInputs(room) {
-        const candidates = [...room.candidates, ...localizedDefaultCandidates()].slice(0, 3);
+        const candidates = [...room.candidates, ...localizedDefaultCandidates()].slice(0, Math.max(3, room.candidates.length));
         return candidates
           .map((candidate, index) => `
             <div class="candidateInputCard">
-              ${reasonChip(index === 0 ? "brand" : "success", `후보 ${index + 1}`)}
+              <div class="candidateInputHeader">
+                ${reasonChip(index === 0 ? "brand" : "success", formatTemplate(locale.ui.candidateLabel, { index: index + 1 }))}
+                <button class="candidateActionButton" type="button" data-action="remove-candidate" data-candidate-index="${index}" data-testid="remove-candidate-${index}" ${candidates.length <= 2 ? "disabled" : ""}>${escapeHtml(locale.ui.removeCandidate)}</button>
+              </div>
               <div class="formGrid">
                 <label class="inputGroup">
                   <span class="inputLabel">날짜</span>
-                  <input class="textInput" data-testid="candidate-label-input-${index}" name="candidate-label-${index}" value="${escapeHtml(candidate.label)}" />
+                  <input class="textInput" type="date" data-testid="candidate-date-input-${index}" name="candidate-date-${index}" value="${escapeHtml(candidate.date || "")}" />
                 </label>
                 <label class="inputGroup">
                   <span class="inputLabel">시간</span>
-                  <input class="textInput" data-testid="candidate-time-input-${index}" name="candidate-time-${index}" value="${escapeHtml(candidate.time)}" />
+                  <input class="textInput" type="time" data-testid="candidate-time-input-${index}" name="candidate-time-${index}" value="${escapeHtml(candidate.time)}" />
                 </label>
               </div>
               <label class="inputGroup">
@@ -2152,13 +2374,15 @@
               </label>
             </div>
           `)
-          .join("");
+          .join("") +
+          `<button class="candidateActionButton" type="button" data-action="add-candidate" data-testid="add-candidate-button" ${candidates.length >= MAX_CANDIDATES ? "disabled" : ""}>${escapeHtml(locale.ui.addCandidate)}</button>`;
       }
 
       const renderers = {
         "scr-00-entry": () => {
           const copy = screenCopy("scr-00-entry");
           const ranked = appState.room ? rankCandidates(appState.room) : null;
+          const hostedCount = appState.hostRooms?.length || 0;
           const savedRoomLine = appState.room
             ? `최근 방: ${escapeHtml(appState.room.title)} · ${ranked.responseCount}명 응답`
             : locale.ui.emptyRoom;
@@ -2175,13 +2399,15 @@
                   ${reasonChip("brand", "Converging Orbit")}
                   <p class="caption">${escapeHtml(locale.ui.entryCaption)}</p>
                   <p class="emptyStateLine">${savedRoomLine}</p>
+                  ${hostedCount ? `<p class="helperText">${escapeHtml(locale.ui.savedMeetupsTitle)} ${hostedCount}</p>` : ""}
                 </div>
               </div>
-              ${stickyBottomCTA(copy.primary, appState.room ? copy.secondary : locale.ui.roomUnavailable, {
+              ${stickyBottomCTA(copy.primary, hostedCount ? locale.ui.savedMeetupsTitle : locale.ui.roomUnavailable, {
                 primaryAction: "start-create-room",
                 primaryTestId: "start-create-room",
-                secondaryAction: appState.room ? "open-existing-room" : null,
-                secondaryDisabled: !appState.room,
+                secondaryAction: hostedCount ? "open-host-dashboard" : null,
+                secondaryTestId: hostedCount ? "open-host-dashboard-button" : null,
+                secondaryDisabled: !hostedCount,
               })}
             </section>
           `;
@@ -2377,6 +2603,7 @@
                   <p>${escapeHtml(description)}</p>
                 </div>
                 ${responseCoverage(room, needsNewOptions ? "blocked" : "low")}
+                ${generalShareLinkBox(room)}
                 ${shareCopyBox(room, ranked)}
                 <p class="guideNote">${needsNewOptions ? "관계 안전을 위해 어려움이 많은 후보는 밀어붙이지 않아요." : "조금 더 모이면 방장이 설명하기 쉬운 추천안을 만들 수 있어요."}</p>
               </div>
@@ -2486,6 +2713,26 @@
             </section>
           `;
         },
+        "scr-08-my-meetups": () => {
+          const copy = screenCopy("scr-08-my-meetups");
+          const rooms = appState.hostRooms || [];
+          return `
+            <section id="scr-08-my-meetups" class="screen" aria-labelledby="my-meetups-title" data-testid="my-meetups-screen">
+              <div class="screenBody">
+                ${standardHeader("scr-08-my-meetups", "my-meetups-title")}
+                <div class="compactSection">
+                  ${rooms.length ? rooms.map((room, index) => hostStatusCard(room, index)).join("") : `<p class="emptyStateLine">${escapeHtml(locale.ui.savedMeetupsEmpty)}</p>`}
+                </div>
+                ${appState.copyStatus ? `<p class="actionStatus" data-testid="copy-status">${escapeHtml(appState.copyStatus)}</p>` : ""}
+              </div>
+              ${stickyBottomCTA(copy.primary, copy.secondary, {
+                primaryAction: "start-create-room",
+                primaryTestId: "dashboard-create-room-button",
+                secondaryAction: "go-home",
+              })}
+            </section>
+          `;
+        },
       };
 
       function currentScreen() {
@@ -2537,12 +2784,18 @@
       function readRoomForm() {
         const form = screenRoot.querySelector("[data-room-form]");
         const fallbackCandidates = localizedDefaultCandidates();
-        const candidateInputs = [0, 1, 2].map((index) => ({
-          id: `slot-${index + 1}`,
-          label: form?.querySelector(`[name="candidate-label-${index}"]`)?.value || fallbackCandidates[index].label,
-          time: form?.querySelector(`[name="candidate-time-${index}"]`)?.value || fallbackCandidates[index].time,
-          note: form?.querySelector(`[name="candidate-note-${index}"]`)?.value || fallbackCandidates[index].note,
-        }));
+        const candidateNodes = [...(form?.querySelectorAll("[data-testid^='candidate-date-input-']") || [])];
+        const candidateInputs = candidateNodes.slice(0, MAX_CANDIDATES).map((node, index) => {
+          const date = form?.querySelector(`[name="candidate-date-${index}"]`)?.value || "";
+          const fallback = fallbackCandidates[index] || fallbackCandidates[0];
+          return {
+            id: `slot-${index + 1}`,
+            date,
+            label: weekdayLabel(date) || fallback.label,
+            time: form?.querySelector(`[name="candidate-time-${index}"]`)?.value || fallback.time,
+            note: form?.querySelector(`[name="candidate-note-${index}"]`)?.value || fallback.note,
+          };
+        });
         return {
           title: form?.querySelector('[name="room-title"]')?.value || "새 모임",
           expectedCount: form?.querySelector('[name="expected-count"]')?.value || 7,
@@ -2555,9 +2808,14 @@
 
       function createRoomFromForm() {
         hasUnsavedEdits = false;
+        const room = createDemoRoom(readRoomForm());
+        room.status = "collecting";
+        room.shareUrl = buildGeneralShareUrl(room);
         appState = {
           version: APP_VERSION,
-          room: createDemoRoom(readRoomForm()),
+          room,
+          hostRooms: upsertHostRoom(room, appState.hostRooms),
+          hostDraft: null,
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
@@ -2567,6 +2825,55 @@
         appState.draftPreferences = getDraftPreferences(appState.room);
         saveState();
         selectScreen("scr-04-insufficient-response");
+      }
+
+      function persistHostDraftFromForm() {
+        appState.hostDraft = createDemoRoom({ ...readRoomForm(), status: "draft" });
+        appState.hostDraft.status = "draft";
+      }
+
+      function upsertHostRoom(room, rooms = []) {
+        if (!room || room.isSharedLink) return rooms || [];
+        const next = (rooms || []).filter((savedRoom) => savedRoom.id !== room.id);
+        next.unshift(createDemoRoom(room));
+        return next.slice(0, 20);
+      }
+
+      function syncActiveRoomToHostRooms() {
+        if (!isDemoMode() && appState.room && !appState.room.isSharedLink) {
+          appState.hostRooms = upsertHostRoom(appState.room, appState.hostRooms);
+        }
+      }
+
+      function addCandidateToDraft() {
+        persistHostDraftFromForm();
+        const fallback = localizedDefaultCandidates()[appState.hostDraft.candidates.length % localizedDefaultCandidates().length];
+        appState.hostDraft.candidates.push(
+          normalizeCandidate(
+            {
+              id: `slot-${appState.hostDraft.candidates.length + 1}`,
+              date: "",
+              label: fallback.label,
+              time: fallback.time,
+              note: fallback.note,
+            },
+            appState.hostDraft.candidates.length,
+          ),
+        );
+        hasUnsavedEdits = true;
+        render("scr-01-host-room");
+      }
+
+      function removeCandidateFromDraft(index) {
+        persistHostDraftFromForm();
+        if (appState.hostDraft.candidates.length <= 2) return;
+        appState.hostDraft.candidates.splice(index, 1);
+        appState.hostDraft.candidates = appState.hostDraft.candidates.map((candidate, nextIndex) => ({
+          ...candidate,
+          id: `slot-${nextIndex + 1}`,
+        }));
+        hasUnsavedEdits = true;
+        render("scr-01-host-room");
       }
 
       function submitResponse() {
@@ -2600,6 +2907,7 @@
         appState.lastSubmittedAt = new Date().toISOString();
         appState.lastResponseId = responseId;
         hasUnsavedEdits = false;
+        syncActiveRoomToHostRooms();
         saveState();
         selectScreen("scr-02b-response-complete");
       }
@@ -2618,13 +2926,12 @@
         }
         refreshRoomStatus(room);
         appState.copyStatus = "";
+        syncActiveRoomToHostRooms();
         saveState();
         selectScreen(rankCandidates(room).top ? "scr-03-result-recommendation" : "scr-04-insufficient-response");
       }
 
-      async function copyShareText(action = "copy-share") {
-        if (!appState.room) return;
-        const text = buildCopyTextForAction(appState.room, action, rankCandidates(appState.room));
+      async function copyExplicitText(text, screen = currentScreen()) {
         let copied = false;
         if (navigator.clipboard?.writeText) {
           try {
@@ -2652,7 +2959,13 @@
         }
         appState.copyStatus = copied ? locale.ui.copySucceeded : locale.ui.copyFailed;
         saveState();
-        render(currentScreen());
+        render(screen);
+      }
+
+      async function copyShareText(action = "copy-share") {
+        if (!appState.room) return;
+        const text = buildCopyTextForAction(appState.room, action, rankCandidates(appState.room));
+        await copyExplicitText(text);
       }
 
       function closeRoom() {
@@ -2670,6 +2983,7 @@
         appState.room.status = "closed";
         appState.room.closedAt = new Date().toISOString();
         appState.copyStatus = "";
+        syncActiveRoomToHostRooms();
         saveState();
         selectScreen("scr-06-room-closed");
       }
@@ -2680,7 +2994,12 @@
         if (!confirmNavigationIfDirty(action)) return;
         if (action === "start-create-room") {
           appState.copyStatus = "";
+          appState.hostDraft = createDraftRoom();
           selectScreen("scr-01-host-room");
+        }
+        if (action === "open-host-dashboard") {
+          appState.copyStatus = "";
+          selectScreen("scr-08-my-meetups");
         }
         if (action === "open-existing-room") {
           if (!appState.room) return;
@@ -2696,6 +3015,23 @@
           selectScreen(ranked.top ? "scr-03-result-recommendation" : "scr-02-participant-input");
         }
         if (action === "create-room") createRoomFromForm();
+        if (action === "add-candidate") addCandidateToDraft();
+        if (action === "remove-candidate") removeCandidateFromDraft(Number(target.dataset.candidateIndex || 0));
+        if (action === "open-room-status") {
+          const room = (appState.hostRooms || []).find((savedRoom) => savedRoom.id === target.dataset.roomId);
+          if (!room) return;
+          appState.room = createDemoRoom(room);
+          appState.copyStatus = "";
+          saveState();
+          if (appState.room.status === "closed") selectScreen("scr-06-room-closed");
+          else selectScreen(rankCandidates(appState.room).top ? "scr-03-result-recommendation" : "scr-04-insufficient-response");
+        }
+        if (action === "copy-room-link") {
+          const room = (appState.hostRooms || []).find((savedRoom) => savedRoom.id === target.dataset.roomId);
+          if (!room) return;
+          appState.room = createDemoRoom(room);
+          copyExplicitText(room.shareUrl || buildGeneralShareUrl(room), "scr-08-my-meetups");
+        }
         if (action === "set-preference") {
           if (!appState.room) return;
           if (isTerminalRoom(appState.room)) return;
@@ -2731,7 +3067,7 @@
         }
       });
 
-      window.HAMMOYEO_MVP_TESTS = {
+      window.HAMMOYEO_APP_TESTS = {
         minimumResponses,
         rankCandidates,
         buildShareText,

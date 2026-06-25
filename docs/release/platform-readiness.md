@@ -1,26 +1,30 @@
 # 함모여 플랫폼 연결 준비
 
-Updated: 2026-06-25
-Status: `backend-ai-deepseek-v4-pro-connection-code`
+Updated: 2026-06-26
+Status: `backend-ai-remote-smoke-plus-app-share-flow`
 
 ## 범위
 
-이번 구현은 실제 외부 상태를 바꾸지 않는 연결 준비입니다. `docs/mvp/index.html`은 계속 정적 MVP로 남기고, 실서비스 연결은 아래 경계 파일과 검증 계약으로 시작합니다.
+함모여는 이제 디자인 샘플이 아니라 앱 흐름으로 다룹니다. `docs/mvp/index.html`과 `docs/index.html`은 날짜/시간 선택, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판을 제공하고, 원격 실서비스 연결은 아래 경계 파일과 검증 계약으로 관리합니다.
 
 - `AuthAdapter`: Apps in Toss `appLogin()` 결과를 서버 교환으로 넘기는 경계
 - `BackendAdapter`: Supabase/Edge Function/server API만 호출하는 경계
-- `ShareAdapter`: preview copy와 Apps in Toss `intoss://...` deep link share 생성을 분리하는 경계
-- `supabase/migrations/20260624_hammoyo_backend.sql`: SQL Editor 검토용 schema/RLS 초안
+- `ShareAdapter`: 일반 HTTPS 공유 링크와 Apps in Toss `intoss://...` deep link share 생성을 분리하는 경계
+- `supabase/migrations/20260624_hammoyo_backend.sql`: 원격 shared Supabase에 적용된 `hammoyo_` schema/RLS 기준
 - `scripts/verify-platform-readiness.mjs`: 플랫폼 준비 계약 검증
 
-## 원격 Supabase 적용 금지
+## 원격 Supabase 적용 상태
 
-Codex는 이번 단계에서 Supabase 원격 DB에 적용하지 않습니다. SQL은 성배님이 Supabase SQL Editor에서 검토 후 실행하는 기본 규칙을 따릅니다.
+2026-06-25 follow-up에서 성배님 지시 범위 안에서 shared Supabase 원격 적용과 Edge Function 배포가 진행됐습니다.
 
-금지:
+- 원격 DB에는 `hammoyo_` prefix table과 service role grants가 적용됐습니다.
+- 8개 Hammoyo Edge Function은 `verify_jwt=false` + Hammoyo signed session 검증 경계로 배포됐습니다.
+- `npm run smoke:remote`는 create-room, submit-response, recompute, deletion-revokes-session을 검증합니다.
+- DeepSeek V4 Pro 일정 조율 smoke는 `hammoyo_ai_coordination_runs` audit row 생성 후 정리까지 검증했습니다.
+
+계속 금지:
 
 - `supabase db push`
-- 원격 migration apply
 - service-role key, DB password, JWT secret, mTLS secret 출력 또는 파일 저장
 - browser/public env에 server secret 추가
 
@@ -32,7 +36,7 @@ Codex는 이번 단계에서 Supabase 원격 DB에 적용하지 않습니다. SQ
 - `ShareAdapter`는 `getTossShareLink()` 같은 Apps in Toss share API를 주입받아 사용합니다. 제품 로직은 Toss SDK를 직접 import하지 않습니다.
 - Apps in Toss share target은 일반 `https://` URL이 아니라 `intoss://<앱이름>/...` 내부 딥링크여야 합니다.
 - 출시 전 테스트 스킴은 공식 테스트 scheme/deploymentId 기준으로 별도 검증해야 합니다.
-- 현재 preview adapter는 실제 초대 링크 성공을 주장하지 않고 `preview 전용` copy만 돌려줍니다.
+- GitHub Pages 앱 화면은 일반 HTTPS 공유 링크를 만들고, Apps in Toss 빌드에서는 Toss share adapter가 `intoss://...` target을 SDK에 넘기는 구조를 유지합니다.
 
 ## Google Play 경계
 
@@ -55,7 +59,7 @@ Migration 기준:
 - `hammoyo_rooms.status`는 `draft`, `collecting`, `low_confidence`, `recommended`, `closed`, `expired`를 저장할 수 있어야 합니다.
 - 방장과 참여자 읽기 권한은 `hammoyo_can_read_room(room_id)` host-or-member helper로 통일합니다.
 - public-open 정책인 `using (true)` / `with check (true)`는 쓰지 않습니다.
-- 클라이언트 직접 write는 MVP에서 열지 않고 Edge Function/server API를 통합니다.
+- 클라이언트 직접 write는 GitHub Pages 앱 화면에서 열지 않고 Edge Function/server API를 통합니다.
 
 BackendAdapter 후보 메서드:
 
@@ -76,7 +80,7 @@ BackendAdapter 후보 메서드:
 client, signed Hammoyo session token, `hammoyo_` tables, server-only DeepSeek V4 Pro
 AI provider proxy를 사용하도록 구현되어 있습니다. admin client는 CLI가 직접 주입할 수
 있는 server-only `HAMMOYEO_DB_ADMIN_KEY`를 우선 사용하고, Supabase 런타임 기본값인
-`SUPABASE_SERVICE_ROLE_KEY`를 fallback으로 허용합니다. 현재 shared MVP 프로젝트에서는
+`SUPABASE_SERVICE_ROLE_KEY`를 fallback으로 허용합니다. 현재 shared mini-project에서는
 기존 PairTune Function secret인 `PAIRTUNE_SUPABASE_SECRET_KEY`도 같은 shared-project
 server key fallback으로 허용합니다.
 
@@ -106,7 +110,7 @@ AI가 제외 후보를 고르거나 존재하지 않는 후보를 만들면 dete
 
 ## 개인정보 / 제출 전 blocker
 
-현재 `docs/mvp/privacy.html`은 정적 preview 정책입니다. 제출 전 아래 값을 확정해야 합니다.
+현재 `docs/mvp/privacy.html`은 브라우저 저장 앱 화면 정책입니다. 제출 전 아래 값을 확정해야 합니다.
 
 - 공개 개인정보처리방침 URL
 - 공개 문의 이메일

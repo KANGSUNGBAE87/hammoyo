@@ -121,7 +121,7 @@ async function main() {
   await page.goto(pageUrl, { waitUntil: "load" });
 
   const algorithmChecks = await page.evaluate(() => {
-    const api = window.HAMMOYEO_MVP_TESTS;
+    const api = window.HAMMOYEO_APP_TESTS;
     if (!api) return null;
     const room = api.createDemoRoom({
       expectedCount: 7,
@@ -158,7 +158,7 @@ async function main() {
     };
   });
 
-  assert(algorithmChecks !== null, "window.HAMMOYEO_MVP_TESTS API is missing");
+  assert(algorithmChecks !== null, "window.HAMMOYEO_APP_TESTS API is missing");
   if (algorithmChecks) {
     assert(algorithmChecks.threshold === 4, "minimum response threshold should be 4 for 7 expected participants");
     assert(algorithmChecks.topId === "slot-1", "ranking should choose slot-1 for the deterministic fixture");
@@ -170,10 +170,9 @@ async function main() {
     );
     assert(algorithmChecks.copyTexts !== null, "copy text builder should be exposed for verification");
     assert(
-      algorithmChecks.copyTexts?.invite.includes("preview 전용") &&
-        !algorithmChecks.copyTexts?.invite.includes("screen=scr-02-participant-input") &&
-        !algorithmChecks.copyTexts?.invite.includes("room="),
-      "invite copy should not promise a real participant URL before ShareAdapter/backend exist",
+      algorithmChecks.copyTexts?.invite.includes("screen=scr-02-participant-input") &&
+        algorithmChecks.copyTexts?.invite.includes("join="),
+      "invite copy should include a general participant share link",
     );
     assert(
       algorithmChecks.copyTexts?.recommendation.includes("가장 현실적인 약속안"),
@@ -189,23 +188,53 @@ async function main() {
   await page.getByTestId("start-create-room").click();
   await page.getByTestId("room-title-input").fill("금요일 저녁 모임");
   await page.getByTestId("expected-count-input").fill("7");
-  await page.getByTestId("candidate-label-input-0").fill("6.29 토요일");
+  const firstDateType = await page.getByTestId("candidate-date-input-0").getAttribute("type");
+  const firstTimeType = await page.getByTestId("candidate-time-input-0").getAttribute("type");
+  assert(firstDateType === "date", "host setup should use a real date picker for candidate dates");
+  assert(firstTimeType === "time", "host setup should use a real time picker for candidate times");
+  await page.getByTestId("candidate-date-input-0").fill("2026-07-05");
   await page.getByTestId("candidate-time-input-0").fill("18:30");
   await page.getByTestId("candidate-note-input-0").fill("강남역 근처");
-  await page.getByTestId("candidate-label-input-1").fill("6.30 일요일");
+  await page.getByTestId("candidate-date-input-1").fill("2026-07-06");
   await page.getByTestId("candidate-time-input-1").fill("17:00");
   await page.getByTestId("candidate-note-input-1").fill("잠실");
+  await page.getByTestId("add-candidate-button").click();
+  assert(await page.getByTestId("candidate-date-input-3").isVisible(), "host should be able to add a fourth candidate slot");
+  await page.getByTestId("candidate-date-input-3").fill("2026-07-07");
+  await page.getByTestId("candidate-time-input-3").fill("19:30");
+  await page.getByTestId("candidate-note-input-3").fill("성수");
+  await page.getByTestId("remove-candidate-2").click();
+  assert((await page.locator("[data-testid^='candidate-date-input-']").count()) === 3, "host should be able to remove a candidate slot");
   await page.getByTestId("create-room-button").click();
 
   const createdRoom = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
   assert(createdRoom?.room?.title === "금요일 저녁 모임", "created room should be persisted in localStorage");
   assert(createdRoom?.room?.status === "collecting", "created room should enter collecting status");
+  assert(createdRoom?.room?.shareUrl?.includes("join="), "created room should persist a general share link");
+  assert(createdRoom?.hostRooms?.length === 1, "created room should be listed in my meetups");
+  assert(createdRoom?.room?.candidates?.[0]?.date === "2026-07-05", "date picker value should be persisted on the candidate");
+  assert(createdRoom?.room?.candidates?.[0]?.label.includes("7.5"), "date picker value should be formatted for display");
   const afterCreateText = await page.locator("body").innerText();
   assert(afterCreateText.includes("응답이 조금 더 필요해요"), "host create CTA should land on invite-copy ready state");
+  assert(afterCreateText.includes("일반 공유 링크"), "host create result should show the general share link");
+  const generalShareLink = await page.getByTestId("general-share-link").inputValue();
+  assert(generalShareLink.includes("join=") && generalShareLink.includes("screen=scr-02-participant-input"), "general share link should open the participant response screen");
   await page.getByTestId("copy-invite-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
   const inviteCopyStatus = await page.getByTestId("copy-status").innerText();
   assert(inviteCopyStatus.includes("복사했어요"), "insufficient response invite copy should show copy feedback");
+  await page.getByTestId("topbar-home-button").click();
+  await page.waitForSelector("#scr-00-entry");
+  await page.getByTestId("open-host-dashboard-button").click();
+  await page.waitForSelector("[data-testid='my-meetups-screen']");
+  const dashboardText = await page.locator("body").innerText();
+  assert(dashboardText.includes("내가 만든 모임") && dashboardText.includes("금요일 저녁 모임"), "my meetups dashboard should show the created room");
+  assert(dashboardText.includes("0명 응답"), "my meetups dashboard should show the current response count");
+  await page.getByTestId("copy-room-link-0").click();
+  await page.waitForSelector("[data-testid='copy-status']");
+  assert((await page.getByTestId("copy-status").innerText()).includes("복사했어요"), "my meetups dashboard should copy the room share link");
+  await page.getByTestId("open-room-status-0").click();
+  await page.waitForSelector("#scr-04-insufficient-response");
 
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
   await page.getByTestId("participant-name-input").fill("   ");
@@ -445,7 +474,7 @@ async function main() {
     "English recommendation card should not mix Korean demo fixture text",
   );
   const englishCopyText = await page.evaluate(() => {
-    const api = window.HAMMOYEO_MVP_TESTS;
+    const api = window.HAMMOYEO_APP_TESTS;
     const room = api.createDemoRoom({
       responses: [
         { alias: "A", preferences: { "slot-1": "prefer", "slot-2": "available", "slot-3": "hardNo" } },
@@ -515,7 +544,7 @@ async function main() {
   await assertStickyCtaDoesNotCoverBody(page, "settings mobile CTA should not cover policy links");
 
   const readyReminderText = await page.evaluate(() => {
-    const api = window.HAMMOYEO_MVP_TESTS;
+    const api = window.HAMMOYEO_APP_TESTS;
     const room = api.createDemoRoom({
       expectedCount: 3,
       responses: [

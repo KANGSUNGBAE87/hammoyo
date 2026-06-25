@@ -1,7 +1,7 @@
 ---
-version: 3
-status: design-mvp-implemented
-updated: 2026-06-24
+version: 4
+status: app-flow-implemented
+updated: 2026-06-26
 canonical: true
 ---
 
@@ -9,7 +9,7 @@ canonical: true
 
 ## 디자인 목표
 
-함모여의 MVP 화면은 "투표 결과표"가 아니라 "방장이 지금 단톡방에 올릴 수 있는 결정 카드"를 중심으로 설계합니다. 참여자는 10~30초 안에 응답을 끝내고, 방장은 전원 가능 시간이 없어도 관계적으로 안전한 추천안과 공유 문구를 얻어야 합니다.
+함모여의 앱 화면은 "투표 결과표"가 아니라 "방장이 지금 단톡방에 올릴 수 있는 결정 카드"를 중심으로 설계합니다. 참여자는 10~30초 안에 응답을 끝내고, 방장은 전원 가능 시간이 없어도 관계적으로 안전한 추천안과 공유 문구를 얻어야 합니다.
 
 이번 보강은 기존 P4 디자인 기획의 방향을 유지하되, `HAMMOYEO_DESIGN_PACKAGE`를 앞으로의 디자인 source of truth로 승격합니다. 구현자는 이 파일만 보지 말고 아래 패키지 파일을 함께 읽어야 합니다.
 
@@ -29,7 +29,7 @@ canonical: true
 
 ## Palette
 
-Design preflight에서 `colors.io` exact service는 확인 가능한 일반 palette source로 잡히지 않아 Coolors를 fallback source로 삼았습니다. MVP palette는 Coolors식 5색 조합을 제품 의미에 맞게 수동 조정했습니다.
+Design preflight에서 `colors.io` exact service는 확인 가능한 일반 palette source로 잡히지 않아 Coolors를 fallback source로 삼았습니다. 앱 palette는 Coolors식 5색 조합을 제품 의미에 맞게 수동 조정했습니다.
 
 | Role | Hex | 용도 |
 | --- | --- | --- |
@@ -111,31 +111,31 @@ Participant input hierarchy:
 
 Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.md`에 둡니다. 생성 이미지에는 실명, 전화번호, Toss 로고, 실제 브랜드 로고, 실제 카카오톡 UI를 넣지 않습니다.
 
-## Sample MVP
+## App Sample
 
-현재 프로젝트에 정적 샘플 MVP를 추가했습니다.
+현재 프로젝트에 정적 앱 화면을 추가했습니다.
 
 - HTML sample: `docs/mvp/index.html`
-- 목적: 구현 전 화면 상태와 문구 흐름을 확인하는 design sample.
-- 범위: 실제 Supabase, Apps in Toss SDK, AI 호출 없음. UI/상태/카피만 시연.
+- 목적: 앱 화면 상태와 문구 흐름을 확인하는 design sample.
+- 범위: GitHub Pages 화면은 브라우저 저장과 일반 공유 링크를 사용합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 연결되어 있으며, Toss login/account 동기화 UI는 아직 별도 단계입니다.
 - 직접 진입: `docs/mvp/index.html?screen=scr-03-result-recommendation`
-- 기본 상태: `AI_COPY_ENABLED=false`, 즉 AI 라벨은 표시하지 않습니다. 현재 정적 MVP에서는 실제 AI 호출이나 AI-polished fixture를 제공하지 않으므로 `?ai=on`도 사용자에게 AI 라벨을 노출하지 않습니다.
-- 첫 버전 i18n 기준에 맞춰 정적 MVP에 `ko/en` locale resource와 언어 전환 버튼을 둡니다. 다음 구현자는 남은 하드코딩 문구를 모두 locale resource로 이동해야 합니다.
-- ShareAdapter와 Supabase/backend가 연결되기 전까지 초대 문구는 실제 참여 링크처럼 말하지 않고 `preview 전용` 문구로 낮춰 표시합니다.
+- 기본 상태: `AI_COPY_ENABLED=false`, 즉 AI 라벨은 표시하지 않습니다. GitHub Pages 화면은 AI-polished fixture를 제공하지 않으므로 `?ai=on`도 사용자에게 AI 라벨을 노출하지 않습니다.
+- 첫 버전 i18n 기준에 맞춰 `ko/en` locale resource와 언어 전환 버튼을 둡니다. 다음 구현자는 남은 하드코딩 문구를 모두 locale resource로 이동해야 합니다.
+- 2026-06-26부터 초대 문구는 일반 공유 링크를 포함합니다. GitHub Pages/브라우저 경로에서는 공개 후보 정보가 담긴 HTTPS 링크로 참여 화면을 열고, Apps in Toss 빌드에서는 ShareAdapter가 `intoss://...` 딥링크 공유로 전환합니다.
 - 모바일 폭에서는 샘플용 화면 선택/토큰 패널을 숨기고 제품 화면만 표시합니다. 데스크톱 폭에서는 QA용 패널을 유지합니다.
 
 ## React Bits 결정
 
-현재 프로젝트는 React 앱이 아니며 정적 기획/샘플 단계입니다. React Bits는 설치하지 않습니다. 향후 React/Vite로 구현할 때도 첫 MVP는 추천/응답 흐름이 핵심이므로 무거운 애니메이션보다 작은 transition과 reduced-motion 대응만 사용합니다.
+현재 프로젝트는 React 앱이 아니며 정적 앱 화면과 platform/backend 경계가 함께 있는 상태입니다. React Bits는 설치하지 않습니다. 향후 React/Vite로 구현할 때도 추천/응답 흐름이 핵심이므로 무거운 애니메이션보다 작은 transition과 reduced-motion 대응만 사용합니다.
 
 ## 디자인 QA 기준
 
 - 360px 폭에서 CTA와 긴 한국어 문구가 넘치지 않아야 합니다.
 - 결과/응답 부족/만료/closed 상태가 서로 다른 색과 문구로 구분되어야 합니다.
 - 추천 근거는 집계값으로만 노출하고 개인을 지목하지 않아야 합니다.
-- AI copy 라벨은 실제 AI 결과가 연결된 뒤에만 공유 문구와 같은 시야에 있어야 합니다. template-only preview에서는 AI 라벨이 없어야 합니다.
+- AI copy 라벨은 실제 AI 결과가 연결된 뒤에만 공유 문구와 같은 시야에 있어야 합니다. template-only 화면에서는 AI 라벨이 없어야 합니다.
 - primary action은 하단 thumb zone에 가까워야 합니다.
-- `docs/mvp/index.html`은 package token, 9개 화면, query parameter route, sticky CTA, reduced-motion, ko/en locale resource, preview-only share boundary를 포함해야 합니다.
+- `docs/mvp/index.html`은 package token, 9개 화면, query parameter route, sticky CTA, reduced-motion, ko/en locale resource, 일반 공유 링크와 host dashboard 흐름을 포함해야 합니다.
 - 구조 검증은 `npm run build`로 실행합니다.
 
 ## Change Log
@@ -143,3 +143,5 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 - 2026-06-24: Supabase/AI 경계 보정과 함께 디자인 계획, 화면 ID, 이미지 계획, 샘플 MVP 위치를 정리.
 - 2026-06-24: `HAMMOYEO_DESIGN_PACKAGE`를 디자인 source of truth로 승격하고, 샘플 MVP를 패키지 토큰/8개 화면/AI 조건부 라벨 기준으로 개편.
 - 2026-06-24: 샘플 MVP 구현과 Chrome/Playwright 360/390/420 QA 통과 결과를 반영해 상태를 `design-mvp-implemented`로 갱신.
+- 2026-06-26: Owner 지시에 따라 MVP 표기를 사용자 화면에서 낮추고, 날짜/시간 picker, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판을 디자인 계약에 반영.
+- 2026-06-26: 현재 상태를 `app-flow-implemented`로 갱신하고, GitHub Pages 앱 화면과 원격 Supabase/DeepSeek 경계의 역할을 분리해 문서화.
