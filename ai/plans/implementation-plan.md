@@ -1,5 +1,5 @@
 ---
-version: 8
+version: 10
 status: app-flow-plus-backend-ai-live-connected
 updated: 2026-06-26
 canonical: true
@@ -11,7 +11,7 @@ canonical: true
 
 이 문서는 조건부 P4 패키지에서 비어 있던 Supabase, 권한, 응답 정책, AI/copy 경계를 닫고 앱 흐름 구현 기준을 유지하기 위한 구현 기획입니다.
 
-현재 기준은 `app-flow-plus-backend-ai-live-connected`입니다. 앱 화면에는 날짜/시간 picker, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판, 브라우저 기반 host room 목록을 추가했습니다. platform adapter contract, `hammoyo_` Supabase migration, release readiness 문서, `SupabaseBackendAdapter`, 실제 Supabase DB write/read를 수행하는 Edge Function, server-only DeepSeek V4 Pro AI provider proxy, AI copy/coordination policy 검증도 연결되어 있습니다. shared Supabase 한 프로젝트에 여러 앱이 붙는 전제를 반영해 app table/helper/policy prefix는 `hammoyo_`로 고정합니다. 원격 shared Supabase DB에는 `hammoyo_` tables와 service role grants가 적용됐고, 8개 Edge Function은 `verify_jwt=false` + Hammoyo signed session 검증 경계로 배포됐습니다. remote smoke는 create-room, submit-response, recompute, deletion-revokes-session, DeepSeek AI coordination audit까지 통과했습니다. Toss secure worker/mTLS 실제 경로, Apps in Toss sandbox evidence, 공개 privacy/contact/delete URL은 아직 release blocker입니다.
+현재 기준은 `app-flow-plus-backend-ai-live-connected`입니다. 앱 화면에는 iPhone식 드롭다운 날짜/시간 picker, 후보 추가/삭제, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 내가 만든 모임 상태판, 브라우저 기반 host room 목록과 모임 수정/삭제 흐름을 추가했습니다. platform adapter contract, `hammoyo_` Supabase migration, release readiness 문서, `SupabaseBackendAdapter`, 실제 Supabase DB write/read를 수행하는 Edge Function, server-only DeepSeek V4 Pro AI provider proxy, AI copy/coordination policy 검증도 연결되어 있습니다. shared Supabase 한 프로젝트에 여러 앱이 붙는 전제를 반영해 app table/helper/policy prefix는 `hammoyo_`로 고정합니다. 원격 shared Supabase DB에는 `hammoyo_` tables와 service role grants가 적용됐고, 8개 Edge Function은 `verify_jwt=false` + Hammoyo signed session 검증 경계로 배포됐습니다. remote smoke는 create-room, submit-response, recompute, deletion-revokes-session, DeepSeek AI coordination audit까지 통과했습니다. Toss secure worker/mTLS 실제 경로, Apps in Toss sandbox evidence, 공개 privacy/contact/delete URL은 아직 release blocker입니다.
 
 ## 앱/플랫폼 경계
 
@@ -20,7 +20,7 @@ canonical: true
 - Backend: Supabase 기본. 앱/domain 로직은 `@supabase/supabase-js`를 직접 import하지 않습니다.
 - Share: 초대/결과 공유는 Toss 내부 deep link를 `getTossShareLink()`로 변환하는 구조를 우선합니다.
 - Google Play: 현재는 준비만 기록합니다. 별도 출시 지시 전까지 Google 로그인, Billing, AdMob은 구현하지 않습니다.
-- i18n: 한국어 기본, 영어 선택 가능. UI copy, 오류, 공유 문구, AI prompt는 locale resource를 통해 관리합니다.
+- Locale: 첫 Apps in Toss 화면은 한국어 단일 UI입니다. 사용자 화면에 언어 전환 버튼을 두지 않고, 추후 다국어가 필요하면 locale resource를 다시 활성화합니다.
 
 ## 어댑터 구조
 
@@ -47,7 +47,7 @@ backend/
   supabase/migrations/
 ```
 
-현재 `docs/mvp/index.html`과 `docs/index.html`은 정적 HTML/CSS/JS 앱 화면으로 유지하되, localStorage 기반 방 생성/응답/추천/확정뿐 아니라 날짜/시간 picker, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판까지 동작합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 구현되어 있으며, Toss login/account 동기화 UI가 붙기 전 GitHub Pages 화면은 브라우저 저장을 우선 사용합니다.
+현재 `docs/mvp/index.html`과 `docs/index.html`은 정적 HTML/CSS/JS 앱 화면으로 유지하되, localStorage 기반 방 생성/응답/추천/확정뿐 아니라 날짜/시간 picker, 후보 추가/삭제, 초대 홈 진입, native share 우선 공유, 내가 만든 모임 상태판, 모임 수정/삭제까지 동작합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 구현되어 있으며, Toss login/account 동기화 UI가 붙기 전 GitHub Pages 화면은 브라우저 저장을 우선 사용합니다. GitHub Pages의 삭제 후 링크 무효화는 같은 브라우저의 revoked room id 기준이며, 다른 기기까지 완전하게 막는 정식 동작은 Supabase invite lookup에서 `deleted/expired` 상태를 확인해야 합니다.
 
 ## Auth Mapping
 
@@ -253,3 +253,5 @@ APPS_IN_TOSS_CONSOLE_API_KEY=agent-or-ci-only
 - 2026-06-25: shared Supabase multi-app 전제를 반영해 app table/helper/policy prefix를 `hm_`에서 `hammoyo_`로 교체하고 검증기가 `hm_` 재도입을 실패 처리하도록 갱신.
 - 2026-06-25: 원격 shared Supabase에 `hammoyo_` schema/grants를 적용하고, Edge Functions를 `verify_jwt=false` + Hammoyo signed session 경계로 배포. CORS/OPTIONS, 삭제 후 세션 차단, submit-response membership requirement, deterministic top 고정 AI coordination, DeepSeek JSON/non-thinking mode를 보강. `npm run build`, `npm run smoke:remote`, live AI coordination smoke(`method=ai`, audit row 1) 통과.
 - 2026-06-26: 사용자 화면을 앱 흐름 기준으로 갱신하고, 날짜/시간 picker, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판, 로컬 host room 목록을 구현. 일반 링크는 공개 후보 snapshot으로 참여 화면을 열며, 원격 상태 동기화는 Toss login/account flow 이후 BackendAdapter 경로로 전환한다.
+- 2026-06-26: 홈 메인 동물 캐릭터 이미지와 개별 캐릭터 asset을 추가하고, 언어 전환/앱 준비 pill을 사용자 화면에서 제거. 날짜/시간 선택은 iPhone식 dropdown shell로 보강하고, 후보 카드 grid overflow를 막도록 입력 wrapper와 grid width 기준을 수정했다.
+- 2026-06-26: 동물 배경 이미지와 3D 버튼/카드 depth를 추가. 공유는 `navigator.share` 우선, clipboard fallback으로 변경. 초대 링크는 홈 초대 카드로 진입하고, 내가 만든 모임에서 삭제하면 같은 브라우저의 기존 링크를 revoked 처리한다.

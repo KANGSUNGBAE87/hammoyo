@@ -95,6 +95,15 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 390, height: 740 },
   });
+  await context.addInitScript(() => {
+    window.__HAMMOYEO_SHARED_PAYLOADS = [];
+    Object.defineProperty(navigator, "share", {
+      configurable: true,
+      value: async (payload) => {
+        window.__HAMMOYEO_SHARED_PAYLOADS.push(payload);
+      },
+    });
+  });
   const page = await context.newPage();
   page.setDefaultTimeout(5000);
   const consoleErrors = [];
@@ -107,10 +116,14 @@ async function main() {
 
   const cleanEntryText = await page.locator("body").innerText();
   assert(!cleanEntryText.includes("최근 방:"), "clean entry should not expose a fake recent room");
-  assert(cleanEntryText.includes("저장된 모임이 아직 없어요"), "clean entry should explain that no room exists yet");
+  assert(cleanEntryText.includes("아직 만든 모임이 없어요"), "clean entry should explain that no room exists yet");
+  assert(cleanEntryText.includes("현재 상태"), "entry should show a concise current status card");
+  assert(cleanEntryText.includes("설정"), "entry should expose settings");
+  assert(!cleanEntryText.includes("EN") && !cleanEntryText.includes("앱 준비"), "entry should not expose language or app-ready pills");
   const cleanEntryStorage = await page.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
   assert(cleanEntryStorage === null, "clean entry should not persist a placeholder room");
-  assert(await page.getByTestId("language-toggle-button").isVisible(), "entry should expose a language switcher");
+  assert(await page.getByTestId("settings-button").isVisible(), "entry should expose a settings button");
+  assert((await page.locator('[data-testid="language-toggle-button"]').count()) === 0, "entry should not expose a language switcher");
 
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.goto(baseFileUrl, { waitUntil: "load" });
@@ -170,9 +183,9 @@ async function main() {
     );
     assert(algorithmChecks.copyTexts !== null, "copy text builder should be exposed for verification");
     assert(
-      algorithmChecks.copyTexts?.invite.includes("screen=scr-02-participant-input") &&
+      algorithmChecks.copyTexts?.invite.includes("screen=scr-00-entry") &&
         algorithmChecks.copyTexts?.invite.includes("join="),
-      "invite copy should include a general participant share link",
+      "invite copy should include a home invite share link",
     );
     assert(
       algorithmChecks.copyTexts?.recommendation.includes("가장 현실적인 약속안"),
@@ -187,11 +200,14 @@ async function main() {
 
   await page.getByTestId("start-create-room").click();
   await page.getByTestId("room-title-input").fill("금요일 저녁 모임");
-  await page.getByTestId("expected-count-input").fill("7");
+  await page.getByTestId("expected-count-select").selectOption("7");
+  assert(await page.getByTestId("expected-count-select").evaluate((node) => node.closest(".selectShell") !== null), "expected count should use an iOS-like select shell");
   const firstDateType = await page.getByTestId("candidate-date-input-0").getAttribute("type");
   const firstTimeType = await page.getByTestId("candidate-time-input-0").getAttribute("type");
   assert(firstDateType === "date", "host setup should use a real date picker for candidate dates");
   assert(firstTimeType === "time", "host setup should use a real time picker for candidate times");
+  assert(await page.getByTestId("candidate-date-input-0").evaluate((node) => node.closest(".AppleDateTimePicker")?.dataset.kind === "date"), "candidate date should use the AppleDateTimePicker shell");
+  assert(await page.getByTestId("candidate-time-input-0").evaluate((node) => node.closest(".AppleDateTimePicker")?.dataset.kind === "time"), "candidate time should use the AppleDateTimePicker shell");
   await page.getByTestId("candidate-date-input-0").fill("2026-07-05");
   await page.getByTestId("candidate-time-input-0").fill("18:30");
   await page.getByTestId("candidate-note-input-0").fill("강남역 근처");
@@ -216,13 +232,26 @@ async function main() {
   assert(createdRoom?.room?.candidates?.[0]?.label.includes("7.5"), "date picker value should be formatted for display");
   const afterCreateText = await page.locator("body").innerText();
   assert(afterCreateText.includes("응답이 조금 더 필요해요"), "host create CTA should land on invite-copy ready state");
-  assert(afterCreateText.includes("일반 공유 링크"), "host create result should show the general share link");
+  assert(afterCreateText.includes("공유 준비됨"), "host create result should show the share-ready card");
+  assert(afterCreateText.includes("친구한테 공유하기"), "host create result should expose friend-share wording");
   const generalShareLink = await page.getByTestId("general-share-link").inputValue();
-  assert(generalShareLink.includes("join=") && generalShareLink.includes("screen=scr-02-participant-input"), "general share link should open the participant response screen");
+  assert(generalShareLink.includes("join=") && generalShareLink.includes("screen=scr-00-entry"), "general share link should open the shared home invite screen");
+  const inviteContext = await browser.newContext({ viewport: { width: 390, height: 740 } });
+  const invitePage = await inviteContext.newPage();
+  invitePage.setDefaultTimeout(5000);
+  await invitePage.goto(generalShareLink, { waitUntil: "load" });
+  const inviteHomeText = await invitePage.locator("body").innerText();
+  assert(inviteHomeText.includes("초대가 도착했어요"), "incoming invite link should land on the home UI with an invite card");
+  assert(inviteHomeText.includes("초대 응답하기"), "incoming invite home should expose a response CTA");
+  await invitePage.getByTestId("respond-to-invite-button").click();
+  await invitePage.waitForSelector("#scr-02-participant-input");
+  await inviteContext.close();
   await page.getByTestId("copy-invite-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
   const inviteCopyStatus = await page.getByTestId("copy-status").innerText();
-  assert(inviteCopyStatus.includes("복사했어요"), "insufficient response invite copy should show copy feedback");
+  assert(inviteCopyStatus.includes("공유 화면"), "insufficient response invite action should open the native share sheet");
+  const firstSharePayloads = await page.evaluate(() => window.__HAMMOYEO_SHARED_PAYLOADS || []);
+  assert(firstSharePayloads.some((payload) => payload?.url?.includes("join=")), "invite action should pass the invite URL to navigator.share");
   await page.getByTestId("topbar-home-button").click();
   await page.waitForSelector("#scr-00-entry");
   await page.getByTestId("open-host-dashboard-button").click();
@@ -230,9 +259,55 @@ async function main() {
   const dashboardText = await page.locator("body").innerText();
   assert(dashboardText.includes("내가 만든 모임") && dashboardText.includes("금요일 저녁 모임"), "my meetups dashboard should show the created room");
   assert(dashboardText.includes("0명 응답"), "my meetups dashboard should show the current response count");
+  await page.getByTestId("edit-host-room-0").click();
+  await page.waitForSelector("#scr-01-host-room");
+  await page.getByTestId("room-title-input").fill("수정된 금요일 모임");
+  await page.getByTestId("expected-count-select").selectOption("9");
+  await page.getByTestId("candidate-date-input-0").fill("2026-07-12");
+  await page.getByTestId("candidate-time-input-0").fill("20:10");
+  await page.getByTestId("candidate-note-input-0").fill("성수역 근처");
+  await page.getByTestId("create-room-button").click();
+  await page.waitForSelector("[data-testid='my-meetups-screen']");
+  const editedRoomState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  assert(editedRoomState?.room?.title === "수정된 금요일 모임", "editing a hosted room should update the active room title");
+  assert(editedRoomState?.room?.expectedCount === 9, "editing a hosted room should update expected count");
+  assert(editedRoomState?.room?.candidates?.[0]?.date === "2026-07-12", "editing a hosted room should update candidate date");
+  assert(editedRoomState?.room?.candidates?.[0]?.time === "20:10", "editing a hosted room should update candidate time");
+  assert(editedRoomState?.room?.candidates?.[0]?.note === "성수역 근처", "editing a hosted room should update candidate place/note");
+  await page.getByTestId("open-room-status-0").click();
+  await page.waitForSelector("#scr-04-insufficient-response");
+  await page.getByTestId("topbar-home-button").click();
+  await page.waitForSelector("#scr-00-entry");
+  await page.getByTestId("open-host-dashboard-button").click();
+  await page.waitForSelector("[data-testid='my-meetups-screen']");
   await page.getByTestId("copy-room-link-0").click();
   await page.waitForSelector("[data-testid='copy-status']");
-  assert((await page.getByTestId("copy-status").innerText()).includes("복사했어요"), "my meetups dashboard should copy the room share link");
+  assert((await page.getByTestId("copy-status").innerText()).includes("공유 화면"), "my meetups dashboard should open the native share sheet");
+  page.once("dialog", async (dialog) => {
+    assert(dialog.message().includes("삭제"), "room deletion should ask for confirmation");
+    await dialog.accept();
+  });
+  await page.getByTestId("delete-room-button-0").click();
+  await page.waitForSelector("[data-testid='my-meetups-screen']");
+  const deletedRoomState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  assert((deletedRoomState?.hostRooms || []).length === 0, "deleted room should be removed from my meetups");
+  assert(deletedRoomState?.room === null, "deleting the active hosted room should clear the active room");
+  assert(deletedRoomState?.revokedRoomIds?.length === 1, "deleted room id should be recorded as revoked");
+  await page.goto(generalShareLink, { waitUntil: "load" });
+  await page.waitForSelector("#scr-05-link-expired");
+  const deletedLinkText = await page.locator("body").innerText();
+  assert(deletedLinkText.includes("만료") || deletedLinkText.includes("삭제"), "deleted room share link should become unavailable in the current browser state");
+  await page.goto(`${baseFileUrl}?reset=1`, { waitUntil: "load" });
+  await page.getByTestId("start-create-room").click();
+  await page.getByTestId("room-title-input").fill("다시 만든 금요일 모임");
+  await page.getByTestId("candidate-date-input-0").fill("2026-07-05");
+  await page.getByTestId("candidate-time-input-0").fill("18:30");
+  await page.getByTestId("create-room-button").click();
+  await page.waitForSelector("#scr-04-insufficient-response");
+  await page.getByTestId("topbar-home-button").click();
+  await page.waitForSelector("#scr-00-entry");
+  await page.getByTestId("open-host-dashboard-button").click();
+  await page.waitForSelector("[data-testid='my-meetups-screen']");
   await page.getByTestId("open-room-status-0").click();
   await page.waitForSelector("#scr-04-insufficient-response");
 
@@ -271,7 +346,7 @@ async function main() {
   await page.getByTestId("copy-reminder-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
   const reminderCopyStatus = await page.getByTestId("copy-status").innerText();
-  assert(reminderCopyStatus.includes("복사했어요"), "response-complete reminder copy should show copy feedback");
+  assert(reminderCopyStatus.includes("공유 화면"), "response-complete reminder action should open the native share sheet");
 
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
   await page.getByTestId("participant-name-input").fill("민지");
@@ -296,7 +371,7 @@ async function main() {
   await page.getByTestId("copy-share-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
   const copyStatus = await page.getByTestId("copy-status").innerText();
-  assert(copyStatus.includes("복사했어요"), "share copy action should show copied status");
+  assert(copyStatus.includes("공유 화면"), "share action should open the native share sheet");
 
   await page.getByTestId("close-room-button").click();
   await page.waitForSelector("#scr-06-room-closed");
@@ -308,18 +383,18 @@ async function main() {
   assert(stateAfterClosedDirect?.room?.status !== "closed", "closed screen direct link should not create a closed room outside demo mode");
   await page.getByTestId("topbar-home-button").click();
   await page.waitForSelector("#scr-00-entry");
-  assert(await page.getByTestId("privacy-settings-button").isVisible(), "entry should expose privacy/settings path");
+  assert(await page.getByTestId("settings-button").isVisible(), "entry should expose settings path");
 
   await page.goto(`${pageUrl}&demo=1&screen=scr-03-result-recommendation&ai=on`, { waitUntil: "load" });
   const aiLabelText = await page.locator("body").innerText();
   assert(!aiLabelText.includes("AI로 문장을 다듬었어요"), "template-only MVP must not claim AI-polished copy");
-  assert(aiLabelText.includes("공유 문구 복사하기"), "result CTA should match clipboard-copy behavior");
+  assert(aiLabelText.includes("친구한테 공유하기"), "result CTA should match friend-share behavior");
   await assertButtonInInitialViewport(page, "copy-share-button", "result copy CTA should be visible on initial mobile viewport");
 
   await page.goto(`${pageUrl}&screen=scr-02b-response-complete`, { waitUntil: "load" });
   const responseCompleteText = await page.locator("body").innerText();
   assert(!responseCompleteText.includes("응답을 보냈어요"), "response-complete direct link should not claim success without a submitted response");
-  assert(responseCompleteText.includes("저장된 모임이 아직 없어요"), "response-complete direct link should fall back to the entry state");
+  assert(responseCompleteText.includes("아직 만든 모임이 없어요"), "response-complete direct link should fall back to the entry state");
 
   await page.goto(`${pageUrl}&screen=scr-05-link-expired`, { waitUntil: "load" });
   const expiredState = await page.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
@@ -328,7 +403,7 @@ async function main() {
 
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
   const participantDirectText = await page.locator("body").innerText();
-  assert(participantDirectText.includes("저장된 모임이 아직 없어요"), "participant direct link without a room should not render a fake response form");
+  assert(participantDirectText.includes("아직 만든 모임이 없어요"), "participant direct link without a room should not render a fake response form");
 
   await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-05-link-expired`, { waitUntil: "load" });
   await page.goto(`${baseFileUrl}?demo=1&screen=scr-02-participant-input`, { waitUntil: "load" });
@@ -337,6 +412,12 @@ async function main() {
   assert(disabledPreferenceCount >= 12, "expired demo room should disable every preference option");
 
   const demoIsolationContext = await browser.newContext({ viewport: { width: 390, height: 740 } });
+  await demoIsolationContext.addInitScript(() => {
+    Object.defineProperty(navigator, "share", {
+      configurable: true,
+      value: async () => {},
+    });
+  });
   const demoIsolationPage = await demoIsolationContext.newPage();
   demoIsolationPage.setDefaultTimeout(5000);
   await demoIsolationPage.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-03-result-recommendation`, { waitUntil: "load" });
@@ -347,7 +428,7 @@ async function main() {
   await demoIsolationPage.goto(`${baseFileUrl}?screen=scr-00-entry`, { waitUntil: "load" });
   const normalHomeAfterDemo = await demoIsolationPage.locator("body").innerText();
   assert(!normalHomeAfterDemo.includes("최근 방:"), "demo interactions should not create a normal recent room");
-  assert(normalHomeAfterDemo.includes("저장된 모임이 아직 없어요"), "normal home should stay empty after demo interactions");
+  assert(normalHomeAfterDemo.includes("아직 만든 모임이 없어요"), "normal home should stay empty after demo interactions");
   await demoIsolationContext.close();
 
   const demoResetContext = await browser.newContext({ viewport: { width: 390, height: 740 } });
@@ -398,9 +479,10 @@ async function main() {
   await demoResetContext.close();
 
   await page.goto(`${pageUrl}&screen=scr-00-entry`, { waitUntil: "load" });
-  await page.getByTestId("privacy-settings-button").click();
+  await page.getByTestId("settings-button").click();
   await page.waitForSelector("[data-testid='settings-screen']");
   const settingsText = await page.locator("body").innerText();
+  assert(settingsText.includes("로그인 상태") && settingsText.includes("로그아웃"), "settings screen should expose login status and logout");
   assert(settingsText.includes("개인정보") && settingsText.includes("로컬 데이터 지우기"), "settings screen should explain privacy and deletion");
   assert(settingsText.includes("개인정보처리방침") && settingsText.includes("문의") && settingsText.includes("보관"), "settings screen should include privacy policy, contact, and retention details");
   const privacyHref = await page.getByTestId("privacy-policy-link").getAttribute("href");
@@ -409,6 +491,9 @@ async function main() {
   assert(contactHref?.includes("contact.html"), "settings screen should expose a contact path");
   const deletionHref = await page.getByTestId("data-deletion-link").getAttribute("href");
   assert(deletionHref?.includes("delete-data.html"), "settings screen should expose a data deletion request path");
+  await page.getByTestId("logout-button").click();
+  await page.waitForSelector("[data-testid='copy-status']");
+  assert((await page.getByTestId("copy-status").innerText()).includes("로그아웃"), "logout action should show status feedback");
   await page.getByTestId("clear-local-data-button").click();
   const storageAfterClear = await page.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
   assert(storageAfterClear === null, "clear local data action should remove MVP localStorage");
@@ -417,7 +502,7 @@ async function main() {
   await page.goto(`${pageUrl}&screen=scr-00-entry`, { waitUntil: "load" });
   await assertButtonInInitialViewport(page, "start-create-room", "primary home CTA should stay visible at 320px width");
   const labelsAt320 = await visibleButtonLabels(page);
-  assert(labelsAt320.includes("개인정보"), "privacy/settings button should remain visible at 320px width");
+  assert(labelsAt320.includes("설정"), "settings button should remain visible at 320px width");
 
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-03-result-recommendation`, { waitUntil: "load" });
@@ -425,6 +510,10 @@ async function main() {
 
   const failureContext = await browser.newContext({ viewport: { width: 390, height: 740 } });
   await failureContext.addInitScript(() => {
+    Object.defineProperty(navigator, "share", {
+      configurable: true,
+      value: undefined,
+    });
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
       value: {
@@ -444,67 +533,9 @@ async function main() {
   assert(failureCopyStatus.includes("복사하지 못했어요"), "copy action should show a failure status when all copy APIs fail");
   await failureContext.close();
 
-  await page.setViewportSize({ width: 390, height: 740 });
-  await page.goto(`${baseFileUrl}?reset=1&lang=en`, { waitUntil: "load" });
-  assert((await page.locator("html").getAttribute("lang")) === "en", "lang=en should set the document language");
-  const englishEntryText = await page.locator("body").innerText();
-  assert(englishEntryText.includes("Find a time that works"), "English locale should render entry headline");
-  assert(
-    (await page.getByTestId("topbar-home-button").getAttribute("aria-label")) === "Go to home",
-    "English locale should localize the topbar home aria-label",
-  );
-  assert(
-    (await page.getByTestId("language-toggle-button").getAttribute("aria-label")) === "Switch language to Korean",
-    "English locale should localize the language toggle aria-label",
-  );
-  await page.goto(`${baseFileUrl}?reset=1&demo=1&lang=en&screen=scr-03-result-recommendation`, { waitUntil: "load" });
-  const englishResultText = await page.locator("body").innerText();
-  assert(englishResultText.includes("Copy result copy"), "English result screen should render the localized CTA");
-  assert(
-    englishResultText.includes("most workable option so far"),
-    "English result screen should render localized recommendation copy",
-  );
-  assert(
-    !englishResultText.includes("가장 현실적인 약속안"),
-    "English result screen should not expose Korean recommendation copy",
-  );
-  const englishRecommendationCardText = await page.getByTestId("recommendation-card").innerText();
-  assert(
-    !/[가-힣]/.test(englishRecommendationCardText),
-    "English recommendation card should not mix Korean demo fixture text",
-  );
-  const englishCopyText = await page.evaluate(() => {
-    const api = window.HAMMOYEO_APP_TESTS;
-    const room = api.createDemoRoom({
-      responses: [
-        { alias: "A", preferences: { "slot-1": "prefer", "slot-2": "available", "slot-3": "hardNo" } },
-        { alias: "B", preferences: { "slot-1": "available", "slot-2": "prefer", "slot-3": "hardNo" } },
-        { alias: "C", preferences: { "slot-1": "prefer", "slot-2": "adjustable", "slot-3": "available" } },
-        { alias: "D", preferences: { "slot-1": "available", "slot-2": "adjustable", "slot-3": "available" } },
-      ],
-    });
-    const ranked = api.rankCandidates(room);
-    return api.buildCopyTextForAction(room, "copy-share", ranked);
-  });
-  assert(englishCopyText.includes("most workable option so far"), "English copy payload should be localized");
-  assert(!englishCopyText.includes("가장 현실적인 약속안"), "English copy payload should not include Korean recommendation copy");
-  assert(!/[가-힣]/.test(englishCopyText), "English copy payload should not mix Korean demo fixture text");
-  await page.goto(`${baseFileUrl}?reset=1&lang=en`, { waitUntil: "load" });
-  await page.getByTestId("language-toggle-button").click();
-  assert((await page.locator("html").getAttribute("lang")) === "ko", "language toggle should switch back to Korean");
-
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto(`${baseFileUrl}?reset=1&screen=scr-01-host-room`, { waitUntil: "load" });
   await page.getByTestId("room-title-input").fill("작성 중인 모임");
-  let dismissedLocaleDialog = false;
-  page.once("dialog", async (dialog) => {
-    dismissedLocaleDialog = dialog.message().includes("작성 중");
-    await dialog.dismiss();
-  });
-  await page.getByTestId("language-toggle-button").click();
-  await page.waitForTimeout(100);
-  assert(dismissedLocaleDialog, "dirty host setup should guard language switching");
-  assert((await page.getByTestId("room-title-input").inputValue()) === "작성 중인 모임", "dismissing language switch should preserve host draft input");
   let dismissedDirtyDialog = false;
   page.once("dialog", async (dialog) => {
     dismissedDirtyDialog = dialog.message().includes("작성 중");

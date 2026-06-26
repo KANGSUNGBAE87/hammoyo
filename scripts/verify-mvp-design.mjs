@@ -25,13 +25,21 @@ const requiredLabels = [
   "조정하면 가능해요",
   "어려워요",
   "추천 1순위",
-  "공유 문구 복사하기",
+  "친구한테 공유하기",
+  "설정",
+  "로그인 상태",
+  "로그아웃",
+  "현재 상태",
+  "초대가 도착했어요",
+  "초대 응답하기",
   "개인정보",
   "로컬 데이터 지우기",
-  "일반 공유 링크",
+  "공유 준비됨",
+  "공유 화면을 열었어요",
   "내가 만든 모임",
-  "Find a time that works",
-  "General share link",
+  "모임 삭제",
+  "모임 이름",
+  "예상 인원",
 ];
 
 const requiredComponentMarkers = [
@@ -43,6 +51,13 @@ const requiredComponentMarkers = [
   "ParticipantAvatarStack",
   "ShareCopyBox",
   "HostStatusCard",
+  "HostRoomEditor",
+  "IOSCountSelect",
+  "AppleDateTimePicker",
+  "SettingsAccountPanel",
+  "IncomingInviteCard",
+  "AnimalBackground",
+  "Button3D",
   "StateGraphic",
   "StickyBottomCTA",
 ];
@@ -81,7 +96,17 @@ for (const token of requiredTokens) {
   assertIncludes(token, "design token");
 }
 
-for (const forbidden of ["#2563eb", "#f7f8fa", "#17171c", "강한 불가"]) {
+for (const forbidden of [
+  "#2563eb",
+  "#f7f8fa",
+  "#17171c",
+  "강한 불가",
+  "Converging Orbit",
+  "기능 MVP",
+  "앱 준비",
+  "General share link",
+  "Find a time that works",
+]) {
   if (html.toLowerCase().includes(forbidden.toLowerCase())) {
     failures.push(`Forbidden legacy value/copy remains: ${forbidden}`);
   }
@@ -103,12 +128,36 @@ if (!html.includes("data-ai-copy-enabled=\"false\"")) {
   failures.push("Default fixture must keep AI copy disabled.");
 }
 
-if (!html.includes('id="locale-en"')) {
-  failures.push("Missing English locale resource.");
+if (!html.includes("hammoyo-hero-animals.png")) {
+  failures.push("Missing generated animal hero asset.");
 }
 
-if (!html.includes('data-testid="language-toggle-button"')) {
-  failures.push("Missing user-facing language toggle.");
+if (!html.includes("hammoyo-animal-background.png")) {
+  failures.push("Missing generated animal background asset.");
+}
+
+if (html.includes('data-testid="language-toggle-button"')) {
+  failures.push("English language toggle should not be user-facing for Apps in Toss first release.");
+}
+
+if (!html.includes('data-testid="expected-count-select"')) {
+  failures.push("Expected count should use an iOS-like select control.");
+}
+
+if (!html.includes("AppleDateTimePicker")) {
+  failures.push("Candidate date/time controls should use the AppleDateTimePicker visual shell.");
+}
+
+if (!html.includes("navigator.share")) {
+  failures.push("Friend sharing should use the native Web Share sheet before clipboard fallback.");
+}
+
+if (!html.includes('data-testid="delete-room-button-')) {
+  failures.push("My meetups should expose per-room deletion.");
+}
+
+if (!html.includes("revokedRoomIds")) {
+  failures.push("Deleted room share links should be locally revoked.");
 }
 
 if (failures.length) {

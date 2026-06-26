@@ -74,7 +74,8 @@
       }
 
       button:focus-visible,
-      input:focus-visible {
+      input:focus-visible,
+      select:focus-visible {
         outline: 3px solid rgba(91, 95, 245, 0.26);
         outline-offset: 2px;
       }
@@ -109,16 +110,36 @@
       }
 
       .app {
+        position: relative;
         min-height: 740px;
         display: flex;
         flex-direction: column;
         background: var(--background);
+        overflow: hidden;
+      }
+
+      .AnimalBackground {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(180deg, rgba(245, 247, 251, 0.50) 0%, rgba(245, 247, 251, 0.80) 44%, rgba(245, 247, 251, 0.94) 100%),
+          url("assets/hammoyo-animal-background.png") center top / cover no-repeat;
+        opacity: 0.46;
+      }
+
+      .topbar,
+      .screenRoot {
+        position: relative;
+        z-index: 1;
       }
 
       .topbar {
         min-height: 60px;
         padding: 14px var(--page-padding) 10px;
-        background: var(--surface);
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(16px);
         border-bottom: 1px solid var(--border);
       }
 
@@ -174,7 +195,11 @@
         padding: 0 12px;
         border: 1px solid var(--border);
         color: var(--text-secondary);
-        background: var(--surface);
+        background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+        box-shadow:
+          0 7px 0 rgba(152, 162, 179, 0.12),
+          0 14px 22px rgba(28, 39, 63, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.95);
         font-size: 12px;
         line-height: 16px;
         font-weight: 800;
@@ -320,8 +345,12 @@
       .ResponseCoverage {
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
-        background: var(--surface);
-        box-shadow: var(--shadow-card);
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow:
+          0 8px 0 rgba(152, 162, 179, 0.09),
+          0 18px 30px rgba(28, 39, 63, 0.10),
+          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(14px);
       }
 
       .surface,
@@ -412,7 +441,11 @@
         border: 1px solid var(--border);
         border-radius: var(--radius-md);
         color: var(--text-primary);
-        background: var(--surface);
+        background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+        box-shadow:
+          0 5px 0 rgba(152, 162, 179, 0.10),
+          0 10px 18px rgba(28, 39, 63, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.95);
         font-size: 13px;
         line-height: 18px;
         font-weight: 700;
@@ -423,7 +456,10 @@
       }
 
       .preferenceOption[data-selected="true"] {
-        box-shadow: var(--shadow-pressed);
+        box-shadow:
+          0 2px 0 rgba(152, 162, 179, 0.14),
+          0 6px 12px rgba(28, 39, 63, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.72);
       }
 
       .preferenceOption[data-status="prefer"][data-selected="true"] {
@@ -713,31 +749,47 @@
       .primaryButton {
         border: 0;
         color: var(--surface);
-        background: var(--brand);
-        box-shadow: 0 10px 20px rgba(91, 95, 245, 0.24);
+        background: linear-gradient(180deg, #6F72FF 0%, var(--brand) 54%, #494DE8 100%);
+        box-shadow:
+          0 9px 0 #4448D7,
+          0 18px 32px rgba(91, 95, 245, 0.32),
+          inset 0 1px 0 rgba(255, 255, 255, 0.42);
       }
 
       .primaryButton:active,
       .secondaryButton:active,
       .quietButton:active,
-      .preferenceOption:active {
-        transform: translateY(1px);
+      .preferenceOption:active,
+      .candidateActionButton:active {
+        transform: translateY(3px);
+        box-shadow:
+          0 2px 0 rgba(28, 39, 63, 0.16),
+          0 7px 14px rgba(28, 39, 63, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.72);
       }
 
       .primaryButton:hover {
-        background: var(--brand-pressed);
+        background: linear-gradient(180deg, #777AFF 0%, #5B5FF5 54%, #4347D4 100%);
       }
 
       .secondaryButton {
         border: 1px solid transparent;
         color: var(--brand);
-        background: var(--brand-soft);
+        background: linear-gradient(180deg, #ffffff 0%, var(--brand-soft) 100%);
+        box-shadow:
+          0 8px 0 rgba(91, 95, 245, 0.14),
+          0 14px 24px rgba(91, 95, 245, 0.14),
+          inset 0 1px 0 rgba(255, 255, 255, 0.95);
       }
 
       .quietButton {
         border: 1px solid var(--border);
         color: var(--text-primary);
-        background: var(--surface);
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        box-shadow:
+          0 8px 0 rgba(152, 162, 179, 0.12),
+          0 14px 24px rgba(28, 39, 63, 0.10),
+          inset 0 1px 0 rgba(255, 255, 255, 0.95);
       }
 
       .fieldList {
@@ -785,6 +837,7 @@
       .inputGroup {
         display: grid;
         gap: 7px;
+        min-width: 0;
       }
 
       .inputLabel {
@@ -796,6 +849,7 @@
 
       .textInput {
         min-height: var(--touch-target);
+        min-width: 0;
         width: 100%;
         padding: 10px 12px;
         border: 1px solid var(--border);
@@ -810,8 +864,80 @@
 
       .formGrid {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(96px, 0.45fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
+      }
+
+      .IOSCountSelect,
+      .AppleDateTimePicker input {
+        appearance: none;
+        -webkit-appearance: none;
+      }
+
+      .selectShell,
+      .AppleDateTimePicker {
+        position: relative;
+        min-width: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(249, 251, 255, 0.96) 100%),
+          var(--surface);
+        box-shadow:
+          inset 0 -1px 0 rgba(17, 24, 39, 0.04),
+          0 1px 0 rgba(255, 255, 255, 0.9);
+        overflow: hidden;
+      }
+
+      .selectShell:focus-within,
+      .AppleDateTimePicker:focus-within {
+        border-color: rgba(91, 95, 245, 0.58);
+        box-shadow: 0 0 0 4px rgba(91, 95, 245, 0.1);
+      }
+
+      .selectShell::after {
+        content: "⌄";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-56%);
+        color: var(--text-tertiary);
+        pointer-events: none;
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      .IOSCountSelect,
+      .AppleDateTimePicker input {
+        min-height: var(--touch-target);
+        width: 100%;
+        min-width: 0;
+        padding: 10px 36px 10px 12px;
+        border: 0;
+        color: var(--text-primary);
+        background: transparent;
+      }
+
+      .AppleDateTimePicker input::-webkit-calendar-picker-indicator {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .AppleDateTimePicker::after {
+        content: "⌄";
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-56%);
+        color: var(--text-tertiary);
+        pointer-events: none;
+        font-size: 16px;
+        font-weight: 800;
+        line-height: 1;
       }
 
       .candidateInputCard {
@@ -820,7 +946,20 @@
         padding: var(--card-padding);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
-        background: var(--surface);
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow:
+          0 8px 0 rgba(152, 162, 179, 0.08),
+          0 16px 26px rgba(28, 39, 63, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+      }
+
+      .heroAnimalImage {
+        display: block;
+        width: min(260px, 78%);
+        aspect-ratio: 1;
+        object-fit: contain;
+        margin: 0 auto 8px;
+        border-radius: 28px;
       }
 
       .candidateInputHeader,
@@ -837,10 +976,40 @@
         border: 1px solid var(--border);
         border-radius: var(--radius-pill);
         color: var(--text-secondary);
-        background: var(--surface-raised);
+        background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+        box-shadow:
+          0 5px 0 rgba(152, 162, 179, 0.12),
+          0 10px 18px rgba(28, 39, 63, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.96);
         font-size: 12px;
         line-height: 16px;
         font-weight: 800;
+        transition:
+          transform var(--motion-fast) var(--ease-standard),
+          box-shadow var(--motion-fast) var(--ease-standard),
+          border-color var(--motion-fast) var(--ease-standard);
+      }
+
+      .candidateActionButton:hover {
+        border-color: rgba(91, 95, 245, 0.32);
+        color: var(--brand);
+      }
+
+      .candidateActionButton.dangerAction {
+        color: #B63B3B;
+        background: linear-gradient(180deg, #ffffff 0%, var(--danger-soft) 100%);
+      }
+
+      .inviteResponseButton {
+        min-height: var(--touch-target);
+        justify-content: center;
+        color: var(--surface);
+        border-color: transparent;
+        background: linear-gradient(180deg, #36D99A 0%, var(--success) 100%);
+        box-shadow:
+          0 7px 0 #149661,
+          0 14px 24px rgba(32, 184, 122, 0.22),
+          inset 0 1px 0 rgba(255, 255, 255, 0.42);
       }
 
       .candidateActionButton:disabled {
@@ -859,6 +1028,13 @@
 
       .linkField input {
         font-size: 13px;
+      }
+
+      .compactLinkInput {
+        min-height: 36px;
+        color: var(--text-secondary);
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.72);
       }
 
       .HostStatusCard {
@@ -924,6 +1100,47 @@
       body:not([data-debug-panels="true"]) .layout {
         grid-template-columns: minmax(320px, 390px);
         justify-content: center;
+      }
+
+      @media (min-width: 861px) {
+        body:not([data-debug-panels="true"]) .phone {
+          overflow: hidden;
+        }
+
+        body:not([data-debug-panels="true"]) .app {
+          height: 738px;
+          min-height: 738px;
+        }
+
+        body:not([data-debug-panels="true"]) .screenRoot {
+          min-height: 0;
+          overflow: hidden;
+        }
+
+        body:not([data-debug-panels="true"]) .screen {
+          min-height: 0;
+          height: calc(738px - 69px);
+          overflow: hidden;
+        }
+
+        body:not([data-debug-panels="true"]) .screenBody {
+          flex: 1 1 auto;
+          min-height: 0;
+          overflow-y: auto;
+          padding-bottom: 8px;
+        }
+
+        body:not([data-debug-panels="true"]) .StickyBottomCTA {
+          position: static;
+          flex-shrink: 0;
+          padding: 12px var(--page-padding);
+          border-top: 1px solid rgba(231, 234, 240, 0.86);
+          background: linear-gradient(
+            rgba(245, 247, 251, 0),
+            var(--background) 14px,
+            var(--background)
+          );
+        }
       }
 
       .tabsIntro {
@@ -1076,7 +1293,7 @@
       @media (max-width: 380px) {
         .PreferenceSelector,
         .metricGrid,
-        .formGrid {
+        .formGrid:not(.dateTimeGrid) {
           grid-template-columns: 1fr;
         }
       }
@@ -1134,15 +1351,14 @@
       <div class="layout">
         <section class="phone" aria-label="함모여 모바일 앱">
           <div class="app">
+            <div class="AnimalBackground" aria-hidden="true"></div>
             <header class="topbar">
               <div class="brand">
                 <button class="brandHomeButton" type="button" data-action="go-home" data-testid="topbar-home-button" aria-label="홈으로 이동">
                   <strong>함모여</strong><span>홈</span>
                 </button>
                 <div class="topbarActions">
-                  <button class="topbarButton" type="button" data-action="open-settings" data-testid="privacy-settings-button">개인정보</button>
-                  <button class="topbarButton" type="button" data-action="toggle-locale" data-testid="language-toggle-button" aria-label="언어 전환">EN</button>
-                  <span class="pill">앱 준비</span>
+                  <button class="topbarButton" type="button" data-action="open-settings" data-testid="settings-button">설정</button>
                 </div>
               </div>
             </header>
@@ -1153,7 +1369,7 @@
         <aside class="tabsPanel" aria-label="샘플 화면 선택">
           <div class="tabsIntro">
             <p class="eyebrow">HAMMOYEO_DESIGN_PACKAGE</p>
-            <h2>Converging Orbit 기준 화면</h2>
+            <h2>함모여 화면 점검</h2>
             <p>
               토큰, 카피, 상태 정책은 패키지 문서를 기준으로 재구성했습니다.
               각 화면은 query parameter로 직접 열 수 있습니다.
@@ -1188,8 +1404,8 @@
           "scr-00-entry": {
             "tab": "SCR-00 직접 진입 홈",
             "eyebrow": "직접 진입 홈",
-            "title": "다들 되는 시간을 정리해드려요",
-            "description": "가능한 시간을 모으면, 가장 현실적인 약속안을 추천해요.",
+            "title": "모이는 시간, 가볍게 정해요",
+            "description": "후보 시간을 정하고 친구들에게 공유하면 가장 현실적인 약속안을 정리해드려요.",
             "primary": "새 모임 만들기",
             "secondary": "참여 중인 모임 보기"
           },
@@ -1221,7 +1437,7 @@
             "eyebrow": "추천 결과",
             "title": "추천 1순위를 먼저 확인하세요",
             "description": "원시 점수 대신 방장이 설명하기 쉬운 이유와 집계만 보여줍니다.",
-            "primary": "공유 문구 복사하기",
+            "primary": "친구한테 공유하기",
             "secondary": "다른 후보 보기"
           },
           "scr-04-insufficient-response": {
@@ -1229,14 +1445,14 @@
             "eyebrow": "응답 부족",
             "title": "조금만 더 모이면 추천할 수 있어요",
             "description": "7명 중 3명이 답했어요. 2명만 더 답하면 추천을 시작해요.",
-            "primary": "초대 문구 복사하기",
+            "primary": "친구한테 공유하기",
             "secondary": "현재 응답 보기"
           },
           "scr-05-link-expired": {
             "tab": "SCR-05 만료 링크",
             "eyebrow": "만료 링크",
-            "title": "응답 기간이 끝났어요",
-            "description": "이 링크에서는 새 응답을 보낼 수 없어요. 방장에게 새 링크를 받아주세요.",
+            "title": "삭제되었거나 만료된 초대예요",
+            "description": "이 링크에서는 새 응답을 보낼 수 없어요. 모임이 삭제되었거나 방장이 새 링크로 바꿨어요.",
             "primary": "홈으로 돌아가기"
           },
           "scr-06-room-closed": {
@@ -1244,14 +1460,14 @@
             "eyebrow": "확정 완료",
             "title": "약속을 확정했어요",
             "description": "확정 뒤에는 응답 수정과 추천 재계산을 하지 않아요.",
-            "primary": "확정 문구 복사하기",
+            "primary": "친구한테 공유하기",
             "secondary": "홈으로 가기"
           },
           "scr-07-settings": {
-            "tab": "SCR-07 개인정보",
-            "eyebrow": "개인정보와 데이터",
-            "title": "저장되는 내용을 확인해요",
-            "description": "현재 화면은 이 브라우저에 저장된 모임과 일반 공유 링크를 우선 사용해요.",
+            "tab": "SCR-07 설정",
+            "eyebrow": "설정",
+            "title": "계정과 정보를 확인해요",
+            "description": "로그인 상태, 개인정보, 문의, 데이터 삭제 경로를 한곳에서 확인해요.",
             "primary": "로컬 데이터 지우기",
             "secondary": "홈으로 돌아가기"
           },
@@ -1259,7 +1475,7 @@
             "tab": "SCR-08 내가 만든 모임",
             "eyebrow": "내가 만든 모임",
             "title": "모임 상태를 계속 확인해요",
-            "description": "내 브라우저에 저장된 모임의 응답 수, 추천 상태, 공유 링크를 바로 확인해요.",
+            "description": "내 브라우저에 저장된 모임의 응답 수, 후보 날짜, 시간, 장소를 확인하고 수정해요.",
             "primary": "새 모임 만들기",
             "secondary": "홈으로 돌아가기"
           }
@@ -1281,28 +1497,39 @@
         "ui": {
           "homeShort": "홈",
           "homeButtonLabel": "홈으로 이동",
-          "privacyButton": "개인정보",
-          "privacyButtonLabel": "개인정보와 데이터 설정으로 이동",
-          "appPill": "앱 준비",
-          "languageToggle": "EN",
-          "languageButtonLabel": "언어를 영어로 전환",
+          "privacyButton": "설정",
+          "privacyButtonLabel": "설정으로 이동",
           "phoneLabel": "함모여 앱",
-          "entryCaption": "가능 시간표보다 먼저, 방장이 공유할 수 있는 결론을 만듭니다.",
-          "emptyRoom": "저장된 모임이 아직 없어요. 새 모임을 만들면 이 브라우저에만 저장돼요.",
+          "entryCaption": "친구들이 되는 시간을 모아 부담 없는 약속안을 만들어요.",
+          "currentStatus": "현재 상태",
+          "incomingInviteTitle": "초대가 도착했어요",
+          "incomingInviteBody": "{title} 모임에서 가능한 시간을 기다리고 있어요. 같은 홈 화면에서 확인하고 바로 응답할 수 있어요.",
+          "incomingInviteMeta": "{count}개 후보 · {expected}명 예정",
+          "respondToInvite": "초대 응답하기",
+          "emptyRoom": "아직 만든 모임이 없어요. 새 모임을 만들면 이 화면에서 계속 확인할 수 있어요.",
           "roomUnavailable": "저장된 모임 없음",
-          "draftOnlyGuide": "날짜와 시간을 고르면 일반 공유 링크가 만들어져요. 로그인 전에는 이 브라우저의 저장소를 기준으로 상태를 확인해요.",
-          "generalShareLink": "일반 공유 링크",
-          "generalShareHint": "이 링크를 복사해 메신저에 보내면 참여자가 바로 응답 화면으로 들어올 수 있어요.",
+          "draftOnlyGuide": "날짜와 시간을 고르면 친구에게 보낼 공유 문구가 만들어져요. 로그인 전에는 이 브라우저의 저장소를 기준으로 상태를 확인해요.",
+          "generalShareLink": "공유 준비됨",
+          "generalShareHint": "친구한테 공유하기를 누르면 공유 화면이 열리고, 친구는 같은 홈 화면에서 초대를 확인한 뒤 응답해요.",
+          "shareSucceeded": "공유 화면을 열었어요",
+          "shareCanceled": "공유를 취소했어요",
           "inviteText": "{title} 가능한 시간 응답을 부탁드려요.\n{url}",
+          "inviteShareText": "{title} 가능한 시간 응답을 부탁드려요.",
           "savedMeetupsTitle": "내가 만든 모임",
           "savedMeetupsEmpty": "아직 만든 모임이 없어요.",
           "openStatus": "상태 보기",
-          "copyLink": "링크 복사",
+          "editRoom": "수정하기",
+          "copyLink": "친구한테 공유하기",
+          "deleteRoom": "모임 삭제",
+          "deleteRoomShort": "삭제",
+          "deleteRoomConfirm": "이 모임을 삭제할까요? 삭제하면 이 브라우저에서 공유했던 초대 링크도 더 이상 열리지 않아요.",
+          "roomDeleted": "모임을 삭제했어요. 이전 공유 링크는 열리지 않아요.",
+          "saveChanges": "변경 저장",
           "addCandidate": "후보 시간 추가",
           "removeCandidate": "삭제",
           "candidateLabel": "후보 {index}",
           "recommendationBlocked": "{title}은 현재 후보 시간에서 어려움 응답이 많아 바로 확정하기 어려워요. 방장이 새 후보 시간을 열면 다시 고를 수 있게 정리할게요.",
-          "recommendationWait": "아직 {need}명 정도의 응답이 더 필요해요. preview에서는 실제 참여 링크를 만들지 않으니, 같은 기기에서 응답 흐름만 확인해 주세요.",
+          "recommendationWait": "아직 {need}명 정도의 응답이 더 필요해요. 친구에게 공유해서 응답을 더 받아보세요.",
           "recommendationText": "{title}은 현재 응답 기준으로 {label} {time}이 가장 현실적인 약속안이에요. {reason} {responses}명이 답했고, {prefer}명이 가장 좋아요로 골랐어요. 이 시간으로 정리해볼게요.",
           "confirmedText": "{title} 약속이 {label} {time}로 확정됐어요. 장소/메모는 {note}입니다. 확정 뒤에는 응답 수정과 추천 재계산을 하지 않아요.",
           "reminderText": "{title} 가능한 시간 응답을 한 번만 더 부탁드려요. 아직 {need}명 정도의 응답이 더 있으면 방장이 무리 없는 약속안을 정할 수 있어요. 마감은 {deadline}입니다.",
@@ -1314,7 +1541,7 @@
           "copyReminder": "미응답자에게 공유하기",
           "copyReminderHint": "답하지 않은 친구에게 보낼 부담 없는 문구를 복사해요.",
           "viewRecommendation": "추천 결과 보기",
-          "kakaoPasteHint": "복사한 문구는 카카오톡 단톡방이나 사용하는 메신저에 붙여넣어 공유하세요.",
+          "kakaoPasteHint": "공유 화면에서 카카오톡, 메시지, 복사 중 원하는 방법을 고를 수 있어요.",
           "recommendationTrustTitle": "왜 이 안인가요?",
           "reasonConsensus": "어려움 응답이 없고 선호가 가장 많이 모였어요.",
           "reasonAdjustment": "모두가 참석 가능하고 일부만 조금 조정하면 돼요.",
@@ -1343,10 +1570,14 @@
           "goHome": "홈으로 가기",
           "preferenceGroupLabel": "{candidate} 선호 선택",
           "preferenceButtonLabel": "{candidate}에 {status}로 응답",
+          "loginStatusTitle": "로그인 상태",
+          "loginStatusBody": "아직 로그인 전이에요. Apps in Toss 로그인 연결 후에는 내가 만든 모임을 계정 기준으로 동기화합니다.",
+          "logout": "로그아웃",
+          "logoutDone": "로그아웃 상태로 전환했어요",
           "localStorageTitle": "로컬 저장",
           "localStorageBody": "방 제목, 후보 시간, 별명, 응답은 현재 브라우저의 localStorage에만 저장돼요. 보관 기간은 사용자가 로컬 데이터를 지우거나 브라우저 저장소를 삭제할 때까지예요.",
           "serverlessTitle": "서버 전송 없음",
-          "serverlessBody": "GitHub Pages 화면은 브라우저 저장과 일반 공유 링크를 우선 사용해요. Supabase/DeepSeek는 서버 함수로 연결되어 있고, Toss login과 정식 계정 흐름을 붙이면 원격 상태 동기화로 전환합니다.",
+          "serverlessBody": "GitHub Pages 화면은 브라우저 저장과 친구 공유 문구를 우선 사용해요. Supabase/DeepSeek는 서버 함수로 연결되어 있고, Toss login과 정식 계정 흐름을 붙이면 원격 상태 동기화로 전환합니다.",
           "privacyPolicyTitle": "개인정보처리방침",
           "privacyPolicyBody": "개인정보처리방침에서 수집 항목, 보관, 삭제, 문의 방법을 확인할 수 있어요.",
           "deleteTitle": "삭제",
@@ -1360,201 +1591,15 @@
         }
       }
     </script>
-
-    <script type="application/json" id="locale-en">
-      {
-        "brand": {
-          "name": "Hammoyo",
-          "tagline": "Find a time that works for everyone."
-        },
-        "screens": {
-          "scr-00-entry": {
-            "tab": "SCR-00 Entry",
-            "eyebrow": "Direct Entry",
-            "title": "Find a time that works",
-            "description": "Collect availability and turn it into a host-friendly plan.",
-            "primary": "Create a meetup",
-            "secondary": "Open saved meetup"
-          },
-          "scr-01-host-room": {
-            "tab": "SCR-01 Host Setup",
-            "eyebrow": "Host Setup",
-            "title": "Prepare invite copy in under a minute",
-            "description": "Set the meetup name and candidate times before sharing.",
-            "primary": "Create invite copy",
-            "secondary": "Create time options"
-          },
-          "scr-02-participant-input": {
-            "tab": "SCR-02 Participant Input",
-            "eyebrow": "Participant Input",
-            "title": "Pick what works for you",
-            "description": "Detailed answers from others stay hidden. Choose your own status quickly.",
-            "primary": "Submit response"
-          },
-          "scr-02b-response-complete": {
-            "tab": "SCR-02B Response Complete",
-            "eyebrow": "Response Complete",
-            "title": "Your response was saved",
-            "description": "You can edit your response until the host closes the room.",
-            "primary": "Edit my response",
-            "secondary": "Copy reminder copy"
-          },
-          "scr-03-result-recommendation": {
-            "tab": "SCR-03 Recommendation",
-            "eyebrow": "Recommendation",
-            "title": "Check the top recommendation first",
-            "description": "The host sees a explainable summary instead of raw scores.",
-            "primary": "Copy result copy",
-            "secondary": "See other options"
-          },
-          "scr-04-insufficient-response": {
-            "tab": "SCR-04 Not Enough Responses",
-            "eyebrow": "Not Enough Responses",
-            "title": "A few more responses are needed",
-            "description": "Hammoyo will recommend a time after enough people answer.",
-            "primary": "Copy invite copy",
-            "secondary": "View current responses"
-          },
-          "scr-05-link-expired": {
-            "tab": "SCR-05 Expired Link",
-            "eyebrow": "Expired Link",
-            "title": "The response window has ended",
-            "description": "New responses cannot be submitted from this link.",
-            "primary": "Go home"
-          },
-          "scr-06-room-closed": {
-            "tab": "SCR-06 Closed",
-            "eyebrow": "Closed",
-            "title": "The meetup is confirmed",
-            "description": "After confirmation, responses and recommendations stay locked.",
-            "primary": "Copy confirmed copy",
-            "secondary": "Go home"
-          },
-          "scr-07-settings": {
-            "tab": "SCR-07 Privacy",
-            "eyebrow": "Privacy and Data",
-            "title": "Check what is stored",
-            "description": "This screen prioritizes saved browser data and general share links.",
-            "primary": "Clear local data",
-            "secondary": "Go home"
-          },
-          "scr-08-my-meetups": {
-            "tab": "SCR-08 My Meetups",
-            "eyebrow": "My Meetups",
-            "title": "Keep checking meetup status",
-            "description": "Review saved host rooms, response counts, recommendation status, and share links.",
-            "primary": "Create a meetup",
-            "secondary": "Go home"
-          }
-        },
-        "status": {
-          "prefer": "Best for me",
-          "available": "Available",
-          "adjustable": "Can adjust",
-          "hardNo": "Difficult"
-        },
-        "shareLabel": {
-          "template": "Template copy",
-          "fallback": "Template fallback"
-        },
-        "coverageLabel": {
-          "collecting": "Collecting responses",
-          "enough": "Ready to recommend"
-        },
-        "ui": {
-          "homeShort": "Home",
-          "homeButtonLabel": "Go to home",
-          "privacyButton": "Privacy",
-          "privacyButtonLabel": "Open privacy and data settings",
-          "appPill": "App ready",
-          "languageToggle": "KO",
-          "languageButtonLabel": "Switch language to Korean",
-          "phoneLabel": "Hammoyo app",
-          "entryCaption": "Before building a full availability table, Hammoyo helps the host share a clear next step.",
-          "emptyRoom": "No meetup is saved yet. Create one to store it in this browser only.",
-          "roomUnavailable": "No saved meetup",
-          "draftOnlyGuide": "Pick dates and times to generate a general share link. Before login, status is tracked from this browser's saved data.",
-          "generalShareLink": "General share link",
-          "generalShareHint": "Copy this link into your messenger so participants can open the response screen directly.",
-          "inviteText": "Please share your availability for {title}.\n{url}",
-          "savedMeetupsTitle": "My meetups",
-          "savedMeetupsEmpty": "No hosted meetup has been created yet.",
-          "openStatus": "View status",
-          "copyLink": "Copy link",
-          "addCandidate": "Add time option",
-          "removeCandidate": "Remove",
-          "candidateLabel": "Option {index}",
-          "recommendationBlocked": "{title} has too many difficult responses for the current options, so it should not be confirmed yet. The host can add new candidate times and collect again.",
-          "recommendationWait": "About {need} more responses are needed. This preview does not create a real participant link, so use it only to inspect the same-device flow.",
-          "recommendationText": "{title}: {label} {time} is the most workable option so far. {reason} {responses} people responded, and {prefer} picked it as best. I will use this time as the plan.",
-          "confirmedText": "{title} is confirmed for {label} {time}. Place/note: {note}. Responses and recommendations stay locked after confirmation.",
-          "reminderText": "Please add your availability for {title}. About {need} more responses will help the host choose a workable plan. Deadline: {deadline}.",
-          "reminderReadyText": "{title} has enough responses. The host can now check the recommendation and share the most workable plan.",
-          "copySucceeded": "Copied",
-          "copyFailed": "Could not copy. Long-press the text and copy it manually.",
-          "anonymousAlias": "Anonymous",
-          "anonymousHint": "Leave the name blank to save as Anonymous.",
-          "copyReminder": "Copy reminder copy",
-          "copyReminderHint": "Copy a low-pressure reminder for people who have not answered yet.",
-          "viewRecommendation": "View recommendation",
-          "kakaoPasteHint": "Paste the copied text into KakaoTalk or the messenger your group already uses.",
-          "recommendationTrustTitle": "Why this option?",
-          "reasonConsensus": "There are no difficult responses, and preference is concentrated here.",
-          "reasonAdjustment": "Everyone can attend, and only a small adjustment is needed.",
-          "reasonFallback": "It is not perfect for everyone, but it keeps the most people included and is easiest for the host to explain.",
-          "confidenceHigh": "High confidence",
-          "confidenceMedium": "Medium confidence",
-          "confidenceLow": "Low confidence",
-          "confidenceNone": "Waiting for recommendation",
-          "candidateExcluded": "Excluded",
-          "candidateRecommended": "Recommended option",
-          "responseCount": "{count} responses",
-          "score": "Score {score}",
-          "recommendationFirst": "Top recommendation",
-          "recommendationReason": "Why this option",
-          "responsesMetric": "Responses",
-          "preferMetric": "Best",
-          "adjustMetric": "Need adjustment",
-          "hardNoMetric": "Difficult for {count}",
-          "noHardNo": "No hard conflicts",
-          "otherOptions": "Other options",
-          "noAlternatives": "There are no comparable backup options yet.",
-          "confirmedCard": "Confirmed card",
-          "confirmedResultSummary": "The shared result includes only the confirmed time and the overall response flow.",
-          "closedResponse": "Responses are closed",
-          "sampleResult": "View sample result",
-          "goHome": "Go home",
-          "preferenceGroupLabel": "Preference choices for {candidate}",
-          "preferenceButtonLabel": "Respond {status} for {candidate}",
-          "localStorageTitle": "Local storage",
-          "localStorageBody": "Room title, candidate times, nickname, and responses are stored only in this browser's localStorage until you clear local data or browser storage.",
-          "serverlessTitle": "No server transfer",
-          "serverlessBody": "The GitHub Pages screen starts with browser storage and general share links. Supabase and DeepSeek are connected through server functions, and remote status sync can be enabled when Toss login/account flow is attached.",
-          "privacyPolicyTitle": "Privacy policy",
-          "privacyPolicyBody": "The privacy policy explains data fields, retention, deletion, and contact paths.",
-          "deleteTitle": "Deletion",
-          "deleteBody": "The button below removes Hammoyo data saved in this browser.",
-          "contactTitle": "Contact",
-          "contactBody": "Preview questions go to the project owner. A public contact email must be connected before store submission.",
-          "futureDeletionTitle": "No account deletion yet",
-          "futureDeletionBody": "There is no account in this preview. When Toss login or Supabase is connected, local reset and account/server data deletion requests must be separated.",
-          "serverDeletionLink": "Account/server data deletion request",
-          "unsavedExitConfirm": "You have unsaved edits. Going home may discard the current input. Continue?"
-        }
-      }
-    </script>
-
     <script>
       const locales = {
         ko: JSON.parse(document.getElementById("locale-ko").textContent),
-        en: JSON.parse(document.getElementById("locale-en").textContent),
       };
       const screenRoot = document.getElementById("screen-root");
       const tabsRoot = document.getElementById("screen-tabs");
       const appRoot = document.querySelector(".app");
       const STORAGE_KEY = "hammoyo:mvp:v1";
       const DEMO_STORAGE_KEY = "hammoyo:mvp:demo:v1";
-      const LOCALE_KEY = "hammoyo:mvp:locale";
       const APP_VERSION = 1;
       let activeLocale = "ko";
       let locale = locales.ko;
@@ -1649,9 +1694,6 @@
         if (!dateValue) return "";
         const date = new Date(`${dateValue}T00:00:00`);
         if (Number.isNaN(date.getTime())) return "";
-        if (activeLocale === "en") {
-          return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-        }
         const weekdays = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
         return `${date.getMonth() + 1}.${date.getDate()} ${weekdays[date.getDay()]}`;
       }
@@ -1660,6 +1702,7 @@
         return {
           v: 1,
           id: room.id,
+          inviteSlug: room.inviteSlug || room.id,
           title: room.title,
           expectedCount: room.expectedCount,
           deadlineLabel: room.deadlineLabel,
@@ -1677,7 +1720,7 @@
         const url = new URL(window.location.href);
         url.search = "";
         url.hash = "";
-        url.searchParams.set("screen", "scr-02-participant-input");
+        url.searchParams.set("screen", "scr-00-entry");
         url.searchParams.set("join", toBase64Url(createShareSnapshot(room)));
         return url.toString();
       }
@@ -1686,6 +1729,7 @@
         if (!snapshot || snapshot.v !== 1 || !Array.isArray(snapshot.candidates)) return null;
         return createDemoRoom({
           id: snapshot.id || `shared-${Date.now().toString(36)}`,
+          inviteSlug: snapshot.inviteSlug || snapshot.id || "",
           title: snapshot.title || localizedDemoFixture().title,
           expectedCount: snapshot.expectedCount || 4,
           deadlineLabel: snapshot.deadlineLabel || localizedDemoFixture().deadlineLabel,
@@ -1701,37 +1745,22 @@
       }
 
       function getInitialLocale() {
-        const params = new URLSearchParams(window.location.search);
-        const fromUrl = params.get("lang");
-        if (Object.prototype.hasOwnProperty.call(locales, fromUrl)) return fromUrl;
-        const stored = localStorage.getItem(LOCALE_KEY);
-        return Object.prototype.hasOwnProperty.call(locales, stored) ? stored : "ko";
+        return "ko";
       }
 
       function applyLocale(nextLocale) {
-        activeLocale = Object.prototype.hasOwnProperty.call(locales, nextLocale) ? nextLocale : "ko";
+        activeLocale = "ko";
         locale = locales[activeLocale];
         document.documentElement.lang = activeLocale;
         const phoneFrame = document.querySelector(".phone");
         const homeButton = document.querySelector('[data-testid="topbar-home-button"]');
-        const privacyButton = document.querySelector('[data-testid="privacy-settings-button"]');
-        const languageButton = document.querySelector('[data-testid="language-toggle-button"]');
+        const privacyButton = document.querySelector('[data-testid="settings-button"]');
         const homeLabel = document.querySelector(".brandHomeButton span");
-        const pill = document.querySelector(".pill");
         if (phoneFrame) phoneFrame.setAttribute("aria-label", locale.ui.phoneLabel);
         if (homeButton) homeButton.setAttribute("aria-label", locale.ui.homeButtonLabel);
         if (privacyButton) privacyButton.textContent = locale.ui.privacyButton;
         if (privacyButton) privacyButton.setAttribute("aria-label", locale.ui.privacyButtonLabel);
-        if (languageButton) languageButton.textContent = locale.ui.languageToggle;
-        if (languageButton) languageButton.setAttribute("aria-label", locale.ui.languageButtonLabel);
         if (homeLabel) homeLabel.textContent = locale.ui.homeShort;
-        if (pill) pill.textContent = locale.ui.appPill;
-      }
-
-      function setLocale(nextLocale) {
-        applyLocale(nextLocale);
-        localStorage.setItem(LOCALE_KEY, activeLocale);
-        render(currentScreen());
       }
 
       const screenCopy = (id) => locale.screens[id];
@@ -1755,6 +1784,7 @@
       }
 
       const isTerminalRoom = (room) => room.status === "closed" || room.status === "expired";
+      const isRoomRevoked = (room) => Boolean(room?.id && (appState?.revokedRoomIds || []).includes(room.id));
 
       function normalizeStatus(status) {
         return Object.prototype.hasOwnProperty.call(statusMeta, status) ? status : "available";
@@ -1812,6 +1842,7 @@
           status: options.status || "collecting",
           selectedCandidateId: options.selectedCandidateId || null,
           shareUrl: options.shareUrl || "",
+          inviteSlug: options.inviteSlug || options.id || "",
           isSharedLink: Boolean(options.isSharedLink),
           createdAt: options.createdAt || new Date().toISOString(),
           closedAt: options.closedAt || null,
@@ -2018,6 +2049,9 @@
           room,
           hostRooms: [room],
           hostDraft: null,
+          editingRoomId: null,
+          inviteContext: null,
+          revokedRoomIds: [],
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
@@ -2032,6 +2066,9 @@
           room: null,
           hostRooms: [],
           hostDraft: null,
+          editingRoomId: null,
+          inviteContext: null,
+          revokedRoomIds: [],
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
@@ -2076,6 +2113,9 @@
           room,
           hostRooms,
           hostDraft: raw.hostDraft ? createDemoRoom(raw.hostDraft) : null,
+          editingRoomId: raw.editingRoomId || null,
+          inviteContext: raw.inviteContext || null,
+          revokedRoomIds: Array.isArray(raw.revokedRoomIds) ? raw.revokedRoomIds : [],
           draftPreferences: raw.draftPreferences || {},
           currentParticipant: raw.currentParticipant || "",
           copyStatus: raw.copyStatus || "",
@@ -2087,22 +2127,37 @@
       function loadState() {
         const params = new URLSearchParams(window.location.search);
         if (params.get("reset") === "1") localStorage.removeItem(currentStorageKey());
-        const sharedRoom = publicRoomFromShareSnapshot(fromBase64Url(params.get("join")));
+        let storedState = null;
+        try {
+          const stored = localStorage.getItem(currentStorageKey());
+          if (stored) storedState = normalizeState(JSON.parse(stored));
+        } catch {
+          storedState = null;
+        }
+        const shareSnapshot = fromBase64Url(params.get("join"));
+        const sharedRoom = publicRoomFromShareSnapshot(shareSnapshot);
+        const revokedRoomIds = storedState?.revokedRoomIds || [];
+        if (shareSnapshot?.id && revokedRoomIds.includes(shareSnapshot.id)) {
+          const expiredRoom = sharedRoom || createDemoRoom({ id: shareSnapshot.id, status: "expired", isSharedLink: true });
+          expiredRoom.status = "expired";
+          return {
+            ...createFreshState(),
+            room: expiredRoom,
+            inviteContext: { status: "deleted", roomId: shareSnapshot.id },
+            revokedRoomIds,
+          };
+        }
         if (sharedRoom) {
           return {
             ...createFreshState(),
             room: sharedRoom,
+            inviteContext: { status: "valid", roomId: sharedRoom.id },
+            revokedRoomIds,
             draftPreferences: {},
           };
         }
-        try {
-          const stored = localStorage.getItem(currentStorageKey());
-          if (!stored) return isDemoMode() ? createDemoState() : createDefaultState();
-          const raw = JSON.parse(stored);
-          return normalizeState(raw);
-        } catch {
-          return createDefaultState();
-        }
+        if (storedState) return storedState;
+        return isDemoMode() ? createDemoState() : createDefaultState();
       }
 
       function saveState() {
@@ -2116,6 +2171,7 @@
 
       function applyRouteState(screen) {
         let changed = false;
+        if (appState.inviteContext?.status === "deleted") return "scr-05-link-expired";
         const roomRequiredScreens = [
           "scr-02-participant-input",
           "scr-03-result-recommendation",
@@ -2154,7 +2210,7 @@
 
       function shouldConfirmNavigation(action) {
         if (!hasUnsavedEdits) return false;
-        if (!["go-home", "open-settings", "open-existing-room", "open-host-dashboard", "start-create-room", "toggle-locale", "history"].includes(action)) return false;
+        if (!["go-home", "open-settings", "open-existing-room", "open-host-dashboard", "start-create-room", "respond-to-invite", "history"].includes(action)) return false;
         return ["scr-01-host-room", "scr-02-participant-input"].includes(renderedScreen);
       }
 
@@ -2291,8 +2347,23 @@
         return `
           <section class="linkField" aria-label="${escapeHtml(locale.ui.generalShareLink)}">
             ${reasonChip("brand", locale.ui.generalShareLink)}
-            <input class="textInput" data-testid="general-share-link" value="${escapeHtml(shareUrl)}" readonly />
             <p class="helperText">${escapeHtml(locale.ui.generalShareHint)}</p>
+            <input class="textInput compactLinkInput" data-testid="general-share-link" value="${escapeHtml(shareUrl)}" readonly />
+          </section>
+        `;
+      }
+
+      function incomingInviteCard(room) {
+        if (!room || !room.isSharedLink) return "";
+        return `
+          <section class="surface IncomingInviteCard" data-testid="invite-context-card" aria-label="${escapeHtml(locale.ui.incomingInviteTitle)}">
+            ${reasonChip("success", locale.ui.incomingInviteTitle)}
+            <div class="slotMeta">
+              <strong>${escapeHtml(room.title)}</strong>
+              <span>${escapeHtml(formatTemplate(locale.ui.incomingInviteMeta, { count: room.candidates.length, expected: room.expectedCount }))}</span>
+            </div>
+            <p class="helperText">${escapeHtml(formatTemplate(locale.ui.incomingInviteBody, { title: room.title }))}</p>
+            <button class="candidateActionButton Button3D inviteResponseButton" type="button" data-action="respond-to-invite" data-testid="respond-to-invite-button">${escapeHtml(locale.ui.respondToInvite)}</button>
           </section>
         `;
       }
@@ -2312,7 +2383,9 @@
             </div>
             <div class="buttonRow">
               <button class="candidateActionButton" type="button" data-action="open-room-status" data-room-id="${escapeHtml(room.id)}" data-testid="open-room-status-${index}">${escapeHtml(locale.ui.openStatus)}</button>
+              <button class="candidateActionButton" type="button" data-action="edit-host-room" data-room-id="${escapeHtml(room.id)}" data-testid="edit-host-room-${index}">${escapeHtml(locale.ui.editRoom)}</button>
               <button class="candidateActionButton" type="button" data-action="copy-room-link" data-room-id="${escapeHtml(room.id)}" data-testid="copy-room-link-${index}">${escapeHtml(locale.ui.copyLink)}</button>
+              <button class="candidateActionButton dangerAction" type="button" data-action="delete-room" data-room-id="${escapeHtml(room.id)}" data-testid="delete-room-button-${index}">${escapeHtml(locale.ui.deleteRoomShort)}</button>
             </div>
           </article>
         `;
@@ -2326,12 +2399,12 @@
         const disabled = options.disabled ? 'disabled aria-disabled="true"' : "";
         const secondaryDisabled = options.secondaryDisabled ? 'disabled aria-disabled="true"' : "";
         const secondaryButton = secondary
-          ? `<button class="quietButton" type="button" ${secondaryDisabled} ${actionAttrs(options.secondaryAction, options.secondaryTestId)}>${escapeHtml(secondary)}</button>`
+          ? `<button class="quietButton Button3D" type="button" ${secondaryDisabled} ${actionAttrs(options.secondaryAction, options.secondaryTestId)}>${escapeHtml(secondary)}</button>`
           : "";
         return `
           <div class="StickyBottomCTA">
             <div class="buttonRow ${secondary ? "two" : ""}">
-              <button class="${options.secondaryPrimary ? "secondaryButton" : "primaryButton"}" type="button" ${disabled} ${actionAttrs(options.primaryAction, options.primaryTestId)}>${escapeHtml(primary)}</button>
+              <button class="${options.secondaryPrimary ? "secondaryButton" : "primaryButton"} Button3D" type="button" ${disabled} ${actionAttrs(options.primaryAction, options.primaryTestId)}>${escapeHtml(primary)}</button>
               ${secondaryButton}
             </div>
           </div>
@@ -2353,19 +2426,23 @@
         const candidates = [...room.candidates, ...localizedDefaultCandidates()].slice(0, Math.max(3, room.candidates.length));
         return candidates
           .map((candidate, index) => `
-            <div class="candidateInputCard">
+            <div class="candidateInputCard HostRoomEditor">
               <div class="candidateInputHeader">
                 ${reasonChip(index === 0 ? "brand" : "success", formatTemplate(locale.ui.candidateLabel, { index: index + 1 }))}
                 <button class="candidateActionButton" type="button" data-action="remove-candidate" data-candidate-index="${index}" data-testid="remove-candidate-${index}" ${candidates.length <= 2 ? "disabled" : ""}>${escapeHtml(locale.ui.removeCandidate)}</button>
               </div>
-              <div class="formGrid">
+              <div class="formGrid dateTimeGrid">
                 <label class="inputGroup">
                   <span class="inputLabel">날짜</span>
-                  <input class="textInput" type="date" data-testid="candidate-date-input-${index}" name="candidate-date-${index}" value="${escapeHtml(candidate.date || "")}" />
+                  <span class="AppleDateTimePicker" data-kind="date">
+                    <input type="date" data-testid="candidate-date-input-${index}" name="candidate-date-${index}" value="${escapeHtml(candidate.date || "")}" />
+                  </span>
                 </label>
                 <label class="inputGroup">
                   <span class="inputLabel">시간</span>
-                  <input class="textInput" type="time" data-testid="candidate-time-input-${index}" name="candidate-time-${index}" value="${escapeHtml(candidate.time)}" />
+                  <span class="AppleDateTimePicker" data-kind="time">
+                    <input type="time" data-testid="candidate-time-input-${index}" name="candidate-time-${index}" value="${escapeHtml(candidate.time)}" />
+                  </span>
                 </label>
               </div>
               <label class="inputGroup">
@@ -2378,36 +2455,53 @@
           `<button class="candidateActionButton" type="button" data-action="add-candidate" data-testid="add-candidate-button" ${candidates.length >= MAX_CANDIDATES ? "disabled" : ""}>${escapeHtml(locale.ui.addCandidate)}</button>`;
       }
 
+      function expectedCountOptions(selected) {
+        const current = clampNumber(selected, 3, 20, 7);
+        return Array.from({ length: 18 }, (_, index) => index + 3)
+          .map((count) => `<option value="${count}" ${count === current ? "selected" : ""}>${count}명</option>`)
+          .join("");
+      }
+
       const renderers = {
         "scr-00-entry": () => {
           const copy = screenCopy("scr-00-entry");
           const ranked = appState.room ? rankCandidates(appState.room) : null;
           const hostedCount = appState.hostRooms?.length || 0;
-          const savedRoomLine = appState.room
-            ? `최근 방: ${escapeHtml(appState.room.title)} · ${ranked.responseCount}명 응답`
+          const hasIncomingInvite = Boolean(appState.room?.isSharedLink && appState.inviteContext?.status === "valid");
+          const savedRoomLine = hasIncomingInvite
+            ? formatTemplate(locale.ui.incomingInviteBody, { title: appState.room.title })
+            : appState.room
+            ? `최근 방: ${appState.room.title} · ${ranked.responseCount}명 응답`
             : locale.ui.emptyRoom;
+          const primaryLabel = hasIncomingInvite ? locale.ui.respondToInvite : copy.primary;
+          const secondaryLabel = hasIncomingInvite
+            ? copy.primary
+            : hostedCount
+              ? locale.ui.savedMeetupsTitle
+              : locale.ui.roomUnavailable;
           return `
             <section id="scr-00-entry" class="screen" aria-labelledby="entry-title">
               <div class="screenBody">
-                ${stateGraphic("entry", "둥근 참여자 토큰이 중앙의 캘린더로 모이는 그래픽")}
+                <img class="heroAnimalImage" src="assets/hammoyo-hero-animals.png" alt="동물 친구들이 달력과 시계를 보며 모임 시간을 정하는 그림" />
                 <div class="section">
                   <span class="eyebrow">${escapeHtml(locale.brand.name)}</span>
                   <h1 id="entry-title">${escapeHtml(copy.title)}</h1>
                   <p>${escapeHtml(copy.description)}</p>
                 </div>
+                ${hasIncomingInvite ? incomingInviteCard(appState.room) : ""}
                 <div class="surface compactSection">
-                  ${reasonChip("brand", "Converging Orbit")}
+                  ${reasonChip("brand", locale.ui.currentStatus)}
                   <p class="caption">${escapeHtml(locale.ui.entryCaption)}</p>
-                  <p class="emptyStateLine">${savedRoomLine}</p>
+                  <p class="emptyStateLine">${escapeHtml(savedRoomLine)}</p>
                   ${hostedCount ? `<p class="helperText">${escapeHtml(locale.ui.savedMeetupsTitle)} ${hostedCount}</p>` : ""}
                 </div>
               </div>
-              ${stickyBottomCTA(copy.primary, hostedCount ? locale.ui.savedMeetupsTitle : locale.ui.roomUnavailable, {
-                primaryAction: "start-create-room",
+              ${stickyBottomCTA(primaryLabel, secondaryLabel, {
+                primaryAction: hasIncomingInvite ? "respond-to-invite" : "start-create-room",
                 primaryTestId: "start-create-room",
-                secondaryAction: hostedCount ? "open-host-dashboard" : null,
-                secondaryTestId: hostedCount ? "open-host-dashboard-button" : null,
-                secondaryDisabled: !hostedCount,
+                secondaryAction: hasIncomingInvite ? "start-create-room" : hostedCount ? "open-host-dashboard" : null,
+                secondaryTestId: hasIncomingInvite ? "start-create-room-secondary" : hostedCount ? "open-host-dashboard-button" : null,
+                secondaryDisabled: !hasIncomingInvite && !hostedCount,
               })}
             </section>
           `;
@@ -2415,6 +2509,7 @@
         "scr-01-host-room": () => {
           const copy = screenCopy("scr-01-host-room");
           const room = roomOrDraft();
+          const primaryLabel = appState.editingRoomId ? locale.ui.saveChanges : copy.primary;
           return `
             <section id="scr-01-host-room" class="screen" aria-labelledby="host-title">
               <div class="screenBody">
@@ -2427,7 +2522,11 @@
                   <div class="formGrid">
                     <label class="inputGroup">
                       <span class="inputLabel">예상 인원</span>
-                      <input class="textInput" data-testid="expected-count-input" name="expected-count" inputmode="numeric" value="${escapeHtml(room.expectedCount)}" />
+                      <span class="selectShell">
+                        <select class="IOSCountSelect" data-testid="expected-count-select" name="expected-count">
+                          ${expectedCountOptions(room.expectedCount)}
+                        </select>
+                      </span>
                     </label>
                     <label class="inputGroup">
                       <span class="inputLabel">응답 마감</span>
@@ -2438,7 +2537,7 @@
                 </form>
                 <p class="guideNote">${escapeHtml(locale.ui.draftOnlyGuide)}</p>
               </div>
-              ${stickyBottomCTA(copy.primary, null, {
+              ${stickyBottomCTA(primaryLabel, null, {
                 primaryAction: "create-room",
                 primaryTestId: "create-room-button",
               })}
@@ -2573,7 +2672,7 @@
                 </div>
                 ${shareCopyBox(room, ranked)}
               </div>
-              ${stickyBottomCTA(copy.primary, activeLocale === "ko" ? "약속 확정하기" : "Confirm meetup", {
+              ${stickyBottomCTA(copy.primary, "약속 확정하기", {
                 primaryAction: "copy-share",
                 primaryTestId: "copy-share-button",
                 secondaryAction: "close-room",
@@ -2679,6 +2778,11 @@
               <div class="screenBody">
                 ${standardHeader("scr-07-settings", "settings-title")}
                 <div class="settingsList" aria-label="개인정보와 저장 안내">
+                  <div class="settingsItem SettingsAccountPanel">
+                    <strong>${escapeHtml(locale.ui.loginStatusTitle)}</strong>
+                    <span>${escapeHtml(locale.ui.loginStatusBody)}</span>
+                    <button class="candidateActionButton" type="button" data-action="logout" data-testid="logout-button">${escapeHtml(locale.ui.logout)}</button>
+                  </div>
                   <div class="settingsItem">
                     <strong>${escapeHtml(locale.ui.localStorageTitle)}</strong>
                     <span>${escapeHtml(locale.ui.localStorageBody)}</span>
@@ -2704,6 +2808,7 @@
                     <span><a data-testid="contact-link" href="contact.html">${escapeHtml(locale.ui.contactTitle)}</a> · ${escapeHtml(locale.ui.contactBody)}</span>
                   </div>
                 </div>
+                ${appState.copyStatus ? `<p class="actionStatus" data-testid="copy-status">${escapeHtml(appState.copyStatus)}</p>` : ""}
               </div>
               ${stickyBottomCTA(copy.primary, copy.secondary, {
                 primaryAction: "clear-local-data",
@@ -2808,14 +2913,28 @@
 
       function createRoomFromForm() {
         hasUnsavedEdits = false;
-        const room = createDemoRoom(readRoomForm());
-        room.status = "collecting";
+        const formRoom = readRoomForm();
+        const existingRoom = appState.editingRoomId
+          ? (appState.hostRooms || []).find((savedRoom) => savedRoom.id === appState.editingRoomId) || appState.room
+          : null;
+        const room = createDemoRoom({
+          ...formRoom,
+          id: existingRoom?.id,
+          responses: existingRoom?.responses || [],
+          status: existingRoom?.status || "collecting",
+          selectedCandidateId: existingRoom?.selectedCandidateId || null,
+          shareUrl: existingRoom?.shareUrl || "",
+          createdAt: existingRoom?.createdAt || new Date().toISOString(),
+          closedAt: existingRoom?.closedAt || null,
+        });
+        if (!existingRoom) room.status = "collecting";
         room.shareUrl = buildGeneralShareUrl(room);
         appState = {
           version: APP_VERSION,
           room,
           hostRooms: upsertHostRoom(room, appState.hostRooms),
           hostDraft: null,
+          editingRoomId: null,
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
@@ -2824,7 +2943,7 @@
         };
         appState.draftPreferences = getDraftPreferences(appState.room);
         saveState();
-        selectScreen("scr-04-insufficient-response");
+        selectScreen(existingRoom ? "scr-08-my-meetups" : "scr-04-insufficient-response");
       }
 
       function persistHostDraftFromForm() {
@@ -2880,6 +2999,12 @@
         const room = appState.room;
         if (!room) {
           selectScreen("scr-00-entry");
+          return;
+        }
+        if (isRoomRevoked(room)) {
+          room.status = "expired";
+          saveState();
+          selectScreen("scr-05-link-expired");
           return;
         }
         if (isTerminalRoom(room)) return;
@@ -2962,10 +3087,62 @@
         render(screen);
       }
 
+      function combineSharePayload(payload) {
+        return [payload.text, payload.url].filter(Boolean).join("\n");
+      }
+
+      function sharePayloadForAction(room, action, ranked = rankCandidates(room)) {
+        const url = room.shareUrl || buildGeneralShareUrl(room);
+        if (action === "copy-invite") {
+          return {
+            title: room.title,
+            text: formatTemplate(locale.ui.inviteShareText, { title: room.title }),
+            url,
+          };
+        }
+        if (action === "copy-reminder") {
+          return {
+            title: room.title,
+            text: buildReminderText(room, ranked),
+            url,
+          };
+        }
+        const text = room.status === "closed" ? buildConfirmedText(room, ranked) : buildRecommendationText(room, ranked);
+        return {
+          title: room.title,
+          text,
+          url,
+        };
+      }
+
+      async function shareExplicitPayload(payload, screen = currentScreen()) {
+        if (navigator.share) {
+          try {
+            await navigator.share(payload);
+            appState.copyStatus = locale.ui.shareSucceeded;
+            saveState();
+            render(screen);
+            return;
+          } catch (error) {
+            if (error?.name === "AbortError") {
+              appState.copyStatus = locale.ui.shareCanceled;
+              saveState();
+              render(screen);
+              return;
+            }
+          }
+        }
+        await copyExplicitText(combineSharePayload(payload), screen);
+      }
+
       async function copyShareText(action = "copy-share") {
         if (!appState.room) return;
-        const text = buildCopyTextForAction(appState.room, action, rankCandidates(appState.room));
-        await copyExplicitText(text);
+        await shareExplicitPayload(sharePayloadForAction(appState.room, action, rankCandidates(appState.room)));
+      }
+
+      async function shareRoomInvite(room, screen = currentScreen()) {
+        if (!room) return;
+        await shareExplicitPayload(sharePayloadForAction(room, "copy-invite", rankCandidates(room)), screen);
       }
 
       function closeRoom() {
@@ -2988,6 +3165,35 @@
         selectScreen("scr-06-room-closed");
       }
 
+      function revokeRoomId(roomId) {
+        if (!roomId) return;
+        const revoked = new Set(appState.revokedRoomIds || []);
+        revoked.add(roomId);
+        appState.revokedRoomIds = [...revoked];
+      }
+
+      function deleteHostedRoom(roomId) {
+        const room = (appState.hostRooms || []).find((savedRoom) => savedRoom.id === roomId) || appState.room;
+        if (!room || room.isSharedLink) return;
+        if (!window.confirm(locale.ui.deleteRoomConfirm)) return;
+        revokeRoomId(room.id);
+        appState.hostRooms = (appState.hostRooms || []).filter((savedRoom) => savedRoom.id !== room.id);
+        if (appState.room?.id === room.id) {
+          appState.room = null;
+          appState.draftPreferences = {};
+          appState.lastSubmittedAt = null;
+          appState.lastResponseId = null;
+        }
+        if (appState.editingRoomId === room.id) {
+          appState.editingRoomId = null;
+          appState.hostDraft = null;
+        }
+        appState.copyStatus = locale.ui.roomDeleted;
+        hasUnsavedEdits = false;
+        saveState();
+        selectScreen("scr-08-my-meetups", true);
+      }
+
       function handleAction(action, target) {
         if (!action) return;
         if (target?.disabled) return;
@@ -2995,11 +3201,22 @@
         if (action === "start-create-room") {
           appState.copyStatus = "";
           appState.hostDraft = createDraftRoom();
+          appState.editingRoomId = null;
           selectScreen("scr-01-host-room");
         }
         if (action === "open-host-dashboard") {
           appState.copyStatus = "";
           selectScreen("scr-08-my-meetups");
+        }
+        if (action === "respond-to-invite") {
+          if (!appState.room || appState.inviteContext?.status === "deleted" || isTerminalRoom(appState.room)) {
+            selectScreen("scr-05-link-expired");
+            return;
+          }
+          appState.copyStatus = "";
+          appState.draftPreferences = getDraftPreferences(appState.room);
+          saveState();
+          selectScreen("scr-02-participant-input");
         }
         if (action === "open-existing-room") {
           if (!appState.room) return;
@@ -3026,11 +3243,24 @@
           if (appState.room.status === "closed") selectScreen("scr-06-room-closed");
           else selectScreen(rankCandidates(appState.room).top ? "scr-03-result-recommendation" : "scr-04-insufficient-response");
         }
+        if (action === "edit-host-room") {
+          const room = (appState.hostRooms || []).find((savedRoom) => savedRoom.id === target.dataset.roomId);
+          if (!room) return;
+          appState.hostDraft = createDemoRoom(room);
+          appState.editingRoomId = room.id;
+          appState.copyStatus = "";
+          hasUnsavedEdits = false;
+          saveState();
+          selectScreen("scr-01-host-room");
+        }
         if (action === "copy-room-link") {
           const room = (appState.hostRooms || []).find((savedRoom) => savedRoom.id === target.dataset.roomId);
           if (!room) return;
           appState.room = createDemoRoom(room);
-          copyExplicitText(room.shareUrl || buildGeneralShareUrl(room), "scr-08-my-meetups");
+          shareRoomInvite(appState.room, "scr-08-my-meetups");
+        }
+        if (action === "delete-room") {
+          deleteHostedRoom(target.dataset.roomId);
         }
         if (action === "set-preference") {
           if (!appState.room) return;
@@ -3050,7 +3280,11 @@
         if (action === "go-home") selectScreen("scr-00-entry");
         if (action === "open-settings") selectScreen("scr-07-settings");
         if (action === "clear-local-data") clearLocalData();
-        if (action === "toggle-locale") setLocale(activeLocale === "ko" ? "en" : "ko");
+        if (action === "logout") {
+          appState.copyStatus = locale.ui.logoutDone;
+          saveState();
+          render("scr-07-settings");
+        }
       }
 
       appRoot.addEventListener("click", (event) => {

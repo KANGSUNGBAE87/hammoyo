@@ -1,6 +1,6 @@
 ---
-version: 4
-status: app-flow-implemented
+version: 6
+status: app-flow-plus-share-delete-background-implemented
 updated: 2026-06-26
 canonical: true
 ---
@@ -117,11 +117,12 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 
 - HTML sample: `docs/mvp/index.html`
 - 목적: 앱 화면 상태와 문구 흐름을 확인하는 design sample.
-- 범위: GitHub Pages 화면은 브라우저 저장과 일반 공유 링크를 사용합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 연결되어 있으며, Toss login/account 동기화 UI는 아직 별도 단계입니다.
+- 범위: GitHub Pages 화면은 브라우저 저장과 OS/브라우저 공유 화면 우선 공유를 사용합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 연결되어 있으며, Toss login/account 동기화 UI는 아직 별도 단계입니다.
 - 직접 진입: `docs/mvp/index.html?screen=scr-03-result-recommendation`
 - 기본 상태: `AI_COPY_ENABLED=false`, 즉 AI 라벨은 표시하지 않습니다. GitHub Pages 화면은 AI-polished fixture를 제공하지 않으므로 `?ai=on`도 사용자에게 AI 라벨을 노출하지 않습니다.
-- 첫 버전 i18n 기준에 맞춰 `ko/en` locale resource와 언어 전환 버튼을 둡니다. 다음 구현자는 남은 하드코딩 문구를 모두 locale resource로 이동해야 합니다.
-- 2026-06-26부터 초대 문구는 일반 공유 링크를 포함합니다. GitHub Pages/브라우저 경로에서는 공개 후보 정보가 담긴 HTTPS 링크로 참여 화면을 열고, Apps in Toss 빌드에서는 ShareAdapter가 `intoss://...` 딥링크 공유로 전환합니다.
+- 첫 Apps in Toss 화면은 한국어 단일 UI로 둡니다. 사용자 화면에는 언어 전환 버튼을 두지 않고, 추후 다국어가 필요할 때 locale resource를 다시 여는 방식으로 확장합니다.
+- 2026-06-26부터 초대 문구는 친구 공유 링크를 포함합니다. GitHub Pages/브라우저 경로에서는 공개 후보 정보가 담긴 HTTPS 링크로 참여 화면을 열고, Apps in Toss 빌드에서는 ShareAdapter가 `intoss://...` 딥링크 공유로 전환합니다.
+- 홈 메인 asset은 `docs/assets/hammoyo-hero-animals.png`를 사용합니다. 화면 배경은 `docs/assets/hammoyo-animal-background.png`를 낮은 대비로 깔고, 같은 생성 이미지에서 잘라낸 개별 캐릭터는 `docs/assets/characters/`에 보관하며, 출처와 생성 기록은 `docs/design/asset-provenance.md`에 남깁니다.
 - 모바일 폭에서는 샘플용 화면 선택/토큰 패널을 숨기고 제품 화면만 표시합니다. 데스크톱 폭에서는 QA용 패널을 유지합니다.
 
 ## React Bits 결정
@@ -135,7 +136,7 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 - 추천 근거는 집계값으로만 노출하고 개인을 지목하지 않아야 합니다.
 - AI copy 라벨은 실제 AI 결과가 연결된 뒤에만 공유 문구와 같은 시야에 있어야 합니다. template-only 화면에서는 AI 라벨이 없어야 합니다.
 - primary action은 하단 thumb zone에 가까워야 합니다.
-- `docs/mvp/index.html`은 package token, 9개 화면, query parameter route, sticky CTA, reduced-motion, ko/en locale resource, 일반 공유 링크와 host dashboard 흐름을 포함해야 합니다.
+- `docs/mvp/index.html`은 package token, 9개 화면, query parameter route, sticky CTA, reduced-motion, 한국어 단일 UI, 초대 홈 진입, native share 우선 공유, host dashboard/edit/delete 흐름을 포함해야 합니다.
 - 구조 검증은 `npm run build`로 실행합니다.
 
 ## Change Log
@@ -145,3 +146,5 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 - 2026-06-24: 샘플 MVP 구현과 Chrome/Playwright 360/390/420 QA 통과 결과를 반영해 상태를 `design-mvp-implemented`로 갱신.
 - 2026-06-26: Owner 지시에 따라 MVP 표기를 사용자 화면에서 낮추고, 날짜/시간 picker, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판을 디자인 계약에 반영.
 - 2026-06-26: 현재 상태를 `app-flow-implemented`로 갱신하고, GitHub Pages 앱 화면과 원격 Supabase/DeepSeek 경계의 역할을 분리해 문서화.
+- 2026-06-26: 홈 메인 동물 캐릭터 이미지와 개별 캐릭터 asset을 추가하고, 사용자 화면에서 언어 전환/앱 준비 pill을 제거. 날짜/시간 입력 overflow를 막기 위해 iPhone식 dropdown shell과 `minmax(0, 1fr)` grid 기준을 계약에 반영.
+- 2026-06-26: 동물 배경 이미지, 3D 버튼/카드 depth, 초대 홈 진입 카드, native share 우선 공유, 내가 만든 모임 삭제와 로컬 revoked 링크 상태를 반영.

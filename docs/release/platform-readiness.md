@@ -5,7 +5,7 @@ Status: `backend-ai-remote-smoke-plus-app-share-flow`
 
 ## 범위
 
-함모여는 이제 디자인 샘플이 아니라 앱 흐름으로 다룹니다. `docs/mvp/index.html`과 `docs/index.html`은 날짜/시간 선택, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판을 제공하고, 원격 실서비스 연결은 아래 경계 파일과 검증 계약으로 관리합니다.
+함모여는 이제 디자인 샘플이 아니라 앱 흐름으로 다룹니다. `docs/mvp/index.html`과 `docs/index.html`은 iPhone식 날짜/시간 선택, 후보 추가/삭제, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 내가 만든 모임 상태판과 모임 수정/삭제를 제공하고, 원격 실서비스 연결은 아래 경계 파일과 검증 계약으로 관리합니다.
 
 - `AuthAdapter`: Apps in Toss `appLogin()` 결과를 서버 교환으로 넘기는 경계
 - `BackendAdapter`: Supabase/Edge Function/server API만 호출하는 경계
@@ -37,6 +37,7 @@ Status: `backend-ai-remote-smoke-plus-app-share-flow`
 - Apps in Toss share target은 일반 `https://` URL이 아니라 `intoss://<앱이름>/...` 내부 딥링크여야 합니다.
 - 출시 전 테스트 스킴은 공식 테스트 scheme/deploymentId 기준으로 별도 검증해야 합니다.
 - GitHub Pages 앱 화면은 일반 HTTPS 공유 링크를 만들고, Apps in Toss 빌드에서는 Toss share adapter가 `intoss://...` target을 SDK에 넘기는 구조를 유지합니다.
+- GitHub Pages 화면의 삭제 후 링크 무효화는 현재 브라우저의 revoked room id 기준입니다. 다른 기기/이미 공유된 외부 링크까지 막는 정식 동작은 Supabase room/invite lookup에서 `deleted/expired` 상태를 확인하는 Edge Function 경로가 필요합니다.
 
 ## Google Play 경계
 
