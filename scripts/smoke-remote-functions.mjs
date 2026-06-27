@@ -87,12 +87,13 @@ let roomId = "";
 
 async function callFunction(name, payload, token) {
   const endpointBase = `${publicEnv.VITE_SUPABASE_URL.replace(/\/+$/, "")}/functions/v1`;
+  const headers = {
+    "content-type": "application/json",
+  };
+  if (token) headers.authorization = `Bearer ${token}`;
   const response = await fetch(`${endpointBase}/${name}`, {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`,
-    },
+    headers,
     body: JSON.stringify(payload),
   });
   const body = await response.json().catch(() => ({}));
@@ -118,15 +119,85 @@ try {
     throw new Error(`create-room failed: ${create.status} ${JSON.stringify(create.body)}`);
   }
   roomId = create.body.room.id;
+  const inviteSlug = create.body.room.invite_slug;
+
+  const lookup = await callFunction("lookup-room", { inviteSlug }, null);
+  if (lookup.status !== 200 || !lookup.body.ok || !lookup.body.joinable) {
+    throw new Error(`lookup-room did not return a joinable room: ${lookup.status} ${JSON.stringify(lookup.body)}`);
+  }
 
   const slots = csvRows(
     queryCsv(`select id::text as id, sort_order from public.hammoyo_candidate_slots where room_id = ${sqlText(roomId)} order by sort_order;`),
   );
   const preferences = Object.fromEntries(slots.map((slot, index) => [slot.id, index === 0 ? "prefer" : "available"]));
 
-  const submit = await callFunction("submit-response", { roomId, responseRound: 1, preferences }, token);
+  const anonymousJoin = await callFunction("join-room", { inviteSlug, displayAlias: "익명 참여자" }, null);
+  if (anonymousJoin.status !== 200 || !anonymousJoin.body.ok || !anonymousJoin.body.anonymousParticipantKey) {
+    throw new Error(`anonymous join-room failed: ${anonymousJoin.status} ${JSON.stringify(anonymousJoin.body)}`);
+  }
+  const anonymousParticipantKey = anonymousJoin.body.anonymousParticipantKey;
+
+  const submit = await callFunction("submit-response", { roomId, responseRound: 1, preferences, anonymousParticipantKey }, null);
   if (submit.status !== 200 || !submit.body.ok) {
-    throw new Error(`submit-response failed: ${submit.status} ${JSON.stringify(submit.body)}`);
+    throw new Error(`anonymous submit-response failed: ${submit.status} ${JSON.stringify(submit.body)}`);
+  }
+
+  const editedPreferences = Object.fromEntries(slots.map((slot, index) => [slot.id, index === 0 ? "available" : "prefer"]));
+  const editedSubmit = await callFunction(
+    "submit-response",
+    { roomId, responseRound: 1, preferences: editedPreferences, anonymousParticipantKey },
+    null,
+  );
+  if (editedSubmit.status !== 200 || !editedSubmit.body.ok || editedSubmit.body.responseId !== submit.body.responseId) {
+    throw new Error(`anonymous response edit did not reuse response row: ${editedSubmit.status} ${JSON.stringify(editedSubmit.body)}`);
+  }
+
+  const signedAnonymousJoin = await callFunction(
+    "join-room",
+    { inviteSlug, displayAlias: "로그인 후 익명 유지", anonymousParticipantKey },
+    token,
+  );
+  if (
+    signedAnonymousJoin.status !== 200 ||
+    !signedAnonymousJoin.body.ok ||
+    signedAnonymousJoin.body.anonymousParticipantKey !== anonymousParticipantKey ||
+    signedAnonymousJoin.body.member?.participant_kind !== "anonymous"
+  ) {
+    throw new Error(
+      `signed anonymous join did not preserve anonymous membership: ${signedAnonymousJoin.status} ${JSON.stringify(signedAnonymousJoin.body)}`,
+    );
+  }
+
+  const signedAnonymousSubmit = await callFunction(
+    "submit-response",
+    { roomId, responseRound: 1, preferences, anonymousParticipantKey },
+    token,
+  );
+  if (
+    signedAnonymousSubmit.status !== 200 ||
+    !signedAnonymousSubmit.body.ok ||
+    signedAnonymousSubmit.body.responseId !== submit.body.responseId ||
+    signedAnonymousSubmit.body.participantKind !== "anonymous"
+  ) {
+    throw new Error(
+      `signed anonymous submit did not reuse anonymous response row: ${signedAnonymousSubmit.status} ${JSON.stringify(
+        signedAnonymousSubmit.body,
+      )}`,
+    );
+  }
+
+  const ownershipRejection = await callFunction(
+    "submit-response",
+    {
+      roomId,
+      responseRound: 1,
+      anonymousParticipantKey,
+      preferences: { "00000000-0000-0000-0000-000000000000": "prefer" },
+    },
+    null,
+  );
+  if (ownershipRejection.status !== 400 || ownershipRejection.body.code !== "CANDIDATE_SLOT_NOT_IN_ROOM") {
+    throw new Error(`cross-room candidate was not rejected: ${ownershipRejection.status} ${JSON.stringify(ownershipRejection.body)}`);
   }
 
   const recompute = await callFunction("recompute-recommendation", { roomId, locale: "ko" }, token);
@@ -135,6 +206,26 @@ try {
   }
   if (recompute.body.coordination?.method !== "deterministic") {
     throw new Error(`Expected low-count deterministic coordination, got ${JSON.stringify(recompute.body.coordination)}`);
+  }
+
+  const roomDeletion = await callFunction("delete-room", { roomId, reasonCode: "smoke_test" }, token);
+  if (roomDeletion.status !== 200 || !roomDeletion.body.ok) {
+    throw new Error(`delete-room failed: ${roomDeletion.status} ${JSON.stringify(roomDeletion.body)}`);
+  }
+
+  const lookupDeleted = await callFunction("lookup-room", { inviteSlug }, null);
+  if (lookupDeleted.status !== 200 || lookupDeleted.body.canonicalRoomStatus !== "deleted" || lookupDeleted.body.joinable !== false) {
+    throw new Error(`lookup-room did not expose deleted status: ${lookupDeleted.status} ${JSON.stringify(lookupDeleted.body)}`);
+  }
+
+  const joinDeleted = await callFunction("join-room", { inviteSlug }, null);
+  if (joinDeleted.status !== 409 || joinDeleted.body.code !== "ROOM_NOT_JOINABLE") {
+    throw new Error(`deleted room remained joinable: ${joinDeleted.status} ${JSON.stringify(joinDeleted.body)}`);
+  }
+
+  const submitDeleted = await callFunction("submit-response", { roomId, responseRound: 1, preferences, anonymousParticipantKey }, null);
+  if (submitDeleted.status !== 409 || submitDeleted.body.code !== "ROOM_WRITE_LOCKED") {
+    throw new Error(`deleted room still accepted responses: ${submitDeleted.status} ${JSON.stringify(submitDeleted.body)}`);
   }
 
   const deletion = await callFunction("request-data-deletion", { reasonCode: "smoke_test" }, token);
@@ -151,7 +242,9 @@ try {
     throw new Error(`Deleted session was not revoked: ${afterDelete.status} ${JSON.stringify(afterDelete.body)}`);
   }
 
-  console.log("remote smoke passed: create-room submit-response recompute deterministic deletion-revokes-session");
+  console.log(
+    "remote smoke passed: create-room lookup-room anonymous-join anonymous-submit-edit signed-anonymous-reuse ownership-rejection recompute delete-room deletion-revokes-session",
+  );
 } finally {
   if (roomId) {
     executeSql(`delete from public.hammoyo_rooms where id = ${sqlText(roomId)};`);

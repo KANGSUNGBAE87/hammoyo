@@ -1,9 +1,11 @@
 import fs from "node:fs";
 
 const htmlPath = "docs/mvp/index.html";
-const tokenPath = "HAMMOYEO_DESIGN_PACKAGE/HAMMOYEO_DESIGN_TOKENS.json";
+const deployedHtmlPath = "docs/index.html";
+const tokenPath = "docs/final-delivery/tokens.json";
 
 const html = fs.readFileSync(htmlPath, "utf8");
+const deployedHtml = fs.readFileSync(deployedHtmlPath, "utf8");
 const tokens = JSON.parse(fs.readFileSync(tokenPath, "utf8"));
 
 const requiredScreens = [
@@ -64,6 +66,7 @@ const requiredComponentMarkers = [
 
 const requiredTokens = [
   tokens.color.brand,
+  tokens.color.brandStrong,
   tokens.color.brandSoft,
   tokens.color.background,
   tokens.color.surface,
@@ -79,6 +82,10 @@ const failures = [];
 const assertIncludes = (value, label) => {
   if (!html.includes(value)) failures.push(`Missing ${label}: ${value}`);
 };
+
+if (html !== deployedHtml) {
+  failures.push(`${htmlPath} and ${deployedHtmlPath} must stay identical for GitHub Pages and MVP verification.`);
+}
 
 for (const screen of requiredScreens) {
   assertIncludes(`id="${screen}"`, `screen id`);
@@ -106,6 +113,8 @@ for (const forbidden of [
   "앱 준비",
   "General share link",
   "Find a time that works",
+  "hammoyo-hero-animals.png",
+  "hammoyo-animal-background.png",
 ]) {
   if (html.toLowerCase().includes(forbidden.toLowerCase())) {
     failures.push(`Forbidden legacy value/copy remains: ${forbidden}`);
@@ -128,12 +137,21 @@ if (!html.includes("data-ai-copy-enabled=\"false\"")) {
   failures.push("Default fixture must keep AI copy disabled.");
 }
 
-if (!html.includes("hammoyo-hero-animals.png")) {
-  failures.push("Missing generated animal hero asset.");
+if (!html.includes("assets/final/hero/hero_animals_calendar_full_square.png")) {
+  failures.push("Missing final delivery animal hero asset.");
 }
 
-if (!html.includes("hammoyo-animal-background.png")) {
-  failures.push("Missing generated animal background asset.");
+if (!html.includes("assets/final/backgrounds/background_sparse_pattern_example.png")) {
+  failures.push("Missing final delivery animal background asset.");
+}
+
+for (const stateAsset of [
+  "assets/final/states/state_confirmed_object.png",
+  "assets/final/states/state_expired_link_object.png",
+  "assets/final/states/state_insufficient_response_object.png",
+  "assets/final/states/state_private_negotiation_object.png",
+]) {
+  assertIncludes(stateAsset, "final delivery state asset");
 }
 
 if (html.includes('data-testid="language-toggle-button"')) {

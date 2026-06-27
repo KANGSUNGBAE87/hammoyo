@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 const failures = [];
@@ -15,7 +15,7 @@ function read(path) {
 const contractsPath = "src/platform/contracts.mjs";
 const previewAdaptersPath = "src/platform/preview-adapters.mjs";
 const tossAdaptersPath = "src/platform/toss-adapters.mjs";
-const migrationPath = "supabase/migrations/20260624_hammoyo_backend.sql";
+const migrationsDir = "supabase/migrations";
 const releaseDocPath = "docs/release/platform-readiness.md";
 const privacyPath = "docs/mvp/privacy.html";
 const contactPath = "docs/mvp/contact.html";
@@ -24,7 +24,11 @@ const deleteDataPath = "docs/mvp/delete-data.html";
 const contractsSource = read(contractsPath);
 const previewSource = read(previewAdaptersPath);
 const tossSource = read(tossAdaptersPath);
-const migration = read(migrationPath);
+const migration = readdirSync(migrationsDir)
+  .filter((fileName) => fileName.endsWith(".sql"))
+  .sort()
+  .map((fileName) => read(`${migrationsDir}/${fileName}`))
+  .join("\n\n");
 const releaseDoc = read(releaseDocPath);
 const privacyDoc = read(privacyPath);
 const contactDoc = read(contactPath);
@@ -88,6 +92,14 @@ assert(migration.includes("hammoyo_app_user_id()"), "migration should define an 
 assert(migration.includes("hammoyo_can_read_room"), "migration should define a host-or-member read helper");
 assert((migration.match(/public\.hammoyo_can_read_room/g) || []).length >= 6, "dependent RLS policies should use host-or-member read helper");
 assert(migration.includes("'draft'"), "room status check should include draft state from the canonical state machine");
+assert(migration.includes("'deleted'"), "room status check should include deleted state from the canonical state machine");
+assert(migration.includes("deleted_by_core_user_id"), "rooms should track who deleted a room");
+assert(migration.includes("participant_kind"), "room members should distinguish authenticated and anonymous participants");
+assert(migration.includes("anonymous_key_hash"), "room members should store only hashed anonymous participant keys");
+assert(migration.includes("hammoyo_room_members_anonymous_key_unique"), "anonymous participant keys should be unique per room");
+assert(migration.includes("hammoyo_validate_response_preference_room"), "migration should enforce candidate-slot ownership at the DB boundary");
+assert(migration.includes("CANDIDATE_SLOT_NOT_IN_ROOM"), "candidate ownership trigger should reject slots from other rooms");
+assert(migration.includes("CANDIDATE_SLOT_INACTIVE"), "candidate ownership trigger should reject inactive slots");
 assert(migration.includes("authmap_user_identities"), "migration should map providers through shared authmap identities");
 assert(!implementationPlan.includes("rooms.host_user_id"), "implementation plan should use hammoyo_rooms.host_core_user_id");
 assert(!implementationPlan.includes("app_users.deleted_at"), "implementation plan should use core_users.deleted_at");

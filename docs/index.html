@@ -7,23 +7,23 @@
     <link rel="icon" href="data:," />
     <style>
       :root {
-        --brand: #5B5FF5;
-        --brand-pressed: #4F46E5;
-        --brand-soft: #EEF0FF;
-        --background: #F5F7FB;
+        --brand: #6B5CFF;
+        --brand-pressed: #5A46F2;
+        --brand-soft: #EDEBFF;
+        --background: #F7F8FC;
         --surface: #FFFFFF;
-        --surface-raised: #FBFCFF;
-        --text-primary: #111827;
-        --text-secondary: #667085;
-        --text-tertiary: #98A2B3;
-        --border: #E7EAF0;
-        --success: #20B87A;
-        --success-soft: #E8F8F1;
-        --warning: #F2A62B;
-        --warning-soft: #FFF6DF;
-        --danger: #EB5757;
-        --danger-soft: #FFF0F0;
-        --info: #4F83F1;
+        --surface-raised: #FFFFFF;
+        --text-primary: #0F172A;
+        --text-secondary: #64748B;
+        --text-tertiary: #94A3B8;
+        --border: #E5E8F1;
+        --success: #22C55E;
+        --success-soft: #EAFBF1;
+        --warning: #F59E0B;
+        --warning-soft: #FFF6DB;
+        --danger: #EF4444;
+        --danger-soft: #FFF0EF;
+        --info: #3B82F6;
         --page-padding: 20px;
         --section-gap: 32px;
         --card-padding: 16px;
@@ -76,7 +76,7 @@
       button:focus-visible,
       input:focus-visible,
       select:focus-visible {
-        outline: 3px solid rgba(91, 95, 245, 0.26);
+        outline: 3px solid rgba(90, 70, 242, 0.26);
         outline-offset: 2px;
       }
 
@@ -124,9 +124,10 @@
         z-index: 0;
         pointer-events: none;
         background:
-          linear-gradient(180deg, rgba(245, 247, 251, 0.50) 0%, rgba(245, 247, 251, 0.80) 44%, rgba(245, 247, 251, 0.94) 100%),
-          url("assets/hammoyo-animal-background.png") center top / cover no-repeat;
-        opacity: 0.46;
+          linear-gradient(180deg, rgba(247, 248, 252, 0.62) 0%, rgba(247, 248, 252, 0.88) 48%, rgba(247, 248, 252, 0.98) 100%),
+          url("assets/final/backgrounds/background_sparse_pattern_example.png") center top / cover no-repeat,
+          url("assets/final/hero/hero_animals_calendar_full_square.png") center bottom 28px / min(86%, 360px) no-repeat;
+        opacity: 0.34;
       }
 
       .topbar,
@@ -228,8 +229,13 @@
       }
 
       .screenBody {
-        display: grid;
+        display: flex;
+        flex-direction: column;
         gap: var(--section-gap);
+      }
+
+      .screenBody > * {
+        flex-shrink: 0;
       }
 
       .section {
@@ -362,26 +368,19 @@
 
       .RecommendationHeroCard {
         position: relative;
-        display: grid;
-        gap: 14px;
+        display: block;
         padding: 18px;
         border-radius: var(--radius-xl);
+        border-color: rgba(90, 70, 242, 0.18);
         background: var(--brand-soft);
         box-shadow: var(--shadow-floating);
         overflow: hidden;
       }
 
-      .RecommendationHeroCard::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        pointer-events: none;
-        border: 1px solid rgba(91, 95, 245, 0.18);
-      }
-
-      .RecommendationHeroCard > * {
+      .RecommendationHeroContent {
         position: relative;
+        display: grid;
+        gap: 14px;
       }
 
       .CandidateSlotCard {
@@ -394,7 +393,7 @@
       }
 
       .CandidateSlotCard[data-selected="true"] {
-        border-color: rgba(91, 95, 245, 0.38);
+        border-color: rgba(90, 70, 242, 0.38);
         box-shadow: var(--shadow-floating);
       }
 
@@ -493,95 +492,12 @@
         isolation: isolate;
       }
 
-      .gatherScene {
-        position: relative;
-        width: 190px;
-        height: 150px;
-      }
-
-      .personToken,
-      .calendarTile,
-      .hourglassTile,
-      .checkTile {
-        position: absolute;
-        border: 1px solid rgba(17, 24, 39, 0.06);
-        box-shadow: 0 14px 28px rgba(63, 63, 120, 0.13);
-      }
-
-      .personToken {
-        width: 46px;
-        height: 58px;
-        border-radius: 24px 24px 20px 20px;
-        background: var(--brand-soft);
-      }
-
-      .personToken::before {
-        content: "";
-        position: absolute;
-        top: -20px;
-        left: 8px;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: inherit;
-        border: inherit;
-      }
-
-      .personToken.one {
-        left: 36px;
-        top: 58px;
-        background: #FFD0B8;
-      }
-
-      .personToken.two {
-        left: 74px;
-        top: 44px;
-        background: #BCEBD7;
-      }
-
-      .personToken.three {
-        left: 112px;
-        top: 60px;
-        background: #C9D6FF;
-      }
-
-      .personToken.four {
-        left: 82px;
-        top: 82px;
-        background: #EEF0FF;
-      }
-
-      .calendarTile,
-      .hourglassTile,
-      .checkTile {
-        display: grid;
-        place-items: center;
-        width: 56px;
-        height: 56px;
-        left: 67px;
-        top: 9px;
-        border-radius: var(--radius-md);
-        color: var(--brand);
-        background: var(--surface);
-        font-size: 22px;
-        font-weight: 800;
-      }
-
-      .hourglassTile {
-        color: var(--warning);
-      }
-
-      .checkTile {
-        color: var(--success);
-      }
-
-      .StateGraphic[data-variant="low"] .personToken.two,
-      .StateGraphic[data-variant="low"] .personToken.three {
-        transform: translateX(12px);
-      }
-
-      .StateGraphic[data-variant="expired"] .personToken {
-        opacity: 0.34;
+      .StateGraphicImage {
+        display: block;
+        width: min(180px, 62vw);
+        max-height: 190px;
+        object-fit: contain;
+        filter: drop-shadow(0 18px 34px rgba(91, 70, 242, 0.12));
       }
 
       .ParticipantAvatarStack {
@@ -749,10 +665,10 @@
       .primaryButton {
         border: 0;
         color: var(--surface);
-        background: linear-gradient(180deg, #6F72FF 0%, var(--brand) 54%, #494DE8 100%);
+        background: linear-gradient(180deg, #7C70FF 0%, var(--brand) 54%, var(--brand-pressed) 100%);
         box-shadow:
-          0 9px 0 #4448D7,
-          0 18px 32px rgba(91, 95, 245, 0.32),
+          0 9px 0 #4433C9,
+          0 18px 32px rgba(90, 70, 242, 0.32),
           inset 0 1px 0 rgba(255, 255, 255, 0.42);
       }
 
@@ -769,7 +685,7 @@
       }
 
       .primaryButton:hover {
-        background: linear-gradient(180deg, #777AFF 0%, #5B5FF5 54%, #4347D4 100%);
+        background: linear-gradient(180deg, #8478FF 0%, var(--brand) 54%, var(--brand-pressed) 100%);
       }
 
       .secondaryButton {
@@ -777,8 +693,8 @@
         color: var(--brand);
         background: linear-gradient(180deg, #ffffff 0%, var(--brand-soft) 100%);
         box-shadow:
-          0 8px 0 rgba(91, 95, 245, 0.14),
-          0 14px 24px rgba(91, 95, 245, 0.14),
+          0 8px 0 rgba(90, 70, 242, 0.14),
+          0 14px 24px rgba(90, 70, 242, 0.14),
           inset 0 1px 0 rgba(255, 255, 255, 0.95);
       }
 
@@ -891,8 +807,8 @@
 
       .selectShell:focus-within,
       .AppleDateTimePicker:focus-within {
-        border-color: rgba(91, 95, 245, 0.58);
-        box-shadow: 0 0 0 4px rgba(91, 95, 245, 0.1);
+        border-color: rgba(90, 70, 242, 0.58);
+        box-shadow: 0 0 0 4px rgba(90, 70, 242, 0.1);
       }
 
       .selectShell::after {
@@ -955,11 +871,12 @@
 
       .heroAnimalImage {
         display: block;
-        width: min(260px, 78%);
+        width: min(286px, 86%);
         aspect-ratio: 1;
         object-fit: contain;
-        margin: 0 auto 8px;
+        margin: 0 auto 4px;
         border-radius: 28px;
+        filter: drop-shadow(0 22px 42px rgba(15, 23, 42, 0.10));
       }
 
       .candidateInputHeader,
@@ -991,7 +908,7 @@
       }
 
       .candidateActionButton:hover {
-        border-color: rgba(91, 95, 245, 0.32);
+        border-color: rgba(90, 70, 242, 0.32);
         color: var(--brand);
       }
 
@@ -1021,7 +938,7 @@
         display: grid;
         gap: 8px;
         padding: 14px;
-        border: 1px solid rgba(91, 95, 245, 0.2);
+        border: 1px solid rgba(90, 70, 242, 0.2);
         border-radius: var(--radius-lg);
         background: var(--brand-soft);
       }
@@ -1066,7 +983,7 @@
         display: grid;
         gap: 10px;
         padding: 14px;
-        border: 1px solid rgba(91, 95, 245, 0.16);
+        border: 1px solid rgba(90, 70, 242, 0.16);
         border-radius: var(--radius-lg);
         background: var(--surface-raised);
       }
@@ -1169,7 +1086,7 @@
       }
 
       .tabButton[data-active="true"] {
-        border-color: rgba(91, 95, 245, 0.4);
+        border-color: rgba(90, 70, 242, 0.4);
         color: var(--brand);
         background: var(--brand-soft);
         font-weight: 800;
@@ -1339,8 +1256,7 @@
         .primaryButton,
         .secondaryButton,
         .quietButton,
-        .StateGraphic[data-variant="low"] .personToken.two,
-        .StateGraphic[data-variant="low"] .personToken.three {
+        .StateGraphicImage {
           transform: none !important;
         }
       }
@@ -1654,7 +1570,7 @@
         prefer: { icon: "★", className: "brand", score: 3 },
         available: { icon: "✓", className: "success", score: 2 },
         adjustable: { icon: "≋", className: "warning", score: 1 },
-        hardNo: { icon: "−", className: "danger", score: -5 },
+        hardNo: { icon: "−", className: "danger", score: 0 },
       };
 
       const escapeHtml = (value) =>
@@ -1711,6 +1627,7 @@
             date: candidate.date || "",
             label: candidate.label,
             time: candidate.time,
+            starts_at: candidate.starts_at || "",
             note: candidate.note,
           })),
         };
@@ -1798,18 +1715,21 @@
 
       function minimumResponses(expectedCount) {
         const safeExpected = Number.isFinite(Number(expectedCount)) ? Number(expectedCount) : 4;
-        return Math.min(4, Math.max(3, Math.ceil(safeExpected * 0.5)));
+        return Math.max(3, Math.ceil(safeExpected * 0.6));
       }
 
       function normalizeCandidate(candidate, index) {
         const fallback = localizedDefaultCandidates()[index] || localizedDefaultCandidates()[0];
         const date = String(candidate?.date || "").trim();
+        const time = String(candidate?.time || fallback.time).trim();
+        const explicitStartsAt = String(candidate?.starts_at || candidate?.startsAt || "").trim();
         const label = String(candidate?.label || weekdayLabel(date) || fallback.label).trim();
         return {
           id: candidate?.id || `slot-${index + 1}`,
           date,
           label,
-          time: String(candidate?.time || fallback.time).trim(),
+          time,
+          starts_at: explicitStartsAt || (date && time ? `${date}T${time}` : ""),
           note: String(candidate?.note || fallback.note).trim(),
         };
       }
@@ -1872,7 +1792,7 @@
           counts.adjustable * statusMeta.adjustable.score +
           counts.hardNo * statusMeta.hardNo.score;
         const hardNoRatio = answered > 0 ? counts.hardNo / answered : 0;
-        const excluded = counts.hardNo >= 2 || hardNoRatio >= 0.34;
+        const excluded = counts.hardNo > 0;
         return {
           candidate,
           order,
@@ -1896,9 +1816,10 @@
           .sort((a, b) => {
             if (a.excluded !== b.excluded) return Number(a.excluded) - Number(b.excluded);
             if (a.score !== b.score) return b.score - a.score;
-            if (a.hardNoCount !== b.hardNoCount) return a.hardNoCount - b.hardNoCount;
             if (a.preferCount !== b.preferCount) return b.preferCount - a.preferCount;
             if (a.positiveCount !== b.positiveCount) return b.positiveCount - a.positiveCount;
+            if (a.counts.adjustable !== b.counts.adjustable) return a.counts.adjustable - b.counts.adjustable;
+            if (a.candidate.starts_at !== b.candidate.starts_at) return String(a.candidate.starts_at || "").localeCompare(String(b.candidate.starts_at || ""));
             return a.order - b.order;
           });
         const eligible = items.filter((item) => !item.excluded);
@@ -1907,8 +1828,9 @@
         const scoreGap = top && second ? top.score - second.score : top ? Math.max(0, top.score) : 0;
         let confidence = "none";
         if (top) {
-          if (top.hardNoCount === 0 && scoreGap >= 3) confidence = "high";
-          else if (scoreGap >= 1) confidence = "medium";
+          const responseRate = room.expectedCount > 0 ? responseCount / room.expectedCount : 0;
+          if (responseRate >= 0.8 && top.hardNoCount === 0 && scoreGap >= 3) confidence = "high";
+          else if (responseRate >= 0.6) confidence = "medium";
           else confidence = "low";
         }
         const confidenceLabel = {
@@ -2031,6 +1953,10 @@
             alias: "도윤",
             preferences: { [first.id]: "prefer", [second.id]: "available", [third.id]: "available" },
           },
+          {
+            alias: "민재",
+            preferences: { [first.id]: "available", [second.id]: "prefer", [third.id]: "available" },
+          },
         ].map(normalizeResponse);
       }
 
@@ -2042,7 +1968,7 @@
         const fixture = localizedDemoFixture();
         const room = createDemoRoom({
           candidates: fixture.candidates,
-          responses: sampleResponsesFor({ candidates: fixture.candidates }).slice(0, 4),
+          responses: sampleResponsesFor({ candidates: fixture.candidates }).slice(0, 5),
         });
         return {
           version: APP_VERSION,
@@ -2240,17 +2166,16 @@
       }
 
       function stateGraphic(variant, label) {
-        const tile = variant === "expired" ? "hourglassTile" : variant === "closed" ? "checkTile" : "calendarTile";
-        const mark = variant === "expired" ? "!" : variant === "closed" ? "✓" : "25";
+        const graphicMap = {
+          closed: "assets/final/states/state_confirmed_object.png",
+          expired: "assets/final/states/state_expired_link_object.png",
+          low: "assets/final/states/state_insufficient_response_object.png",
+          negotiating: "assets/final/states/state_private_negotiation_object.png",
+        };
+        const src = graphicMap[variant] || graphicMap.low;
         return `
           <div class="StateGraphic" data-variant="${variant}" role="img" aria-label="${escapeHtml(label)}">
-            <div class="gatherScene" aria-hidden="true">
-              <div class="${tile}">${mark}</div>
-              <div class="personToken one"></div>
-              <div class="personToken two"></div>
-              <div class="personToken three"></div>
-              <div class="personToken four"></div>
-            </div>
+            <img class="StateGraphicImage" src="${src}" alt="" aria-hidden="true" />
           </div>
         `;
       }
@@ -2482,7 +2407,7 @@
           return `
             <section id="scr-00-entry" class="screen" aria-labelledby="entry-title">
               <div class="screenBody">
-                <img class="heroAnimalImage" src="assets/hammoyo-hero-animals.png" alt="동물 친구들이 달력과 시계를 보며 모임 시간을 정하는 그림" />
+                <img class="heroAnimalImage" src="assets/final/hero/hero_animals_calendar_full_square.png" alt="동물 친구들이 달력과 시계를 보며 모임 시간을 정하는 그림" />
                 <div class="section">
                   <span class="eyebrow">${escapeHtml(locale.brand.name)}</span>
                   <h1 id="entry-title">${escapeHtml(copy.title)}</h1>
@@ -2642,29 +2567,31 @@
               <div class="screenBody">
                 ${standardHeader("scr-03-result-recommendation", "result-title")}
                 <article class="RecommendationHeroCard" aria-label="추천 1순위" data-testid="recommendation-card">
-                  <div class="topline">
-                    ${reasonChip("brand", ranked.confidenceLabel)}
-                    ${avatarStack(ranked.responseCount)}
-                  </div>
-                  <div class="section">
-                  <span class="microLabel">${escapeHtml(locale.ui.recommendationFirst)}</span>
-                  <h2>${escapeHtml(rec.label)} ${escapeHtml(rec.time)}</h2>
-                  <p>${escapeHtml(rec.note)} · ${escapeHtml(room.title)}</p>
-                </div>
-                <p class="copyText">${escapeHtml(buildShareText(room, ranked))}</p>
-                <div class="trustPanel" data-testid="recommendation-reason">
-                  <strong>${escapeHtml(locale.ui.recommendationTrustTitle)}</strong>
-                  <p class="helperText">${escapeHtml(recommendationReason(room, ranked))}</p>
-                </div>
-                <div class="metricGrid">
-                    <div class="metric"><b>${ranked.responseCount}</b><span>${escapeHtml(locale.ui.responsesMetric)}</span></div>
-                    <div class="metric"><b>${top.counts.prefer}</b><span>${escapeHtml(locale.ui.preferMetric)}</span></div>
-                    <div class="metric"><b>${top.counts.adjustable}</b><span>${escapeHtml(locale.ui.adjustMetric)}</span></div>
-                  </div>
-                  <div class="topline" aria-label="${escapeHtml(locale.ui.recommendationReason)}">
-                    ${reasonChip("success", formatTemplate(locale.ui.responseCount, { count: ranked.responseCount }))}
-                    ${reasonChip("brand", formatTemplate(locale.ui.score, { score: top.score }))}
-                    ${top.counts.hardNo > 0 ? reasonChip("warning", formatTemplate(locale.ui.hardNoMetric, { count: top.counts.hardNo })) : reasonChip("success", locale.ui.noHardNo)}
+                  <div class="RecommendationHeroContent">
+                    <div class="topline">
+                      ${reasonChip("brand", ranked.confidenceLabel)}
+                      ${avatarStack(ranked.responseCount)}
+                    </div>
+                    <div class="section">
+                      <span class="microLabel">${escapeHtml(locale.ui.recommendationFirst)}</span>
+                      <h2>${escapeHtml(rec.label)} ${escapeHtml(rec.time)}</h2>
+                      <p>${escapeHtml(rec.note)} · ${escapeHtml(room.title)}</p>
+                    </div>
+                    <p class="copyText">${escapeHtml(buildShareText(room, ranked))}</p>
+                    <div class="trustPanel" data-testid="recommendation-reason">
+                      <strong>${escapeHtml(locale.ui.recommendationTrustTitle)}</strong>
+                      <p class="helperText">${escapeHtml(recommendationReason(room, ranked))}</p>
+                    </div>
+                    <div class="metricGrid">
+                      <div class="metric"><b>${ranked.responseCount}</b><span>${escapeHtml(locale.ui.responsesMetric)}</span></div>
+                      <div class="metric"><b>${top.counts.prefer}</b><span>${escapeHtml(locale.ui.preferMetric)}</span></div>
+                      <div class="metric"><b>${top.counts.adjustable}</b><span>${escapeHtml(locale.ui.adjustMetric)}</span></div>
+                    </div>
+                    <div class="topline" aria-label="${escapeHtml(locale.ui.recommendationReason)}">
+                      ${reasonChip("success", formatTemplate(locale.ui.responseCount, { count: ranked.responseCount }))}
+                      ${reasonChip("brand", formatTemplate(locale.ui.score, { score: top.score }))}
+                      ${top.counts.hardNo > 0 ? reasonChip("warning", formatTemplate(locale.ui.hardNoMetric, { count: top.counts.hardNo })) : reasonChip("success", locale.ui.noHardNo)}
+                    </div>
                   </div>
                 </article>
                 <div class="compactSection" aria-label="${escapeHtml(locale.ui.otherOptions)}">
@@ -2754,12 +2681,14 @@
                   <p>${escapeHtml(copy.description)}</p>
                 </div>
                 <article class="RecommendationHeroCard" aria-label="확정 카드">
-                  ${reasonChip("success", locale.ui.confirmedCard)}
-                  <div class="section">
-                    <h2>${escapeHtml(selected.label)} ${escapeHtml(selected.time)}</h2>
-                    <p>${escapeHtml(selected.note)} · ${escapeHtml(room.title)} · ${escapeHtml(formatTemplate(locale.ui.responseCount, { count: ranked.responseCount }))}</p>
+                  <div class="RecommendationHeroContent">
+                    ${reasonChip("success", locale.ui.confirmedCard)}
+                    <div class="section">
+                      <h2>${escapeHtml(selected.label)} ${escapeHtml(selected.time)}</h2>
+                      <p>${escapeHtml(selected.note)} · ${escapeHtml(room.title)} · ${escapeHtml(formatTemplate(locale.ui.responseCount, { count: ranked.responseCount }))}</p>
+                    </div>
+                    <p class="copyText">${escapeHtml(locale.ui.confirmedResultSummary)}</p>
                   </div>
-                  <p class="copyText">${escapeHtml(locale.ui.confirmedResultSummary)}</p>
                 </article>
                 ${shareCopyBox(room, ranked)}
               </div>

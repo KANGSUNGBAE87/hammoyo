@@ -18,11 +18,11 @@ const SCORE = {
   prefer: 3,
   available: 2,
   adjustable: 1,
-  hardNo: -5,
+  hardNo: 0,
 };
 
 export function minimumResponses(expectedCount: number) {
-  return Math.min(4, Math.max(3, Math.ceil(Number(expectedCount || 0) * 0.5)));
+  return Math.max(3, Math.ceil(Number(expectedCount || 4) * 0.6));
 }
 
 export function rankCandidates({
@@ -45,7 +45,7 @@ export function rankCandidates({
     const available = values.filter((value) => value === "available").length;
     const adjustable = values.filter((value) => value === "adjustable").length;
     const score = values.reduce((sum, value) => sum + SCORE[value], 0);
-    const excluded = hardNo >= 2 || (responseCount > 0 && hardNo / responseCount >= 0.34);
+    const excluded = hardNo > 0;
     return {
       candidate,
       score,
@@ -55,15 +55,16 @@ export function rankCandidates({
   });
 
   const sorted = [...items].sort((a, b) => {
-    // Canonical tie-breaker: score, hard-no count, prefer count, prefer + available count, then host order.
+    // Canonical tie-breaker: eligibility, score, prefer count, prefer + available count, fewer adjustments, earlier time, then host order.
     const aPreferAvailable = a.aggregateCounts.prefer + a.aggregateCounts.available;
     const bPreferAvailable = b.aggregateCounts.prefer + b.aggregateCounts.available;
     return (
       Number(a.excluded) - Number(b.excluded) ||
       b.score - a.score ||
-      a.aggregateCounts.hardNo - b.aggregateCounts.hardNo ||
       b.aggregateCounts.prefer - a.aggregateCounts.prefer ||
       bPreferAvailable - aPreferAvailable ||
+      a.aggregateCounts.adjustable - b.aggregateCounts.adjustable ||
+      String(a.candidate.starts_at || "").localeCompare(String(b.candidate.starts_at || "")) ||
       (a.candidate.sort_order ?? 0) - (b.candidate.sort_order ?? 0)
     );
   });
@@ -71,18 +72,19 @@ export function rankCandidates({
   const top = sorted.find((item) => !item.excluded);
   const second = sorted.filter((item) => !item.excluded)[1];
   const scoreGap = top && second ? top.score - second.score : top ? top.score : 0;
+  const responseRate = expectedCount > 0 ? responseCount / expectedCount : 0;
   const confidence =
     responseCount < threshold
       ? "none"
-      : top && top.aggregateCounts.hardNo === 0 && scoreGap >= 3
+      : top && responseRate >= 0.8 && top.aggregateCounts.hardNo === 0 && scoreGap >= 3
         ? "high"
-        : top && scoreGap >= 1
+        : top && responseRate >= 0.6
           ? "medium"
           : top
             ? "low"
             : "low";
   return {
-    algorithmVersion: "deterministic-v1",
+    algorithmVersion: "deterministic-v2",
     responseCount,
     threshold,
     confidence,

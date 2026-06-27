@@ -2,12 +2,14 @@ import { PlatformUnavailableError, validateRequiredFunction } from "./contracts.
 
 const FUNCTION_NAMES = Object.freeze({
   exchangeTossAuth: "exchange-toss-auth",
+  lookupRoom: "lookup-room",
   createRoom: "create-room",
   joinRoom: "join-room",
   submitResponse: "submit-response",
   recomputeRecommendation: "recompute-recommendation",
   generateShareCopy: "generate-share-copy",
   closeRoom: "close-room",
+  deleteRoom: "delete-room",
   requestDataDeletion: "request-data-deletion",
 });
 
@@ -35,6 +37,7 @@ export function createSupabaseBackendAdapter({ invoke, createIntossDeepLink = de
     kind: "supabase-backend",
     connected: true,
     exchangeTossAuth: (payload) => call("exchangeTossAuth", payload),
+    lookupRoom: (payload) => call("lookupRoom", payload),
     createRoom: (payload) => call("createRoom", payload),
     joinRoom: (payload) => call("joinRoom", payload),
     submitResponse: (payload) => call("submitResponse", payload),
@@ -49,6 +52,7 @@ export function createSupabaseBackendAdapter({ invoke, createIntossDeepLink = de
       };
     },
     closeRoom: (payload) => call("closeRoom", payload),
+    deleteRoom: (payload) => call("deleteRoom", payload),
     requestDataDeletion: (payload) => call("requestDataDeletion", payload),
   });
 }

@@ -87,10 +87,11 @@ async function assertStickyCtaDoesNotCoverBody(page, message) {
 }
 
 async function main() {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  });
+  const launchOptions = { headless: true };
+  if (process.env.HAMMOYEO_PLAYWRIGHT_CHROME_PATH) {
+    launchOptions.executablePath = process.env.HAMMOYEO_PLAYWRIGHT_CHROME_PATH;
+  }
+  const browser = await chromium.launch(launchOptions);
 
   const context = await browser.newContext({
     viewport: { width: 390, height: 740 },
@@ -148,14 +149,48 @@ async function main() {
         { alias: "B", preferences: { "slot-1": "available", "slot-2": "prefer", "slot-3": "hardNo" } },
         { alias: "C", preferences: { "slot-1": "prefer", "slot-2": "adjustable", "slot-3": "available" } },
         { alias: "D", preferences: { "slot-1": "available", "slot-2": "adjustable", "slot-3": "available" } },
+        { alias: "E", preferences: { "slot-1": "available", "slot-2": "prefer", "slot-3": "available" } },
       ],
     });
     const ranked = api.rankCandidates(room);
+    const hardNoConstraintRoom = api.createDemoRoom({
+      expectedCount: 5,
+      candidates: [
+        { id: "slot-1", label: "7.5 토요일", time: "18:30", note: "강남역" },
+        { id: "slot-2", label: "7.6 일요일", time: "17:00", note: "잠실" },
+        { id: "slot-3", label: "7.7 월요일", time: "19:00", note: "홍대" },
+      ],
+      responses: [
+        { alias: "A", preferences: { "slot-1": "prefer", "slot-2": "adjustable", "slot-3": "hardNo" } },
+        { alias: "B", preferences: { "slot-1": "prefer", "slot-2": "adjustable", "slot-3": "hardNo" } },
+        { alias: "C", preferences: { "slot-1": "prefer", "slot-2": "adjustable", "slot-3": "hardNo" } },
+        { alias: "D", preferences: { "slot-1": "prefer", "slot-2": "adjustable", "slot-3": "hardNo" } },
+        { alias: "E", preferences: { "slot-1": "hardNo", "slot-2": "adjustable", "slot-3": "hardNo" } },
+      ],
+    });
+    const constrained = api.rankCandidates(hardNoConstraintRoom);
+    const sameDayTieRoom = api.createDemoRoom({
+      expectedCount: 3,
+      candidates: [
+        { id: "slot-1", date: "2026-07-05", label: "7.5 토요일", time: "20:00", note: "강남역" },
+        { id: "slot-2", date: "2026-07-05", label: "7.5 토요일", time: "18:00", note: "잠실" },
+        { id: "slot-3", date: "2026-07-06", label: "7.6 일요일", time: "19:00", note: "홍대" },
+      ],
+      responses: [
+        { alias: "A", preferences: { "slot-1": "available", "slot-2": "available", "slot-3": "hardNo" } },
+        { alias: "B", preferences: { "slot-1": "available", "slot-2": "available", "slot-3": "hardNo" } },
+        { alias: "C", preferences: { "slot-1": "available", "slot-2": "available", "slot-3": "hardNo" } },
+      ],
+    });
+    const sameDayTie = api.rankCandidates(sameDayTieRoom);
     return {
       threshold: api.minimumResponses(7),
       topId: ranked.top?.candidate.id,
       confidence: ranked.confidence,
       excluded: ranked.items.filter((item) => item.excluded).map((item) => item.candidate.id),
+      constraintTopId: constrained.top?.candidate.id,
+      constraintExcluded: constrained.items.filter((item) => item.excluded).map((item) => item.candidate.id),
+      sameDayTieTopId: sameDayTie.top?.candidate.id,
       shareCopy: api.buildShareText(room, ranked),
       copyTexts: api.buildCopyTextForAction
         ? {
@@ -173,10 +208,13 @@ async function main() {
 
   assert(algorithmChecks !== null, "window.HAMMOYEO_APP_TESTS API is missing");
   if (algorithmChecks) {
-    assert(algorithmChecks.threshold === 4, "minimum response threshold should be 4 for 7 expected participants");
+    assert(algorithmChecks.threshold === 5, "minimum response threshold should be 5 for 7 expected participants");
     assert(algorithmChecks.topId === "slot-1", "ranking should choose slot-1 for the deterministic fixture");
-    assert(algorithmChecks.confidence === "high", "fixture should produce high confidence");
-    assert(algorithmChecks.excluded.includes("slot-3"), "candidate with two hard-no responses should be excluded");
+    assert(algorithmChecks.confidence === "medium", "fixture should produce medium confidence at 5/7 responses");
+    assert(algorithmChecks.excluded.includes("slot-3"), "candidate with any hard-no response should be excluded");
+    assert(algorithmChecks.constraintTopId === "slot-2", "a single hard-no should make a candidate ineligible even when its score is high");
+    assert(algorithmChecks.constraintExcluded.includes("slot-1"), "hard-no constrained candidate should be marked excluded");
+    assert(algorithmChecks.sameDayTieTopId === "slot-2", "same-day tied candidates should use the earlier time before host order");
     assert(
       algorithmChecks.shareCopy.includes("6.29 토요일 18:30"),
       "share copy should include the recommended date and time",

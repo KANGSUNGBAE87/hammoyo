@@ -1,7 +1,7 @@
 ---
-version: 11
-status: backend-ai-deepseek-v4-pro-hammoyo-prefix-code-reviewed
-updated: 2026-06-25
+version: 12
+status: final-delivery-reorder-reviewed
+updated: 2026-06-27
 canonical: true
 ---
 
@@ -11,14 +11,81 @@ canonical: true
 
 공식 P4 패키지는 조건부 산출물로는 구조가 갖춰져 있지만, 원본만 기준으로 구현에 바로 넘기기에는 부족했습니다. 2026-06-24 보정으로 구현 전 필수 정책과 디자인 샘플은 현재 프로젝트 문서에 추가되었습니다.
 
-- 최신 판정: `CORRECTED_PLANNING_READY`
-- 최신 구현 상태: `PREDEPLOY_MVP_FINAL_REVIEW_REMEDIATED`
+- 최신 판정: `FINAL_DELIVERY_REORDER_READY`
+- 최신 구현 상태: `APP_FLOW_BASE_BUILT_BUT_FINAL_DELIVERY_P0_PENDING`
 - 원 리뷰 판정: `BLOCK_FOR_IMPLEMENTATION`
 - 패키지 품질: `CONDITIONAL_P4_PACKAGE_OK`
 - 추가 기획 필요 여부: 2026-06-24 보정 완료. P2/P3/P4 재논의는 필요하지 않습니다.
 - 디자인 판정: 방향은 유지하고, 화면 ID/상태/AI 라벨/샘플 MVP를 보강했습니다.
 - 기능 판정: 정적 HTML MVP 안에서 방 생성, 응답 저장, deterministic 추천, 공유 문구 복사, 확정 흐름이 동작합니다.
 - 배포 전 보완 판정: 모바일 홈/개인정보/삭제 경로, 복사 CTA 정합성, template-only AI 고지, expired/closed 상태 가드, demo storage 격리, ko/en 결과/copy payload 전환, preview-only 초대 문구, bilingual privacy summary, 320/390 CTA 가시성을 보강했습니다.
+
+## 2026-06-27 Final Delivery 재정렬 리뷰
+
+검토 대상:
+
+- `HAMMOYEO_FINAL_DELIVERY/README.md`
+- `HAMMOYEO_FINAL_DELIVERY/docs/01_FINAL_PRODUCT_PLAN.md`
+- `HAMMOYEO_FINAL_DELIVERY/docs/02_FINAL_IMPLEMENTATION_PLAN.md`
+- `HAMMOYEO_FINAL_DELIVERY/docs/03_FINAL_DESIGN_PLAN.md`
+- `HAMMOYEO_FINAL_DELIVERY/docs/04_FINAL_IMAGE_ASSET_PLAN.md`
+- `HAMMOYEO_FINAL_DELIVERY/tokens/hammoyo_design_tokens_final_v12.json`
+- 현재 `docs/index.html`, `docs/mvp/index.html`, `supabase/functions/*`, `supabase/migrations/20260624_hammoyo_backend.sql`
+
+사용한 검토 축:
+
+- Antigravity/Gemini 3.1 Pro High: UX/platform/design feasibility.
+- Codex native `reviewer`: correctness, auth, recommendation, data-boundary feasibility.
+- Claude Opus route: `auth status`는 정상이었으나 non-interactive execution에서 `401 Invalid authentication credentials`가 발생해 이번 결론에는 반영하지 않음.
+
+최종 판단:
+
+- `HAMMOYEO_FINAL_DELIVERY` 지시대로 구현은 가능하다.
+- 그러나 현재 배포본에 asset만 바꾸면 완료되는 상태는 아니다.
+- final/store-ready로 부르려면 P0에서 auth, recommendation, server link status, state machine 계약을 먼저 맞춰야 한다.
+
+Findings:
+
+1. 기본 debug/토큰/화면 점검 패널은 이미 `?debug=1`로 격리되는 구조가 있다. 이 방향은 final delivery와 맞다.
+2. final delivery는 `어려워요`를 점수가 아닌 eligibility constraint로 요구하지만, 현재 프론트와 백엔드는 `hardNo = -5`를 score에 포함한다.
+3. final delivery는 최소 응답 기준을 `max(3, ceil(expected_count * 0.6))`로 요구하지만, 현재 구현은 `min(4, max(3, ceil(expected_count * 0.5)))`다.
+4. final delivery는 deleted/expired/closed 링크를 서버 상태로 검증하라고 요구하지만, 현재 GitHub Pages 공유는 base64 snapshot과 localStorage revoked room id에 의존한다.
+5. final delivery는 참여자 로그인 없는 응답을 요구하지만, 현재 `join-room`과 `submit-response`는 Hammoyo signed session을 요구한다.
+6. final delivery의 `negotiating`, `ready_to_confirm`, negotiation request 모델이 현재 DB/Edge Function/UI에 없다.
+7. `submit-response`는 candidate slot이 같은 room에 속하는지 서버에서 검증해야 한다.
+8. final delivery split assets는 구현 가능한 상태지만, 현재 배포본은 그 asset 체계를 아직 본격 적용하지 않았다.
+
+Reordered next steps:
+
+1. `docs/final-delivery/`, `docs/assets/final/`, `docs/mvp/assets/final/`에 승격한 source/asset을 다음 구현 기준으로 사용한다.
+2. final delivery home/asset 기준을 적용하되, 동시에 recommendation/auth/link-state 계약을 손본다.
+3. recommendation v2를 프론트/백엔드/검증기에서 통일한다.
+4. Supabase migration/Edge Function을 server invite status lookup, deleted state, anonymous participant, candidate ownership 기준으로 확장한다.
+5. `negotiating`/`ready_to_confirm`은 실제 구현 또는 explicit scope cut 중 하나를 결정한다.
+6. Apps in Toss sandbox와 privacy/contact/delete 공개 URL을 닫는다.
+
+### 2026-06-28 P0 서버 하드닝 업데이트
+
+아래 항목은 로컬 코드 기준으로 구현되었습니다.
+
+- `hardNo` eligibility constraint와 60% 최소 응답 기준.
+- `lookup-room` Edge Function을 통한 invite_slug 기반 canonical status lookup.
+- `deleted` room status, `deleted_at`, `deleted_by_core_user_id`, soft-delete `delete-room`.
+- anonymous participant key 생성/해시 저장/재진입/응답 수정 경로. signed session이 함께 와도 요청에 anonymous participant key가 있으면 같은 익명 응답 row를 재사용합니다.
+- `submit-response`의 candidate slot room ownership 및 active slot 검증.
+- DB trigger `hammoyo_validate_response_preference_room`으로 함수 밖 write에도 후보 소유권 방어.
+- `smoke-remote-functions.mjs`의 host/anonymous participant 분리 경로와 delete 후 lookup/write 차단 경로.
+
+원격 적용/검증:
+
+- 신규 migration은 원격 shared Supabase에 적용했습니다.
+- `lookup-room`, `delete-room`, `join-room`, `submit-response`, `close-room`, `recompute-recommendation` Edge Function을 재배포했습니다.
+- `npm run smoke:remote` 통과: host 생성, lookup, 익명 join, 익명 응답 수정, signed anonymous reuse, candidate ownership rejection, recompute, delete-room, 삭제 후 lookup/write 차단, 삭제 요청 후 세션 차단.
+
+남은 release-gate 항목:
+
+- Apps in Toss sandbox에서 Toss login, anonymous participant path, intoss deep link, native share, safe-area/back behavior 검증.
+- `negotiating`/`ready_to_confirm`은 P1 구현 또는 명시적 scope cut 결정.
 
 검토 대상:
 

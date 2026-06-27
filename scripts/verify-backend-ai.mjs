@@ -21,17 +21,20 @@ const functionPaths = [
   "supabase/functions/_shared/hammoyo/response.ts",
   "supabase/functions/_shared/hammoyo/backend.ts",
   "supabase/functions/_shared/hammoyo/security.ts",
+  "supabase/functions/_shared/hammoyo/rooms.ts",
   "supabase/functions/_shared/hammoyo/recommendation.ts",
   "supabase/functions/_shared/hammoyo/ai-copy.ts",
   "supabase/functions/_shared/hammoyo/schedule-coordinator.ts",
   "supabase/functions/_shared/hammoyo/ai-provider.ts",
   "supabase/functions/exchange-toss-auth/index.ts",
+  "supabase/functions/lookup-room/index.ts",
   "supabase/functions/create-room/index.ts",
   "supabase/functions/join-room/index.ts",
   "supabase/functions/submit-response/index.ts",
   "supabase/functions/recompute-recommendation/index.ts",
   "supabase/functions/generate-share-copy/index.ts",
   "supabase/functions/close-room/index.ts",
+  "supabase/functions/delete-room/index.ts",
   "supabase/functions/request-data-deletion/index.ts",
 ];
 
@@ -53,12 +56,14 @@ for (const token of [
   "createSupabaseBackendAdapter",
   "exchangeTossAuth",
   "createRoom",
+  "lookupRoom",
   "joinRoom",
   "submitResponse",
   "recomputeRecommendation",
   "createShareLink",
   "generateShareCopy",
   "closeRoom",
+  "deleteRoom",
   "requestDataDeletion",
 ]) {
   assert(backendAdapterSource.includes(token), `Supabase backend adapter missing ${token}`);
@@ -130,18 +135,31 @@ const functionIndexExpectations = {
     "signSessionToken",
     "verifySessionToken",
     "hashProviderSubject",
+    "hashAnonymousParticipantKey",
+    "generateAnonymousParticipantKey",
+    "readOptionalActiveSession",
     "requireActiveSession",
     "SESSION_REVOKED",
     "deleted_at",
   ],
+  "supabase/functions/_shared/hammoyo/rooms.ts": [
+    "canonicalRoomStatus",
+    "isJoinableRoom",
+    "isWritableRoom",
+    "low_confidence",
+    "recommended",
+    "deleted",
+  ],
   "supabase/functions/_shared/hammoyo/recommendation.ts": [
     "rankCandidates",
     "minimumResponses",
-    "deterministic-v1",
+    "deterministic-v2",
     "prefer: 3",
     "available: 2",
+    "hardNo: 0",
     "hardNo",
-    "prefer + available",
+    "hardNo > 0",
+    "expectedCount || 4",
   ],
   "supabase/functions/_shared/hammoyo/ai-provider.ts": [
     "DEFAULT_DEEPSEEK_MODEL",
@@ -180,12 +198,38 @@ const functionIndexExpectations = {
     "hammoyo_candidate_slots",
     "hammoyo_room_members",
   ],
-  "supabase/functions/join-room/index.ts": ["joinRoom", "requireActiveSession", "inviteSlug", "hammoyo_room_members", "upsert"],
+  "supabase/functions/lookup-room/index.ts": [
+    "lookupRoom",
+    "inviteSlug",
+    "hammoyo_rooms",
+    "hammoyo_candidate_slots",
+    "canonicalRoomStatus",
+    "deleted_at",
+    "joinable",
+  ],
+  "supabase/functions/join-room/index.ts": [
+    "joinRoom",
+    "readOptionalActiveSession",
+    "anonymousParticipantKey",
+    "generateAnonymousParticipantKey",
+    "hashAnonymousParticipantKey",
+    "participant_kind",
+    "anonymous_key_hash",
+    "inviteSlug",
+    "hammoyo_room_members",
+    "upsert",
+  ],
   "supabase/functions/submit-response/index.ts": [
     "submitResponse",
-    "requireActiveSession",
+    "readOptionalActiveSession",
+    "anonymousParticipantKey",
+    "hashAnonymousParticipantKey",
+    "PARTICIPANT_AUTH_REQUIRED",
     "MEMBERSHIP_REQUIRED",
+    "CANDIDATE_SLOT_NOT_IN_ROOM",
+    "CANDIDATE_SLOT_INACTIVE",
     "responseRound",
+    "hammoyo_candidate_slots",
     "hammoyo_responses",
     "hammoyo_response_preferences",
     "upsert",
@@ -211,6 +255,14 @@ const functionIndexExpectations = {
     "insert",
   ],
   "supabase/functions/close-room/index.ts": ["closeRoom", "requireActiveSession", "closed", "update"],
+  "supabase/functions/delete-room/index.ts": [
+    "deleteRoom",
+    "requireActiveSession",
+    "deleted",
+    "deleted_at",
+    "deleted_by_core_user_id",
+    "HOST_REQUIRED",
+  ],
   "supabase/functions/request-data-deletion/index.ts": ["requestDataDeletion", "requireActiveSession", "core_users", "deleted_at", "update"],
 };
 
@@ -227,6 +279,26 @@ for (const [path, tokens] of Object.entries(functionIndexExpectations)) {
 assert(
   !functionSources["supabase/functions/submit-response/index.ts"].includes("role: \"participant\""),
   "submit-response must not create membership from roomId alone",
+);
+assert(
+  functionSources["supabase/functions/submit-response/index.ts"].includes("hammoyo_candidate_slots") &&
+    functionSources["supabase/functions/submit-response/index.ts"].includes("CANDIDATE_SLOT_NOT_IN_ROOM"),
+  "submit-response must validate candidate-slot room ownership before inserting preferences",
+);
+assert(
+  functionSources["supabase/functions/submit-response/index.ts"].includes("anonymousParticipantKey") &&
+    functionSources["supabase/functions/submit-response/index.ts"].includes("PARTICIPANT_AUTH_REQUIRED"),
+  "submit-response must support anonymous participant keys without accepting roomId-only writes",
+);
+assert(
+  functionSources["supabase/functions/join-room/index.ts"].includes("anonymous_key_hash") &&
+    functionSources["supabase/functions/join-room/index.ts"].includes("participant_kind"),
+  "join-room must persist anonymous participants through hashed participant keys",
+);
+assert(
+  functionSources["supabase/functions/lookup-room/index.ts"].includes("canonicalRoomStatus") &&
+    functionSources["supabase/functions/lookup-room/index.ts"].includes("joinable"),
+  "lookup-room must expose canonical invite status and joinability",
 );
 assert(
   !functionSources["supabase/functions/_shared/hammoyo/schedule-coordinator.ts"].includes("label: text(item.candidate?.label"),
@@ -258,8 +330,8 @@ for (const token of [
 }
 
 assert(
-  implementationPlan.includes("backend-ai-live-connected"),
-  "implementation plan status should mention backend-ai-live-connected",
+  implementationPlan.includes("backend-invite-anonymous-hardening-implemented"),
+  "implementation plan status should mention backend-invite-anonymous-hardening-implemented",
 );
 assert(envExample.includes("AI_PROVIDER="), ".env.example should include AI_PROVIDER placeholder");
 assert(envExample.includes("AI_MODEL_COPY="), ".env.example should include AI_MODEL_COPY placeholder");
@@ -285,6 +357,8 @@ assert(!functionSources["supabase/functions/exchange-toss-auth/index.ts"].includ
 
 const backendModule = await import(pathToFileURL(`${process.cwd()}/${backendAdapterPath}`).href);
 const aiPolicy = await import(pathToFileURL(`${process.cwd()}/${aiPolicyPath}`).href);
+const roomsModule = await import(pathToFileURL(`${process.cwd()}/supabase/functions/_shared/hammoyo/rooms.ts`).href);
+const recommendationModule = await import(pathToFileURL(`${process.cwd()}/supabase/functions/_shared/hammoyo/recommendation.ts`).href);
 const serverAiCopySource = functionSources["supabase/functions/_shared/hammoyo/ai-copy.ts"];
 const generateShareCopySource = functionSources["supabase/functions/generate-share-copy/index.ts"];
 
@@ -314,21 +388,25 @@ const adapter = backendModule.createSupabaseBackendAdapter({
 });
 
 await adapter.createRoom({ title: "테스트 모임" });
+await adapter.lookupRoom({ inviteSlug: "abc123" });
 await adapter.joinRoom({ inviteSlug: "abc123" });
 await adapter.submitResponse({ roomId: "room-1", responseRound: 1, preferences: { slot1: "prefer" } });
 await adapter.recomputeRecommendation({ roomId: "room-1" });
 await adapter.generateShareCopy({ roomId: "room-1", locale: "ko" });
 await adapter.closeRoom({ roomId: "room-1" });
+await adapter.deleteRoom({ roomId: "room-1", reasonCode: "host_deleted" });
 await adapter.requestDataDeletion({ reasonCode: "user_request" });
 
 const functionNames = calls.map((call) => call.functionName);
 for (const expected of [
   "create-room",
+  "lookup-room",
   "join-room",
   "submit-response",
   "recompute-recommendation",
   "generate-share-copy",
   "close-room",
+  "delete-room",
   "request-data-deletion",
 ]) {
   assert(functionNames.includes(expected), `adapter did not invoke ${expected}`);
@@ -358,6 +436,107 @@ assert(
   edgeCalls[0].init.headers.authorization === "Bearer hammoyo-session",
   "edge invoker should attach the dynamic Hammoyo session token",
 );
+
+assert(roomsModule.canonicalRoomStatus({ status: "collecting" }) === "collecting", "rooms helper should preserve collecting status");
+assert(roomsModule.canonicalRoomStatus({ status: "recommended" }) === "recommended", "rooms helper should preserve recommended status");
+assert(roomsModule.canonicalRoomStatus({ status: "deleted" }) === "deleted", "rooms helper should preserve deleted status");
+assert(
+  roomsModule.canonicalRoomStatus({ status: "collecting", expires_at: "2000-01-01T00:00:00.000Z" }) === "expired",
+  "rooms helper should canonicalize expired rooms",
+);
+assert(roomsModule.isJoinableRoom({ status: "collecting" }) === true, "collecting rooms should be joinable");
+assert(roomsModule.isJoinableRoom({ status: "low_confidence" }) === true, "low-confidence rooms should remain joinable");
+assert(roomsModule.isJoinableRoom({ status: "recommended" }) === true, "recommended rooms should remain joinable for edits");
+assert(roomsModule.isJoinableRoom({ status: "closed" }) === false, "closed rooms should not be joinable");
+assert(roomsModule.isJoinableRoom({ status: "deleted" }) === false, "deleted rooms should not be joinable");
+
+assert(recommendationModule.minimumResponses(7) === 5, "backend recommendation helper should require 5 responses for 7 expected participants");
+assert(recommendationModule.minimumResponses(3) === 3, "backend recommendation helper should keep a 3-response floor");
+
+const constrainedRecommendation = recommendationModule.rankCandidates({
+  expectedCount: 5,
+  candidates: [
+    { id: "slot-1", label: "7.5 토요일", sort_order: 0 },
+    { id: "slot-2", label: "7.6 일요일", sort_order: 1 },
+    { id: "slot-3", label: "7.7 월요일", sort_order: 2 },
+  ],
+  responses: [
+    {
+      preferences: [
+        { candidate_slot_id: "slot-1", value: "prefer" },
+        { candidate_slot_id: "slot-2", value: "adjustable" },
+        { candidate_slot_id: "slot-3", value: "hardNo" },
+      ],
+    },
+    {
+      preferences: [
+        { candidate_slot_id: "slot-1", value: "prefer" },
+        { candidate_slot_id: "slot-2", value: "adjustable" },
+        { candidate_slot_id: "slot-3", value: "hardNo" },
+      ],
+    },
+    {
+      preferences: [
+        { candidate_slot_id: "slot-1", value: "prefer" },
+        { candidate_slot_id: "slot-2", value: "adjustable" },
+        { candidate_slot_id: "slot-3", value: "hardNo" },
+      ],
+    },
+    {
+      preferences: [
+        { candidate_slot_id: "slot-1", value: "prefer" },
+        { candidate_slot_id: "slot-2", value: "adjustable" },
+        { candidate_slot_id: "slot-3", value: "hardNo" },
+      ],
+    },
+    {
+      preferences: [
+        { candidate_slot_id: "slot-1", value: "hardNo" },
+        { candidate_slot_id: "slot-2", value: "adjustable" },
+        { candidate_slot_id: "slot-3", value: "hardNo" },
+      ],
+    },
+  ],
+});
+assert(constrainedRecommendation.algorithmVersion === "deterministic-v2", "backend recommendation should expose deterministic-v2");
+assert(constrainedRecommendation.top?.candidate.id === "slot-2", "backend recommendation should treat any hardNo as an eligibility constraint");
+assert(
+  constrainedRecommendation.items.find((item) => item.candidate.id === "slot-1")?.excluded === true,
+  "backend recommendation should mark hardNo-constrained candidates as excluded",
+);
+
+const sameDayTieRecommendation = recommendationModule.rankCandidates({
+  expectedCount: 3,
+  candidates: [
+    { id: "slot-1", label: "7.5 토요일 20:00", starts_at: "2026-07-05T20:00:00+09:00", sort_order: 0 },
+    { id: "slot-2", label: "7.5 토요일 18:00", starts_at: "2026-07-05T18:00:00+09:00", sort_order: 1 },
+    { id: "slot-3", label: "7.6 일요일 19:00", starts_at: "2026-07-06T19:00:00+09:00", sort_order: 2 },
+  ],
+  responses: [
+    {
+      preferences: [
+        { candidate_slot_id: "slot-1", value: "available" },
+        { candidate_slot_id: "slot-2", value: "available" },
+        { candidate_slot_id: "slot-3", value: "hardNo" },
+      ],
+    },
+    {
+      preferences: [
+        { candidate_slot_id: "slot-1", value: "available" },
+        { candidate_slot_id: "slot-2", value: "available" },
+        { candidate_slot_id: "slot-3", value: "hardNo" },
+      ],
+    },
+    {
+      preferences: [
+        { candidate_slot_id: "slot-1", value: "available" },
+        { candidate_slot_id: "slot-2", value: "available" },
+        { candidate_slot_id: "slot-3", value: "hardNo" },
+      ],
+    },
+  ],
+});
+assert(sameDayTieRecommendation.top?.candidate.id === "slot-2", "backend recommendation should use starts_at for same-day tied candidates");
 
 let missingConfigError = "";
 try {

@@ -2,7 +2,7 @@
 
 Status: `ACTIVE_PROJECT_ROOT`
 Created/standardized: 2026-06-22 19:09 KST
-Updated: 2026-06-26
+Updated: 2026-06-27
 
 이 폴더가 앞으로 `함모여(hammoyo)`의 기본 프로젝트 루트입니다.
 
@@ -16,8 +16,10 @@ Updated: 2026-06-26
 - Owner state: `OWNER_UNREVIEWED_AFTER_CONDITIONAL_P4_PACKAGE`
 - 2026-06-24 보정: Supabase/권한/응답/AI/copy 정책, 디자인 보강 기획, 이미지 생성문, 정적 앱 샘플, localStorage 경계가 현재 프로젝트에 추가되었습니다.
 - 2026-06-25 구현: `SupabaseBackendAdapter`, Supabase Edge Function runtime connection code, DeepSeek V4 Pro AI provider proxy, AI copy policy, `verify:backend-ai` 검증을 추가했습니다. 이후 원격 shared Supabase DB `hammoyo_` schema 적용, Edge Function 8개 배포, remote smoke, DeepSeek AI coordination smoke까지 통과했습니다.
+- 2026-06-28 구현: `lookup-room`, `delete-room`, anonymous participant key 기반 `join-room`/`submit-response`, `deleted` canonical state, candidate-slot ownership DB trigger를 추가했습니다. 신규 migration과 Edge Function은 원격 shared Supabase에 적용/배포했고, `npm run smoke:remote`가 익명 참여/응답 수정/삭제 링크 차단까지 통과했습니다.
 - 2026-06-25 DB prefix 결정: shared Supabase 한 프로젝트에 여러 앱이 붙는 전제로, 함모여 app table/helper/policy prefix를 짧은 `hm_`가 아니라 명시적인 `hammoyo_`로 고정했습니다.
 - 2026-06-26 구현: 정적 화면을 앱 흐름으로 올리고, iPhone식 드롭다운 날짜/시간 선택, 후보 추가/삭제, 친구 공유 화면, 초대 홈 진입, 내가 만든 모임 상태판, 로컬 host room 목록, 모임 수정/삭제 흐름을 추가했습니다.
+- 2026-06-27 재정렬: `HAMMOYEO_FINAL_DELIVERY`를 다음 구현 기준으로 채택했습니다. 현재 앱 흐름은 베이스로 유지하되, final delivery 기준을 만족하려면 제품 홈, final split assets, `어려워요` 제약 처리, 60% 최소 응답 기준, server invite/status lookup, 익명 참여자 응답 모델, `negotiating`/`ready_to_confirm` 상태를 P0/P1로 보강해야 합니다.
 - 다음 필요 실행: Toss login/account 동기화 UI, Apps in Toss sandbox evidence, 공개 contact/privacy/delete URL 확정, 또는 방장/총무/운영진 8~12명 모집 경로 확보 후 live validation 재개. 조건부 P4 패키지는 생성됐지만 실제 응답은 0건이며 `FINAL_APPROVED`는 아닙니다.
 
 ## 현재 제품 정의
@@ -37,18 +39,21 @@ Updated: 2026-06-26
 
 - `00_PROJECT_BRIEF.md` — 현재 프로젝트 브리프
 - `01_DECISIONS.md` — Owner/Planning Lab 결정 기록
-- `ai/plans/product-plan.md` — P2/P3/pre-P4 기반 제품기획 상태 문서, P4 최종 기획 아님
+- `ai/plans/product-plan.md` — `HAMMOYEO_FINAL_DELIVERY` 기준으로 재정렬된 최신 제품기획 상태 문서
 - `ai/plans/design-plan.md` — 2026-06-24 디자인 보강 기획
 - `ai/plans/implementation-plan.md` — 2026-06-24 Supabase/권한/응답/AI 구현 준비 기획
 - `ai/plans/planning-status.md` — 현재 진행상황 및 다음 단계
 - `planning-lab/PL-P2-HAMMOYEO-2026-06-22-t_bc2fbb9a/` — Planning Lab P2 원본 산출물 사본
 - `planning-lab/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/` — 조건부 P2/P3/P4 전체 산출물 사본
 - `docs/mvp/index.html` — 디자인 패키지 기반 정적 앱 화면. 날짜/시간 선택, 후보 추가/삭제, 친구 공유 화면, 초대 홈 진입, 로컬 상태 확인, 모임 수정/삭제가 동작합니다. 원격 Supabase/AI는 Edge Function 경계와 smoke 검증이 있으며, GitHub Pages 화면은 Toss login/account 동기화 전까지 브라우저 저장을 우선합니다.
+- `docs/final-delivery/` — `HAMMOYEO_FINAL_DELIVERY`에서 선별 승격한 최종 제품/구현/디자인/이미지/토큰 source. 원본 패키지 전체는 local archive로 유지하고 git/Graphify에서는 제외합니다.
+- `docs/assets/final/`와 `docs/mvp/assets/final/` — final delivery에서 앱 runtime용으로 선별한 hero/state/icon/background/character/communication asset.
 - `docs/assets/hammoyo-hero-animals.png` — 홈 메인 동물 캐릭터 이미지.
 - `docs/assets/hammoyo-animal-background.png` — 화면 배경용 동물 캐릭터 이미지.
 - `docs/assets/characters/` — 메인 이미지에서 분리 저장한 개별 캐릭터 asset.
 - `src/platform/` — Apps in Toss/Supabase 연결을 위한 platform adapter contract, preview/Toss adapter skeleton, Supabase backend adapter, AI copy policy
 - `supabase/migrations/20260624_hammoyo_backend.sql` — `hammoyo_` prefixed Supabase/RLS schema 기준. 2026-06-25 기준 shared Supabase 원격 DB에 적용됨.
+- `supabase/migrations/20260628_hammoyo_invite_status_anonymous_hardening.sql` — invite/status, anonymous participant, deleted room, candidate ownership hardening 기준. 2026-06-28 기준 shared Supabase 원격 DB에 적용됨.
 - `supabase/functions/` — Edge Function runtime connection code. `exchange-toss-auth`, `create-room`, `join-room`, `submit-response`, `recompute-recommendation`, `generate-share-copy`, `close-room`, `request-data-deletion`이 Supabase DB와 server-only DeepSeek V4 Pro AI provider 경계를 호출함.
 - `docs/release/platform-readiness.md` — Apps in Toss / Google Play / Supabase 출시 연결 readiness 문서
 - `docs/design/image-generation-brief.md` — 이미지 생성문 및 이미지 기획

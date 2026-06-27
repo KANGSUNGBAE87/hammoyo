@@ -97,7 +97,7 @@ This project uses Understand-Anything project memory in `.understand-anything/`.
 
 Rules:
 - For architecture mapping, onboarding, codebase Q&A, domain flow, or diff-risk analysis, prefer the installed Understand-Anything skills before doing a broad source walk.
-- Keep `.understand-anything/config.json` with `"language": "ko"`, `"outputLanguage": "ko"`, and `"autoUpdate": true` unless the user asks otherwise.
+- Keep `.understand-anything/config.json` with `"language": "ko"`, `"outputLanguage": "ko"`, and `"autoUpdate": false` unless the user asks otherwise.
 - Refresh Understand-Anything only after meaningful project or code architecture changes. Do not run it for policy-only, copy-only, or note-only changes.
 
 ## Project Plans and Session Logs
@@ -181,3 +181,13 @@ Rules:
 - Refresh project Graphify after new project setup, verified feature completion, finalized important project docs, durable decisions, or handoffs that depend on recent files.
 - Do not refresh project Graphify for ordinary conversation, tiny copy edits, or short unsaved opinions.
 - Use `graphify update . --no-cluster` as the routine structural fallback when a refresh is worthwhile.
+
+## codebase-memory-mcp (cmm)
+
+This project uses codebase-memory-mcp (cmm) as the primary code-read/code-write knowledge layer. The index is stored per project, locally, via `.mcp.json` (`env.HOME=<project>/.codebase-memory-home`).
+
+Rules (Owner rule 2026-06-28):
+- For reading or writing code (functions, classes, callers, call chains, impact, architecture), use cmm tools first (`search_graph`, `trace_path`, `get_code_snippet`, `query_graph`, `get_architecture`) instead of grep/glob/broad file reads.
+- Use Graphify for docs, decisions, session logs, plans, and cross-file/cross-document relationships. Use direct file reads as the final source of truth for exact code.
+- Understand-Anything is a third-tier manual backup only (architecture narrative / onboarding / diff-risk), refreshed on explicit request; its `autoUpdate` is off.
+- `.codebase-memory-home/` is a local index store; keep it in `.gitignore` and out of Graphify source scans. `auto_index` is on, so the index refreshes on change.

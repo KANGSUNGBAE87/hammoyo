@@ -34,6 +34,16 @@ export async function hashProviderSubject(providerSubject: string) {
   return base64Url(digest);
 }
 
+export function generateAnonymousParticipantKey() {
+  return `anon_${crypto.randomUUID().replace(/-/g, "")}${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}`;
+}
+
+export async function hashAnonymousParticipantKey(roomId: string, anonymousParticipantKey: string) {
+  const normalized = `${roomId}:${anonymousParticipantKey.trim()}`;
+  const digest = await hmac(getProviderHashSecret(), normalized);
+  return base64Url(digest);
+}
+
 export async function signSessionToken(coreUserId: string, ttlSeconds = 60 * 60 * 24 * 14) {
   const payload: SessionPayload = {
     coreUserId,
@@ -60,7 +70,7 @@ export async function verifySessionToken(authorizationHeader: string | null) {
   return { ok: true as const, coreUserId: payload.coreUserId };
 }
 
-export async function requireActiveSession(supabase: unknown, request: Request) {
+export async function readOptionalActiveSession(supabase: unknown, request: Request) {
   const session = await verifySessionToken(request.headers.get("authorization"));
   if (!session.ok) return session;
 
@@ -75,4 +85,8 @@ export async function requireActiveSession(supabase: unknown, request: Request) 
   if (!user || user.deleted_at) return { ok: false as const, code: "SESSION_REVOKED" };
 
   return session;
+}
+
+export async function requireActiveSession(supabase: unknown, request: Request) {
+  return readOptionalActiveSession(supabase, request);
 }

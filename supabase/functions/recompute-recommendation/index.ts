@@ -1,6 +1,7 @@
 import { createSupabaseAdminClient, runQuery } from "../_shared/hammoyo/backend.ts";
 import { generateAiScheduleCoordination, resolveDeepSeekModel } from "../_shared/hammoyo/ai-provider.ts";
 import { rankCandidates } from "../_shared/hammoyo/recommendation.ts";
+import { canonicalRoomStatus } from "../_shared/hammoyo/rooms.ts";
 import {
   buildScheduleCoordinationPayload,
   hashScheduleCoordinationPayload,
@@ -24,13 +25,15 @@ Deno.serve(async (request) => {
     const room = await runQuery(
       supabase
         .from("hammoyo_rooms")
-        .select("id, host_core_user_id, status, expected_count, response_round")
+        .select("id, host_core_user_id, status, expected_count, response_round, expires_at, closed_at, deleted_at")
         .eq("id", roomId)
         .maybeSingle(),
     );
     if (!room) return jsonError("ROOM_NOT_FOUND", "Room was not found.", 404);
     if (room.host_core_user_id !== session.coreUserId) return jsonError("HOST_REQUIRED", "Only the host can recompute.", 403);
-    if (["closed", "expired"].includes(room.status)) return jsonError("ROOM_WRITE_LOCKED", "Room is locked.", 409);
+    if (["closed", "expired", "deleted"].includes(canonicalRoomStatus(room))) {
+      return jsonError("ROOM_WRITE_LOCKED", "Room is locked.", 409);
+    }
 
     const candidates = await runQuery(
       supabase.from("hammoyo_candidate_slots").select("id, label, starts_at, sort_order").eq("room_id", roomId).eq("active", true),

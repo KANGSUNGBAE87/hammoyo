@@ -8,6 +8,10 @@
 # OS/editor noise
 .DS_Store
 
+# Local final-delivery source package archive. Curated implementation subset
+# lives under docs/final-delivery/ and docs/assets/final/.
+HAMMOYEO_FINAL_DELIVERY/
+
 # Local agent/runtime state
 .agents/
 .codex/
@@ -20,3 +24,6 @@ graphify-out/
 .understand-anything/*
 !.understand-anything/config.json
 !.understand-anything/.understandignore
+
+# codebase-memory-mcp local index store
+.codebase-memory-home/

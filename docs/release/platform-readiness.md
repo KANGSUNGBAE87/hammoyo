@@ -1,7 +1,7 @@
 # 함모여 플랫폼 연결 준비
 
-Updated: 2026-06-26
-Status: `backend-ai-remote-smoke-plus-app-share-flow`
+Updated: 2026-06-28
+Status: `backend-invite-anonymous-remote-smoke-passed`
 
 ## 범위
 
@@ -11,6 +11,7 @@ Status: `backend-ai-remote-smoke-plus-app-share-flow`
 - `BackendAdapter`: Supabase/Edge Function/server API만 호출하는 경계
 - `ShareAdapter`: 일반 HTTPS 공유 링크와 Apps in Toss `intoss://...` deep link share 생성을 분리하는 경계
 - `supabase/migrations/20260624_hammoyo_backend.sql`: 원격 shared Supabase에 적용된 `hammoyo_` schema/RLS 기준
+- `supabase/migrations/20260628_hammoyo_invite_status_anonymous_hardening.sql`: `deleted` canonical state, anonymous participant, response ownership trigger hardening 기준
 - `scripts/verify-platform-readiness.mjs`: 플랫폼 준비 계약 검증
 
 ## 원격 Supabase 적용 상태
@@ -18,8 +19,9 @@ Status: `backend-ai-remote-smoke-plus-app-share-flow`
 2026-06-25 follow-up에서 성배님 지시 범위 안에서 shared Supabase 원격 적용과 Edge Function 배포가 진행됐습니다.
 
 - 원격 DB에는 `hammoyo_` prefix table과 service role grants가 적용됐습니다.
-- 8개 Hammoyo Edge Function은 `verify_jwt=false` + Hammoyo signed session 검증 경계로 배포됐습니다.
-- `npm run smoke:remote`는 create-room, submit-response, recompute, deletion-revokes-session을 검증합니다.
+- 10개 Hammoyo Edge Function은 `verify_jwt=false` + Hammoyo signed session 또는 anonymous participant key 검증 경계로 배포됐습니다.
+- `lookup-room`, `delete-room`, updated `join-room`, `submit-response`, `close-room`, `recompute-recommendation`은 2026-06-28에 재배포됐습니다.
+- `npm run smoke:remote`는 create-room, lookup-room, anonymous join, anonymous submit/edit, signed session plus anonymous key response reuse, candidate ownership rejection, recompute, delete-room, deleted lookup/write lock, deletion-revokes-session을 검증합니다.
 - DeepSeek V4 Pro 일정 조율 smoke는 `hammoyo_ai_coordination_runs` audit row 생성 후 정리까지 검증했습니다.
 
 계속 금지:
@@ -57,7 +59,9 @@ Migration 기준:
 - shared identity는 `core_users`, `authmap_user_identities`를 사용합니다.
 - raw Toss identifier는 저장하지 않고 HMAC 처리된 값을 `provider_subject`에 저장합니다.
 - 모든 table은 RLS를 켭니다.
-- `hammoyo_rooms.status`는 `draft`, `collecting`, `low_confidence`, `recommended`, `closed`, `expired`를 저장할 수 있어야 합니다.
+- `hammoyo_rooms.status`는 `draft`, `collecting`, `low_confidence`, `recommended`, `closed`, `expired`, `deleted`를 저장할 수 있어야 합니다.
+- anonymous participant는 원문 키를 저장하지 않고 room-scoped HMAC hash만 `hammoyo_room_members.anonymous_key_hash`에 저장합니다.
+- `hammoyo_response_preferences`는 DB trigger로 response room과 candidate slot room이 같은지, candidate slot이 active인지 검증합니다.
 - 방장과 참여자 읽기 권한은 `hammoyo_can_read_room(room_id)` host-or-member helper로 통일합니다.
 - public-open 정책인 `using (true)` / `with check (true)`는 쓰지 않습니다.
 - 클라이언트 직접 write는 GitHub Pages 앱 화면에서 열지 않고 Edge Function/server API를 통합니다.
@@ -65,6 +69,7 @@ Migration 기준:
 BackendAdapter 후보 메서드:
 
 - `exchangeTossAuth({ authorizationCode })`
+- `lookupRoom({ inviteSlug })`
 - `createRoom(payload)`
 - `joinRoom({ inviteSlug })`
 - `submitResponse(payload)`
@@ -72,12 +77,13 @@ BackendAdapter 후보 메서드:
 - `generateShareCopy(payload)`
 - `createShareLink(payload)`
 - `closeRoom({ roomId })`
+- `deleteRoom({ roomId })`
 - `requestDataDeletion(payload)`
 
 현재 repo에는 `SupabaseBackendAdapter`가 추가되어 있으며, 앱은 이 adapter를 통해
 `exchange-toss-auth`, `create-room`, `join-room`, `submit-response`,
 `recompute-recommendation`, `generate-share-copy`, `close-room`,
-`request-data-deletion` Edge Function을 호출합니다. 각 Function은 Supabase admin
+`request-data-deletion`, `lookup-room`, `delete-room` Edge Function을 호출합니다. 각 Function은 Supabase admin
 client, signed Hammoyo session token, `hammoyo_` tables, server-only DeepSeek V4 Pro
 AI provider proxy를 사용하도록 구현되어 있습니다. admin client는 CLI가 직접 주입할 수
 있는 server-only `HAMMOYEO_DB_ADMIN_KEY`를 우선 사용하고, Supabase 런타임 기본값인
