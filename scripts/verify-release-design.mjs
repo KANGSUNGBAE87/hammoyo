@@ -57,6 +57,9 @@ const requiredComponentMarkers = [
   "IOSCountSelect",
   "BottomNav",
   "BottomNavItem",
+  "BottomNavLabel",
+  "ResponseInbox",
+  "ConfirmDialog",
   "IPhoneCalendarPicker",
   "ReleaseCalendarSheet",
   "ReleaseCalendarDay",
@@ -195,6 +198,22 @@ if (!html.includes("ReleaseTimeWheel") || !html.includes("ReleaseTimeWheelOption
 
 if (!html.includes("bottom-nav") || !html.includes("bottom-nav-create")) {
   failures.push("Release app shell should expose a keepthis-style bottom navigation.");
+}
+
+if (html.includes('data-testid="settings-button"')) {
+  failures.push("Topbar settings button should be removed because bottom settings tab owns that route.");
+}
+
+if (!html.includes("custom-confirm-modal") || !html.includes("confirm-modal-confirm")) {
+  failures.push("Dirty/delete confirmation should use an in-app custom modal instead of native confirm.");
+}
+
+if (!html.includes("response-inbox-list") || !html.includes("받은 초대")) {
+  failures.push("Response tab should expose a received-invites list before the detail response form.");
+}
+
+if (html.includes("window.confirm")) {
+  failures.push("Native window.confirm should not be used for release confirmation flows.");
 }
 
 if (!html.includes("navigator.share")) {

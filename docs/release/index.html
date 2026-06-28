@@ -90,7 +90,7 @@
         width: min(1080px, 100%);
         margin: 0 auto;
         display: grid;
-        grid-template-columns: minmax(360px, 390px) minmax(280px, 1fr);
+        grid-template-columns: minmax(320px, 430px) minmax(280px, 1fr);
         gap: 24px;
         align-items: start;
       }
@@ -99,9 +99,9 @@
         position: sticky;
         top: 24px;
         width: 100%;
-        max-width: 390px;
+        max-width: 430px;
         max-height: calc(100dvh - 48px);
-        min-height: 740px;
+        min-height: min(820px, calc(100dvh - 48px));
         border: 1px solid var(--border);
         border-radius: 30px;
         background: var(--surface);
@@ -112,7 +112,7 @@
 
       .app {
         position: relative;
-        min-height: 740px;
+        min-height: min(820px, calc(100dvh - 48px));
         display: flex;
         flex-direction: column;
         background: var(--background);
@@ -154,6 +154,7 @@
         gap: 12px;
       }
 
+      .brandMark,
       .brandHomeButton,
       .topbarButton {
         min-height: var(--touch-target);
@@ -173,13 +174,20 @@
         color: var(--text-primary);
       }
 
+      .brandMark {
+        min-width: 0;
+        color: var(--text-primary);
+        pointer-events: none;
+      }
+
       .brand strong {
         font-size: 18px;
         line-height: 26px;
         font-weight: 700;
       }
 
-      .brandHomeButton span {
+      .brandHomeButton span,
+      .brandMark span {
         color: var(--text-secondary);
         font-size: 12px;
         line-height: 16px;
@@ -638,7 +646,7 @@
       .BottomNav {
         flex-shrink: 0;
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(76px, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
         align-items: end;
         gap: 4px;
         min-height: var(--bottom-nav-height);
@@ -668,6 +676,16 @@
         font-weight: 900;
       }
 
+      .BottomNavLabel {
+        min-width: 0;
+        display: block;
+        color: currentColor;
+        font-size: 11px;
+        line-height: 14px;
+        font-weight: 950;
+        text-align: center;
+      }
+
       .BottomNavItem[data-active="true"] {
         color: var(--brand);
       }
@@ -685,6 +703,20 @@
       .BottomNavItem[data-center="true"] {
         margin-top: -32px;
         color: var(--brand);
+      }
+
+      .BottomNavItem[data-center="true"] .BottomNavLabel {
+        width: min(76px, 100%);
+        max-width: 100%;
+        margin-top: 2px;
+        padding: 3px 4px;
+        border-radius: var(--radius-pill);
+        color: var(--surface);
+        background: var(--brand);
+        box-shadow: 0 5px 12px rgba(90, 70, 242, 0.24);
+        font-size: 12px;
+        line-height: 14px;
+        white-space: nowrap;
       }
 
       .BottomNavItem[data-center="true"] .BottomNavIcon {
@@ -708,6 +740,12 @@
 
       .buttonRow.two {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .HostStatusCard .buttonRow,
+      .settingsItem .buttonRow {
+        width: 100%;
+        grid-template-columns: 1fr;
       }
 
       .primaryButton,
@@ -1099,6 +1137,7 @@
 
       .candidateActionButton {
         min-height: 34px;
+        width: 100%;
         padding: 0 10px;
         border: 1px solid var(--border);
         border-radius: var(--radius-pill);
@@ -1171,6 +1210,90 @@
         background: var(--surface);
       }
 
+      .HostStatusCard {
+        display: grid;
+        align-items: start;
+        gap: 12px;
+      }
+
+      .ResponseInbox {
+        display: grid;
+        gap: 12px;
+      }
+
+      .ResponseInboxCard {
+        display: grid;
+        gap: 10px;
+        width: 100%;
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: var(--shadow-card);
+        text-align: left;
+      }
+
+      .ResponseInboxCard strong {
+        font-size: 17px;
+        line-height: 23px;
+      }
+
+      .progressPill {
+        width: max-content;
+        max-width: 100%;
+        padding: 8px 12px;
+        border-radius: var(--radius-pill);
+        color: var(--brand);
+        background: var(--brand-soft);
+        font-size: 13px;
+        line-height: 16px;
+        font-weight: 900;
+      }
+
+      .ConfirmDialogMount {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        pointer-events: none;
+      }
+
+      .ConfirmDialog {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.48);
+        backdrop-filter: blur(10px);
+        pointer-events: auto;
+      }
+
+      .ConfirmDialogPanel {
+        display: grid;
+        gap: 16px;
+        width: min(100%, 340px);
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: var(--shadow-floating);
+      }
+
+      .ConfirmDialogPanel h2 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 20px;
+        line-height: 27px;
+      }
+
+      .ConfirmDialogPanel p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 14px;
+        line-height: 21px;
+      }
+
       .HostStatusCard .slotMeta {
         min-width: 0;
       }
@@ -1216,7 +1339,7 @@
       }
 
       body[data-debug-panels="true"] .layout {
-        grid-template-columns: minmax(360px, 390px) minmax(280px, 1fr);
+        grid-template-columns: minmax(320px, 430px) minmax(280px, 1fr);
         justify-content: stretch;
       }
 
@@ -1225,7 +1348,7 @@
       }
 
       body:not([data-debug-panels="true"]) .layout {
-        grid-template-columns: minmax(320px, 390px);
+        grid-template-columns: minmax(320px, 430px);
         justify-content: center;
       }
 
@@ -1235,8 +1358,8 @@
         }
 
         body:not([data-debug-panels="true"]) .app {
-          height: 738px;
-          min-height: 738px;
+          height: min(820px, calc(100dvh - 48px));
+          min-height: min(740px, calc(100dvh - 48px));
         }
 
         body:not([data-debug-panels="true"]) .screenRoot {
@@ -1246,7 +1369,7 @@
 
         body:not([data-debug-panels="true"]) .screen {
           min-height: 0;
-          height: calc(738px - 69px - var(--bottom-nav-height));
+          height: calc(min(820px, calc(100dvh - 48px)) - 69px - var(--bottom-nav-height));
           overflow: hidden;
         }
 
@@ -1480,16 +1603,14 @@
             <div class="AnimalBackground" aria-hidden="true"></div>
             <header class="topbar">
               <div class="brand">
-                <button class="brandHomeButton" type="button" data-action="go-home" data-testid="topbar-home-button" aria-label="홈으로 이동">
-                  <strong>함모여</strong><span>홈</span>
-                </button>
-                <div class="topbarActions">
-                  <button class="topbarButton" type="button" data-action="open-settings" data-testid="settings-button">설정</button>
+                <div class="brandMark" aria-label="함모여">
+                  <strong>함모여</strong><span>하단 탭으로 이동해요</span>
                 </div>
               </div>
             </header>
             <div id="screen-root" class="screenRoot" aria-live="polite"></div>
             <nav id="bottom-nav" class="BottomNav bottom-nav" aria-label="주요 화면"></nav>
+            <div id="confirm-modal-root" class="ConfirmDialogMount" aria-live="polite"></div>
           </div>
         </section>
 
@@ -1633,6 +1754,23 @@
           "incomingInviteBody": "{title} 모임에서 가능한 시간을 기다리고 있어요. 같은 홈 화면에서 확인하고 바로 응답할 수 있어요.",
           "incomingInviteMeta": "{count}개 후보 · {expected}명 예정",
           "respondToInvite": "초대 응답하기",
+          "responseInboxHint": "응답 탭에서는 먼저 초대함을 보고 들어가요.",
+          "responseInboxStatusClosed": "마감",
+          "responseInboxStatusPending": "미응답",
+          "responseInboxSubmitted": "응답 완료",
+          "responseInboxLabel": "받은 초대",
+          "responseInboxTitle": "받은 초대를 먼저 확인해요",
+          "responseInboxBody": "공유 링크를 여러 개 받는 상황을 기준으로, 응답할 방을 고른 뒤 상세로 들어가요.",
+          "responseInboxGraphicAlt": "받은 초대와 응답 상태를 나타내는 동물 그래픽",
+          "responseProgressText": "{progress} 응답",
+          "responseInboxCandidateMeta": "{label} {time} 외 {count}개 후보",
+          "sentRoomLabel": "내가 보낸 방",
+          "sentRoomHint": "내가 만든 모임은 하단의 내 모임 탭에서 관리해요.",
+          "confirmCancel": "취소",
+          "confirmProceed": "이동하기",
+          "confirmDelete": "삭제하기",
+          "unsavedExitTitle": "작성 중인 내용이 있어요",
+          "unsavedExitBody": "이 화면을 벗어나면 현재 입력이 사라질 수 있어요. 그래도 이동할까요?",
           "emptyRoom": "아직 만든 모임이 없어요. 새 모임을 만들면 이 화면에서 계속 확인할 수 있어요.",
           "roomUnavailable": "저장된 모임 없음",
           "draftOnlyGuide": "날짜와 시간을 고르면 친구에게 보낼 공유 문구가 만들어져요. 로그인 전에는 이 브라우저의 저장소를 기준으로 상태를 확인해요.",
@@ -1725,6 +1863,7 @@
       const screenRoot = document.getElementById("screen-root");
       const tabsRoot = document.getElementById("screen-tabs");
       const bottomNavRoot = document.getElementById("bottom-nav");
+      const confirmModalRoot = document.getElementById("confirm-modal-root");
       const appRoot = document.querySelector(".app");
       const STORAGE_KEY = "hammoyo:release:v1";
       const DEMO_STORAGE_KEY = "hammoyo:release:demo:v1";
@@ -1733,6 +1872,10 @@
       let locale = locales.ko;
       let hasUnsavedEdits = false;
       let renderedScreen = "scr-00-entry";
+      let renderedResponseMode = "detail";
+      let pendingConfirmation = null;
+      let appRouteStack = [];
+      const screenScrollPositions = {};
       const screenOrder = [
         "scr-00-entry",
         "scr-01-host-room",
@@ -1755,7 +1898,7 @@
           testId: "bottom-nav-respond",
           screens: ["scr-02-participant-input", "scr-02b-response-complete", "scr-03-result-recommendation", "scr-04-insufficient-response", "scr-05-link-expired", "scr-06-room-closed"],
         },
-        { key: "create", label: "만들기", icon: "+", action: "start-create-room", testId: "bottom-nav-create", center: true, screens: ["scr-01-host-room"] },
+        { key: "create", label: "모임 만들기", icon: "+", action: "start-create-room", testId: "bottom-nav-create", center: true, screens: ["scr-01-host-room"] },
         { key: "meetups", label: "내 모임", icon: "≡", action: "open-host-dashboard", testId: "bottom-nav-meetups", screens: ["scr-08-my-meetups"] },
         { key: "settings", label: "설정", icon: "◦", action: "open-settings", testId: "bottom-nav-settings", screens: ["scr-07-settings"] },
       ];
@@ -2043,14 +2186,7 @@
         locale = locales[activeLocale];
         document.documentElement.lang = activeLocale;
         const phoneFrame = document.querySelector(".phone");
-        const homeButton = document.querySelector('[data-testid="topbar-home-button"]');
-        const privacyButton = document.querySelector('[data-testid="settings-button"]');
-        const homeLabel = document.querySelector(".brandHomeButton span");
         if (phoneFrame) phoneFrame.setAttribute("aria-label", locale.ui.phoneLabel);
-        if (homeButton) homeButton.setAttribute("aria-label", locale.ui.homeButtonLabel);
-        if (privacyButton) privacyButton.textContent = locale.ui.privacyButton;
-        if (privacyButton) privacyButton.setAttribute("aria-label", locale.ui.privacyButtonLabel);
-        if (homeLabel) homeLabel.textContent = locale.ui.homeShort;
       }
 
       const screenCopy = (id) => locale.screens[id];
@@ -2356,6 +2492,7 @@
           copyStatus: "",
           lastSubmittedAt: null,
           lastResponseId: null,
+          showResponseInbox: false,
         };
       }
 
@@ -2373,6 +2510,7 @@
           copyStatus: "",
           lastSubmittedAt: null,
           lastResponseId: null,
+          showResponseInbox: false,
         };
       }
 
@@ -2420,6 +2558,7 @@
           copyStatus: raw.copyStatus || "",
           lastSubmittedAt: raw.lastSubmittedAt || null,
           lastResponseId: raw.lastResponseId || null,
+          showResponseInbox: Boolean(raw.showResponseInbox),
         };
       }
 
@@ -2444,6 +2583,7 @@
             room: expiredRoom,
             inviteContext: { status: "deleted", roomId: shareSnapshot.id },
             revokedRoomIds,
+            showResponseInbox: false,
           };
         }
         if (sharedRoom) {
@@ -2453,6 +2593,7 @@
             inviteContext: { status: "valid", roomId: sharedRoom.id },
             revokedRoomIds,
             draftPreferences: {},
+            showResponseInbox: false,
           };
         }
         if (storedState) return storedState;
@@ -2499,6 +2640,11 @@
         return screen;
       }
 
+      function responseModeFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("response") === "inbox" ? "inbox" : "detail";
+      }
+
       function clearLocalData() {
         localStorage.removeItem(currentStorageKey());
         appState = createFreshState();
@@ -2513,11 +2659,77 @@
         return ["scr-01-host-room", "scr-02-participant-input"].includes(renderedScreen);
       }
 
-      function confirmNavigationIfDirty(action) {
+      function renderConfirmModal() {
+        if (!pendingConfirmation) {
+          confirmModalRoot.innerHTML = "";
+          return;
+        }
+        const isDelete = pendingConfirmation.kind === "delete-room";
+        const title = isDelete ? locale.ui.deleteRoom : locale.ui.unsavedExitTitle;
+        const body = isDelete
+          ? locale.ui.deleteRoomConfirm
+          : locale.ui.unsavedExitBody;
+        const confirmLabel = isDelete ? locale.ui.confirmDelete : locale.ui.confirmProceed;
+        const cancelLabel = locale.ui.confirmCancel;
+        confirmModalRoot.innerHTML = `
+          <div class="ConfirmDialog" role="presentation">
+            <section class="ConfirmDialogPanel" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title" data-testid="custom-confirm-modal">
+              <div class="section">
+                <h2 id="confirm-modal-title">${escapeHtml(title)}</h2>
+                <p>${escapeHtml(body)}</p>
+              </div>
+              <div class="buttonRow two">
+                <button class="quietButton Button3D" type="button" data-action="confirm-modal-cancel" data-testid="confirm-modal-cancel">${escapeHtml(cancelLabel)}</button>
+                <button class="${isDelete ? "secondaryButton" : "primaryButton"} Button3D" type="button" data-action="confirm-modal-confirm" data-testid="confirm-modal-confirm">${escapeHtml(confirmLabel)}</button>
+              </div>
+            </section>
+          </div>
+        `;
+      }
+
+      function requestConfirmation(config) {
+        pendingConfirmation = config;
+        renderConfirmModal();
+        return false;
+      }
+
+      function closeConfirmation() {
+        pendingConfirmation = null;
+        renderConfirmModal();
+      }
+
+      function confirmNavigationIfDirty(action, target = null) {
         if (!shouldConfirmNavigation(action)) return true;
-        const ok = window.confirm(locale.ui.unsavedExitConfirm);
-        if (ok) hasUnsavedEdits = false;
-        return ok;
+        return requestConfirmation({
+          kind: "unsaved-navigation",
+          action,
+          targetAction: target?.dataset?.action || "",
+          targetData: target?.dataset ? { ...target.dataset } : {},
+        });
+      }
+
+      function applyPendingConfirmation() {
+        const confirmation = pendingConfirmation;
+        closeConfirmation();
+        if (!confirmation) return;
+        if (confirmation.kind === "delete-room") {
+          performDeleteHostedRoom(confirmation.roomId);
+          return;
+        }
+        if (confirmation.kind === "history") {
+          hasUnsavedEdits = false;
+          const nextRoute = confirmation.nextRoute || routeStateFor(confirmation.nextScreen, { responseMode: confirmation.nextResponseMode });
+          const nextUrl = buildScreenUrl(nextRoute.screen, { responseMode: nextRoute.responseMode });
+          if (appRouteStack.length > 1) appRouteStack.pop();
+          else rememberRoute(nextRoute, true);
+          window.history.replaceState(nextRoute, "", nextUrl);
+          render(nextRoute.screen);
+          return;
+        }
+        if (confirmation.kind === "unsaved-navigation") {
+          hasUnsavedEdits = false;
+          handleAction(confirmation.action, { dataset: confirmation.targetData || { action: confirmation.targetAction || confirmation.action }, disabled: false });
+        }
       }
 
       function nextAnonymousAlias(room, editingResponseId = null) {
@@ -2597,6 +2809,24 @@
         `;
       }
 
+      function responseProgressLabel(room) {
+        const ranked = rankCandidates(room);
+        return `${ranked.responseCount}/${room.expectedCount}`;
+      }
+
+      function responseProgressText(room) {
+        return formatTemplate(locale.ui.responseProgressText, { progress: responseProgressLabel(room) });
+      }
+
+      function responseInboxCandidateMeta(room) {
+        const firstCandidate = room?.candidates?.[0] || {};
+        return formatTemplate(locale.ui.responseInboxCandidateMeta, {
+          label: firstCandidate.label || "",
+          time: firstCandidate.time || "",
+          count: Math.max(0, (room?.candidates?.length || 0) - 1),
+        });
+      }
+
       function responseCoverage(room, state = "enough") {
         const ranked = rankCandidates(room);
         const percent = Math.min(100, Math.round((ranked.responseCount / room.expectedCount) * 100));
@@ -2611,10 +2841,42 @@
           <section class="ResponseCoverage" aria-label="응답률">
             <div class="topline">
               <h3>응답 현황</h3>
+              <span class="progressPill">${escapeHtml(responseProgressText(room))}</span>
               ${reasonChip(state === "blocked" ? "danger" : state === "low" ? "warning" : "success", chipLabel)}
             </div>
             <div class="coverageTrack" aria-hidden="true"><div class="coverageFill" style="width: ${percent}%"></div></div>
             <p class="caption">${label}</p>
+          </section>
+        `;
+      }
+
+      function responseInbox(room) {
+        if (!room) return "";
+        const statusLabel = room.status === "closed"
+          ? locale.ui.responseInboxStatusClosed
+          : appState.lastSubmittedAt
+            ? locale.ui.responseInboxSubmitted
+            : locale.ui.responseInboxStatusPending;
+        return `
+          <section class="ResponseInbox" data-testid="response-inbox-list" aria-labelledby="response-inbox-title">
+            ${stateGraphic("low", locale.ui.responseInboxGraphicAlt)}
+            <div class="section">
+              <span class="eyebrow">${escapeHtml(locale.ui.responseInboxLabel)}</span>
+              <h1 id="response-inbox-title">${escapeHtml(locale.ui.responseInboxTitle)}</h1>
+              <p>${escapeHtml(locale.ui.responseInboxBody)}</p>
+            </div>
+            <button class="ResponseInboxCard Button3D" type="button" data-action="open-response-room" data-testid="response-inbox-open-0">
+              <div class="topline">
+                <strong>${escapeHtml(room.title)}</strong>
+                ${reasonChip(appState.lastSubmittedAt ? "success" : "brand", statusLabel)}
+              </div>
+              <span class="progressPill">${escapeHtml(responseProgressText(room))}</span>
+              <span class="helperText">${escapeHtml(responseInboxCandidateMeta(room))}</span>
+            </button>
+            <section class="surface compactSection" aria-label="${escapeHtml(locale.ui.sentRoomLabel)}">
+              ${reasonChip("success", locale.ui.sentRoomLabel)}
+              <p class="helperText">${escapeHtml(locale.ui.sentRoomHint)}</p>
+            </section>
           </section>
         `;
       }
@@ -2767,12 +3029,6 @@
             : appState.room
             ? `최근 방: ${appState.room.title} · ${ranked.responseCount}명 응답`
             : locale.ui.emptyRoom;
-          const primaryLabel = hasIncomingInvite ? locale.ui.respondToInvite : copy.primary;
-          const secondaryLabel = hasIncomingInvite
-            ? copy.primary
-            : hostedCount
-              ? locale.ui.savedMeetupsTitle
-              : locale.ui.roomUnavailable;
           return `
             <section id="scr-00-entry" class="screen" aria-labelledby="entry-title">
               <div class="screenBody">
@@ -2789,14 +3045,8 @@
                   <p class="emptyStateLine">${escapeHtml(savedRoomLine)}</p>
                   ${hostedCount ? `<p class="helperText">${escapeHtml(locale.ui.savedMeetupsTitle)} ${hostedCount}</p>` : ""}
                 </div>
+                ${hasIncomingInvite ? `<p class="guideNote">${escapeHtml(locale.ui.responseInboxHint)}</p>` : ""}
               </div>
-              ${stickyBottomCTA(primaryLabel, secondaryLabel, {
-                primaryAction: hasIncomingInvite ? "respond-to-invite" : "start-create-room",
-                primaryTestId: "start-create-room",
-                secondaryAction: hasIncomingInvite ? "start-create-room" : hostedCount ? "open-host-dashboard" : null,
-                secondaryTestId: hasIncomingInvite ? "start-create-room-secondary" : hostedCount ? "open-host-dashboard-button" : null,
-                secondaryDisabled: !hasIncomingInvite && !hostedCount,
-              })}
             </section>
           `;
         },
@@ -2843,13 +3093,25 @@
           const room = appState.room;
           if (!room) return renderers["scr-00-entry"]();
           const ranked = rankCandidates(room);
+          if (appState.showResponseInbox) {
+            return `
+              <section id="scr-02-participant-input" class="screen" aria-labelledby="response-inbox-title">
+                <div class="screenBody">
+                  ${responseInbox(room)}
+                </div>
+              </section>
+            `;
+          }
           const draft = getDraftPreferences(room);
           const isClosed = room.status === "closed" || room.status === "expired";
           return `
             <section id="scr-02-participant-input" class="screen" aria-labelledby="participant-title">
               <div class="screenBody">
                 ${standardHeader("scr-02-participant-input", "participant-title")}
-                ${reasonChip("brand", `${room.title} · ${ranked.responseCount}/${room.expectedCount} 응답`)}
+                <div class="topline">
+                  ${reasonChip("brand", room.title)}
+                  <span class="progressPill">${escapeHtml(responseProgressText(room))}</span>
+                </div>
                 <label class="inputGroup">
                   <span class="inputLabel">내 이름 또는 별명</span>
                   <input class="textInput" data-testid="participant-name-input" value="${escapeHtml(appState.currentParticipant)}" placeholder="예: 민지" ${isClosed ? "disabled" : ""} />
@@ -2902,6 +3164,7 @@
                   <h1 id="complete-title">${escapeHtml(copy.title)}</h1>
                   <p>${escapeHtml(room.expectedCount)}명 중 ${escapeHtml(ranked.responseCount)}명이 답했어요. 방이 닫히기 전에는 내 응답을 수정할 수 있어요.</p>
                 </div>
+                <span class="progressPill">${escapeHtml(responseProgressText(room))}</span>
                 ${responseCoverage(room, coverageState)}
                 <p class="guideNote">${escapeHtml(locale.ui.copyReminderHint)}</p>
                 ${appState.copyStatus ? `<p class="actionStatus" data-testid="copy-status">${escapeHtml(appState.copyStatus)}</p>` : ""}
@@ -3108,10 +3371,9 @@
                 </div>
                 ${appState.copyStatus ? `<p class="actionStatus" data-testid="copy-status">${escapeHtml(appState.copyStatus)}</p>` : ""}
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary, {
+              ${stickyBottomCTA(copy.primary, null, {
                 primaryAction: "clear-local-data",
                 primaryTestId: "clear-local-data-button",
-                secondaryAction: "go-home",
               })}
             </section>
           `;
@@ -3128,11 +3390,6 @@
                 </div>
                 ${appState.copyStatus ? `<p class="actionStatus" data-testid="copy-status">${escapeHtml(appState.copyStatus)}</p>` : ""}
               </div>
-              ${stickyBottomCTA(copy.primary, copy.secondary, {
-                primaryAction: "start-create-room",
-                primaryTestId: "dashboard-create-room-button",
-                secondaryAction: "go-home",
-              })}
             </section>
           `;
         },
@@ -3143,14 +3400,62 @@
         return screenOrder.includes(params.get("screen")) ? params.get("screen") : "scr-00-entry";
       }
 
-      function selectScreen(nextScreen, replace = false) {
+      function buildScreenUrl(nextScreen, options = {}) {
         const screen = screenOrder.includes(nextScreen) ? nextScreen : "scr-00-entry";
         const params = new URLSearchParams(window.location.search);
         params.delete("reset");
         params.set("screen", screen);
-        const nextUrl = `${window.location.pathname}?${params.toString()}`;
-        if (replace) window.history.replaceState({}, "", nextUrl);
-        else window.history.pushState({}, "", nextUrl);
+        if (screen === "scr-02-participant-input") {
+          const existingMode = params.get("response") === "inbox" ? "inbox" : params.get("response") === "detail" ? "detail" : null;
+          const responseMode = options.responseMode || existingMode || (appState.showResponseInbox ? "inbox" : "detail");
+          params.set("response", responseMode);
+        } else {
+          params.delete("response");
+        }
+        return `${window.location.pathname}?${params.toString()}`;
+      }
+
+      function routeStateFor(nextScreen, options = {}) {
+        const screen = screenOrder.includes(nextScreen) ? nextScreen : "scr-00-entry";
+        const state = { screen };
+        if (screen === "scr-02-participant-input") {
+          const responseMode = options.responseMode || (appState.showResponseInbox ? "inbox" : "detail");
+          state.responseMode = responseMode === "inbox" ? "inbox" : "detail";
+        }
+        return state;
+      }
+
+      function rememberRoute(route, replace = false) {
+        if (replace || appRouteStack.length === 0) {
+          appRouteStack[appRouteStack.length ? appRouteStack.length - 1 : 0] = route;
+          return;
+        }
+        appRouteStack.push(route);
+      }
+
+      function previousRouteFromStack(fallbackRoute) {
+        return appRouteStack.length > 1 ? appRouteStack[appRouteStack.length - 2] : fallbackRoute;
+      }
+
+      function currentRouteFromRender() {
+        return routeStateFor(renderedScreen, { responseMode: renderedResponseMode });
+      }
+
+      function syncResponseModeFromRoute(screen) {
+        if (screen === "scr-02-participant-input") {
+          appState.showResponseInbox = responseModeFromUrl() === "inbox";
+        } else {
+          appState.showResponseInbox = false;
+        }
+      }
+
+      function selectScreen(nextScreen, replace = false, options = {}) {
+        const screen = screenOrder.includes(nextScreen) ? nextScreen : "scr-00-entry";
+        const nextUrl = buildScreenUrl(screen, options);
+        const nextState = routeStateFor(screen, options);
+        if (replace) window.history.replaceState(nextState, "", nextUrl);
+        else window.history.pushState(nextState, "", nextUrl);
+        rememberRoute(nextState, replace);
         render(screen);
       }
 
@@ -3175,7 +3480,7 @@
             const active = item.screens.includes(activeScreen);
             return `<button class="BottomNavItem" type="button" data-active="${active}" data-center="${item.center ? "true" : "false"}" aria-current="${active ? "page" : "false"}" ${actionAttrs(item.action, item.testId)}>
               <span class="BottomNavIcon" aria-hidden="true">${escapeHtml(item.icon)}</span>
-              <span>${escapeHtml(item.label)}</span>
+              <span class="BottomNavLabel">${escapeHtml(item.label)}</span>
             </button>`;
           })
           .join("");
@@ -3186,15 +3491,17 @@
         const requested = screenOrder.includes(screen) ? screen : "scr-00-entry";
         const current = applyRouteState(requested);
         if (current !== requested) {
-          const params = new URLSearchParams(window.location.search);
-          params.set("screen", current);
-          window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+          const currentRoute = routeStateFor(current);
+          window.history.replaceState(currentRoute, "", buildScreenUrl(current));
+          rememberRoute(currentRoute, true);
         }
+        syncResponseModeFromRoute(current);
         applyLocale(activeLocale);
         screenRoot.innerHTML = renderers[current]();
         renderTabs(current);
         renderBottomNav(current);
         renderedScreen = current;
+        renderedResponseMode = current === "scr-02-participant-input" ? responseModeFromUrl() : "detail";
       }
 
       function readRoomForm() {
@@ -3246,11 +3553,14 @@
           hostRooms: upsertHostRoom(room, appState.hostRooms),
           hostDraft: null,
           editingRoomId: null,
+          inviteContext: null,
+          revokedRoomIds: appState.revokedRoomIds || [],
           draftPreferences: {},
           currentParticipant: "",
           copyStatus: "",
           lastSubmittedAt: null,
           lastResponseId: null,
+          showResponseInbox: false,
         };
         appState.draftPreferences = getDraftPreferences(appState.room);
         saveState();
@@ -3542,7 +3852,12 @@
       function deleteHostedRoom(roomId) {
         const room = (appState.hostRooms || []).find((savedRoom) => savedRoom.id === roomId) || appState.room;
         if (!room || room.isSharedLink) return;
-        if (!window.confirm(locale.ui.deleteRoomConfirm)) return;
+        requestConfirmation({ kind: "delete-room", roomId: room.id });
+      }
+
+      function performDeleteHostedRoom(roomId) {
+        const room = (appState.hostRooms || []).find((savedRoom) => savedRoom.id === roomId) || appState.room;
+        if (!room || room.isSharedLink) return;
         revokeRoomId(room.id);
         appState.hostRooms = (appState.hostRooms || []).filter((savedRoom) => savedRoom.id !== room.id);
         if (appState.room?.id === room.id) {
@@ -3575,26 +3890,33 @@
           selectScreen("scr-06-room-closed");
           return;
         }
-        if (appState.lastSubmittedAt) {
-          selectScreen("scr-02b-response-complete");
-          return;
-        }
-        const ranked = rankCandidates(appState.room);
-        selectScreen(ranked.top ? "scr-03-result-recommendation" : "scr-02-participant-input");
+        appState.showResponseInbox = true;
+        saveState();
+        selectScreen("scr-02-participant-input", false, { responseMode: "inbox" });
       }
 
       function handleAction(action, target) {
         if (!action) return;
         if (target?.disabled) return;
-        if (!confirmNavigationIfDirty(action)) return;
+        if (action === "confirm-modal-cancel") {
+          closeConfirmation();
+          return;
+        }
+        if (action === "confirm-modal-confirm") {
+          applyPendingConfirmation();
+          return;
+        }
+        if (!confirmNavigationIfDirty(action, target)) return;
         if (action === "start-create-room") {
           appState.copyStatus = "";
+          appState.showResponseInbox = false;
           appState.hostDraft = createDraftRoom();
           appState.editingRoomId = null;
           selectScreen("scr-01-host-room");
         }
         if (action === "open-host-dashboard") {
           appState.copyStatus = "";
+          appState.showResponseInbox = false;
           selectScreen("scr-08-my-meetups");
         }
         if (action === "open-participation-tab") openParticipationTab();
@@ -3604,12 +3926,26 @@
             return;
           }
           appState.copyStatus = "";
+          appState.showResponseInbox = true;
           appState.draftPreferences = getDraftPreferences(appState.room);
           saveState();
-          selectScreen("scr-02-participant-input");
+          selectScreen("scr-02-participant-input", false, { responseMode: "inbox" });
+        }
+        if (action === "open-response-room") {
+          if (!appState.room) return;
+          appState.copyStatus = "";
+          appState.showResponseInbox = false;
+          appState.draftPreferences = getDraftPreferences(appState.room);
+          saveState();
+          if (appState.lastSubmittedAt) {
+            selectScreen("scr-02b-response-complete");
+          } else {
+            selectScreen("scr-02-participant-input", false, { responseMode: "detail" });
+          }
         }
         if (action === "open-existing-room") {
           if (!appState.room) return;
+          appState.showResponseInbox = false;
           if (appState.room.status === "expired") {
             selectScreen("scr-05-link-expired");
             return;
@@ -3631,6 +3967,7 @@
           if (!room) return;
           appState.room = createDemoRoom(room);
           appState.copyStatus = "";
+          appState.showResponseInbox = false;
           saveState();
           if (appState.room.status === "closed") selectScreen("scr-06-room-closed");
           else selectScreen(rankCandidates(appState.room).top ? "scr-03-result-recommendation" : "scr-04-insufficient-response");
@@ -3641,6 +3978,7 @@
           appState.hostDraft = createDemoRoom(room);
           appState.editingRoomId = room.id;
           appState.copyStatus = "";
+          appState.showResponseInbox = false;
           hasUnsavedEdits = false;
           saveState();
           selectScreen("scr-01-host-room");
@@ -3657,12 +3995,15 @@
         if (action === "set-preference") {
           if (!appState.room) return;
           if (isTerminalRoom(appState.room)) return;
+          const previousScrollTop = screenRoot.querySelector(".screenBody")?.scrollTop || 0;
           hasUnsavedEdits = true;
           appState.draftPreferences = getDraftPreferences(appState.room);
           appState.draftPreferences[target.dataset.candidateId] = normalizeStatus(target.dataset.status);
           appState.copyStatus = "";
           saveState();
           render(currentScreen());
+          const nextBody = screenRoot.querySelector(".screenBody");
+          if (nextBody) nextBody.scrollTop = previousScrollTop;
         }
         if (action === "submit-response") submitResponse();
         if (action === "edit-response") selectScreen("scr-02-participant-input");
@@ -3680,11 +4021,6 @@
       }
 
       appRoot.addEventListener("click", (event) => {
-        const target = event.target.closest("[data-action]");
-        handleAction(target?.dataset.action, target);
-      });
-
-      bottomNavRoot.addEventListener("click", (event) => {
         const target = event.target.closest("[data-action]");
         handleAction(target?.dataset.action, target);
       });
@@ -3711,16 +4047,22 @@
       applyDebugMode();
       selectScreen(initialScreen, true);
 
-      window.addEventListener("popstate", () => {
-        const nextScreen = currentScreen();
-        if (!confirmNavigationIfDirty("history")) {
-          const params = new URLSearchParams(window.location.search);
-          params.set("screen", renderedScreen);
-          window.history.pushState({}, "", `${window.location.pathname}?${params.toString()}`);
-          render(renderedScreen);
+      window.addEventListener("popstate", (event) => {
+        const stateScreen = event.state?.screen;
+        const nextScreen = screenOrder.includes(stateScreen) ? stateScreen : currentScreen();
+        const nextResponseMode = event.state?.responseMode === "inbox" ? "inbox" : "detail";
+        const fallbackRoute = routeStateFor(nextScreen, { responseMode: nextResponseMode });
+        const nextRoute = previousRouteFromStack(fallbackRoute);
+        if (shouldConfirmNavigation("history")) {
+          const currentRoute = currentRouteFromRender();
+          const currentUrl = buildScreenUrl(currentRoute.screen, { responseMode: currentRoute.responseMode });
+          window.history.pushState(currentRoute, "", currentUrl);
+          requestConfirmation({ kind: "history", nextRoute });
           return;
         }
-        render(nextScreen);
+        if (appRouteStack.length > 1) appRouteStack.pop();
+        else rememberRoute(nextRoute, true);
+        render(nextRoute.screen);
       });
     </script>
   </body>

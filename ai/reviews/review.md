@@ -1,6 +1,6 @@
 ---
-version: 14
-status: bottom-tab-calendar-wheel-verified
+version: 15
+status: final-nav-response-inbox-verified
 updated: 2026-06-28
 canonical: true
 ---
@@ -12,7 +12,7 @@ canonical: true
 공식 P4 패키지는 조건부 산출물로는 구조가 갖춰져 있지만, 원본만 기준으로 구현에 바로 넘기기에는 부족했습니다. 2026-06-24 보정으로 구현 전 필수 정책과 디자인 샘플은 현재 프로젝트 문서에 추가되었습니다.
 
 - 최신 판정: `FINAL_DELIVERY_REORDER_READY`
-- 최신 구현 상태: `BOTTOM_TAB_CALENDAR_WHEEL_RELEASE_FLOW_VERIFIED`
+- 최신 구현 상태: `FINAL_NAV_RESPONSE_INBOX_RELEASE_FLOW_VERIFIED`
 - 원 리뷰 판정: `BLOCK_FOR_IMPLEMENTATION`
 - 패키지 품질: `CONDITIONAL_P4_PACKAGE_OK`
 - 추가 기획 필요 여부: 2026-06-24 보정 완료. P2/P3/P4 재논의는 필요하지 않습니다.
@@ -27,6 +27,16 @@ canonical: true
 - 후보 시간은 오전/오후, 시, 분을 나누는 `ReleaseTimeWheel`로 전환했고, 누른 열의 값만 바뀌도록 hidden input 동기화를 검증했습니다.
 - `npm run verify:release`와 `npm run build`가 통과했습니다.
 - 390px/320px Playwright screenshot에서 하단 탭, CTA, calendar/time wheel의 주요 겹침이 없는 것을 확인했습니다.
+
+## 2026-06-28 최종 내비게이션 / 응답함 리뷰
+
+- 상단 중복 `설정`/`홈` 버튼을 제거하고 하단 탭을 유일한 주요 이동 구조로 정리했습니다.
+- 홈과 내 모임 화면의 중복 `새 모임 만들기`/`홈으로 돌아가기` CTA를 제거했습니다.
+- 응답 탭과 공유 링크의 `초대 응답하기`는 받은 초대 목록을 먼저 보여준 뒤 상세 응답으로 들어갑니다.
+- 응답함과 상세 응답은 `response=inbox/detail` route로 분리해 브라우저 뒤로가기에서 리스트 복귀가 가능하게 했습니다.
+- 기본 브라우저 confirm을 제거하고 앱 내부 `ConfirmDialog`로 작성 중 이탈, 브라우저 뒤로가기, 모임 삭제 확인을 처리합니다.
+- 서브에이전트 리뷰에서 발견된 P1 회귀는 `history` 승인 경로와 응답함 back-stack이었고, 하단 탭 click handler 중복으로 route stack이 두 번 쌓이던 원인까지 수정했습니다.
+- 검증 계약은 response inbox back, share-link inbox-first, custom confirm accept/cancel, preference scroll retention, 320px bottom nav 가시성을 포함합니다.
 
 ## 2026-06-27 Final Delivery 재정렬 리뷰
 

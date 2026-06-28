@@ -119,11 +119,15 @@ async function main() {
   assert(!cleanEntryText.includes("최근 방:"), "clean entry should not expose a fake recent room");
   assert(cleanEntryText.includes("아직 만든 모임이 없어요"), "clean entry should explain that no room exists yet");
   assert(cleanEntryText.includes("현재 상태"), "entry should show a concise current status card");
-  assert(cleanEntryText.includes("설정"), "entry should expose settings");
   assert(!cleanEntryText.includes("EN") && !cleanEntryText.includes("앱 준비"), "entry should not expose language or app-ready pills");
   const cleanEntryStorage = await page.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
   assert(cleanEntryStorage === null, "clean entry should not persist a placeholder room");
-  assert(await page.getByTestId("settings-button").isVisible(), "entry should expose a settings button");
+  assert((await page.locator('[data-testid="settings-button"]').count()) === 0, "topbar should not expose a duplicate settings button");
+  assert((await page.locator('[data-testid="topbar-home-button"]').count()) === 0, "topbar should not expose a duplicate home button");
+  assert((await page.locator('[data-testid="start-create-room"]').count()) === 0, "home should not expose a duplicate create CTA");
+  assert((await page.locator('[data-testid="open-host-dashboard-button"]').count()) === 0, "home should not expose a duplicate my-meetups CTA");
+  assert(await page.getByTestId("bottom-nav-settings").isVisible(), "entry should expose settings through bottom navigation");
+  assert((await page.getByTestId("bottom-nav-create").innerText()).includes("모임"), "bottom create tab should use a readable create label");
   assert((await page.locator('[data-testid="language-toggle-button"]').count()) === 0, "entry should not expose a language switcher");
 
   await page.setViewportSize({ width: 1024, height: 768 });
@@ -236,7 +240,7 @@ async function main() {
     );
   }
 
-  await page.getByTestId("start-create-room").click();
+  await page.getByTestId("bottom-nav-create").click();
   assert((await page.locator('input[type="date"], input[type="time"]').count()) === 0, "host setup should not expose browser-native date/time pickers");
   assert(await page.getByTestId("bottom-nav-create").isVisible(), "release shell should expose bottom create tab");
   assert(await page.getByTestId("bottom-nav-home").evaluate((node) => node.closest(".BottomNav") !== null), "bottom nav should use the BottomNav shell");
@@ -280,6 +284,24 @@ async function main() {
   assert(afterCreateText.includes("친구한테 공유하기"), "host create result should expose friend-share wording");
   const generalShareLink = await page.getByTestId("general-share-link").inputValue();
   assert(generalShareLink.includes("join=") && generalShareLink.includes("screen=scr-00-entry"), "general share link should open the shared home invite screen");
+  await page.getByTestId("bottom-nav-respond").click();
+  await page.waitForSelector('[data-testid="response-inbox-list"]');
+  const responseInboxText = await page.getByTestId("response-inbox-list").innerText();
+  assert(responseInboxText.includes("받은 초대"), "response tab should show received invitations before the response form");
+  assert(/0\s*\/\s*7/.test(responseInboxText), "response inbox should show progress like 0/7");
+  await page.getByTestId("response-inbox-open-0").click();
+  await page.waitForSelector("#scr-02-participant-input");
+  await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "detail");
+  await page.goBack();
+  await page.waitForSelector('[data-testid="response-inbox-list"]');
+  await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "inbox");
+  await page.getByTestId("response-inbox-open-0").click();
+  await page.waitForSelector("#scr-02-participant-input");
+  await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "detail");
+  await page.getByTestId("bottom-nav-meetups").click();
+  await page.waitForSelector("[data-testid='my-meetups-screen']");
+  await page.getByTestId("open-room-status-0").click();
+  await page.waitForSelector("#scr-04-insufficient-response");
   const inviteContext = await browser.newContext({ viewport: { width: 390, height: 740 } });
   const invitePage = await inviteContext.newPage();
   invitePage.setDefaultTimeout(5000);
@@ -288,7 +310,13 @@ async function main() {
   assert(inviteHomeText.includes("초대가 도착했어요"), "incoming invite link should land on the home UI with an invite card");
   assert(inviteHomeText.includes("초대 응답하기"), "incoming invite home should expose a response CTA");
   await invitePage.getByTestId("respond-to-invite-button").click();
+  await invitePage.waitForSelector('[data-testid="response-inbox-list"]');
+  const inviteInboxText = await invitePage.getByTestId("response-inbox-list").innerText();
+  assert(inviteInboxText.includes("받은 초대"), "incoming invite CTA should open the received-invites list before the response form");
+  assert(/0\s*\/\s*7/.test(inviteInboxText), "incoming invite inbox should expose response progress before entering detail");
+  await invitePage.getByTestId("response-inbox-open-0").click();
   await invitePage.waitForSelector("#scr-02-participant-input");
+  await invitePage.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "detail");
   await inviteContext.close();
   await page.getByTestId("copy-invite-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
@@ -296,13 +324,14 @@ async function main() {
   assert(inviteCopyStatus.includes("공유 화면"), "insufficient response invite action should open the native share sheet");
   const firstSharePayloads = await page.evaluate(() => window.__HAMMOYEO_SHARED_PAYLOADS || []);
   assert(firstSharePayloads.some((payload) => payload?.url?.includes("join=")), "invite action should pass the invite URL to navigator.share");
-  await page.getByTestId("topbar-home-button").click();
+  await page.getByTestId("bottom-nav-home").click();
   await page.waitForSelector("#scr-00-entry");
-  await page.getByTestId("open-host-dashboard-button").click();
+  await page.getByTestId("bottom-nav-meetups").click();
   await page.waitForSelector("[data-testid='my-meetups-screen']");
   const dashboardText = await page.locator("body").innerText();
   assert(dashboardText.includes("내가 만든 모임") && dashboardText.includes("금요일 저녁 모임"), "my meetups dashboard should show the created room");
   assert(dashboardText.includes("0명 응답"), "my meetups dashboard should show the current response count");
+  assert((await page.locator('[data-testid="dashboard-create-room-button"]').count()) === 0, "my meetups should not expose duplicate create CTA");
   await page.getByTestId("edit-host-room-0").click();
   await page.waitForSelector("#scr-01-host-room");
   await page.getByTestId("room-title-input").fill("수정된 금요일 모임");
@@ -321,18 +350,17 @@ async function main() {
   assert(editedRoomState?.room?.candidates?.[0]?.note === "성수역 근처", "editing a hosted room should update candidate place/note");
   await page.getByTestId("open-room-status-0").click();
   await page.waitForSelector("#scr-04-insufficient-response");
-  await page.getByTestId("topbar-home-button").click();
+  await page.getByTestId("bottom-nav-home").click();
   await page.waitForSelector("#scr-00-entry");
-  await page.getByTestId("open-host-dashboard-button").click();
+  await page.getByTestId("bottom-nav-meetups").click();
   await page.waitForSelector("[data-testid='my-meetups-screen']");
   await page.getByTestId("copy-room-link-0").click();
   await page.waitForSelector("[data-testid='copy-status']");
   assert((await page.getByTestId("copy-status").innerText()).includes("공유 화면"), "my meetups dashboard should open the native share sheet");
-  page.once("dialog", async (dialog) => {
-    assert(dialog.message().includes("삭제"), "room deletion should ask for confirmation");
-    await dialog.accept();
-  });
   await page.getByTestId("delete-room-button-0").click();
+  await page.waitForSelector('[data-testid="custom-confirm-modal"]');
+  assert((await page.getByTestId("custom-confirm-modal").innerText()).includes("삭제"), "room deletion should ask for custom confirmation");
+  await page.getByTestId("confirm-modal-confirm").click();
   await page.waitForSelector("[data-testid='my-meetups-screen']");
   const deletedRoomState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert((deletedRoomState?.hostRooms || []).length === 0, "deleted room should be removed from my meetups");
@@ -343,16 +371,16 @@ async function main() {
   const deletedLinkText = await page.locator("body").innerText();
   assert(deletedLinkText.includes("만료") || deletedLinkText.includes("삭제"), "deleted room share link should become unavailable in the current browser state");
   await page.goto(`${baseFileUrl}?reset=1`, { waitUntil: "load" });
-  await page.getByTestId("start-create-room").click();
+  await page.getByTestId("bottom-nav-create").click();
   await page.getByTestId("room-title-input").fill("다시 만든 금요일 모임");
   await page.getByTestId("candidate-calendar-day-0-2026-07-05").click();
   await page.getByTestId("candidate-time-hour-0-18").click();
   await page.getByTestId("candidate-time-minute-0-30").click();
   await page.getByTestId("create-room-button").click();
   await page.waitForSelector("#scr-04-insufficient-response");
-  await page.getByTestId("topbar-home-button").click();
+  await page.getByTestId("bottom-nav-home").click();
   await page.waitForSelector("#scr-00-entry");
-  await page.getByTestId("open-host-dashboard-button").click();
+  await page.getByTestId("bottom-nav-meetups").click();
   await page.waitForSelector("[data-testid='my-meetups-screen']");
   await page.getByTestId("open-room-status-0").click();
   await page.waitForSelector("#scr-04-insufficient-response");
@@ -427,9 +455,9 @@ async function main() {
   await page.goto(`${pageUrl}&screen=scr-06-room-closed`, { waitUntil: "load" });
   const stateAfterClosedDirect = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1") || "null"));
   assert(stateAfterClosedDirect?.room?.status !== "closed", "closed screen direct link should not create a closed room outside demo mode");
-  await page.getByTestId("topbar-home-button").click();
+  await page.getByTestId("bottom-nav-home").click();
   await page.waitForSelector("#scr-00-entry");
-  assert(await page.getByTestId("settings-button").isVisible(), "entry should expose settings path");
+  assert(await page.getByTestId("bottom-nav-settings").isVisible(), "entry should expose settings path through bottom nav");
 
   await page.goto(`${pageUrl}&demo=1&screen=scr-03-result-recommendation&ai=on`, { waitUntil: "load" });
   const aiLabelText = await page.locator("body").innerText();
@@ -445,7 +473,7 @@ async function main() {
   await page.goto(`${pageUrl}&screen=scr-05-link-expired`, { waitUntil: "load" });
   const expiredState = await page.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
   assert(expiredState === null, "expired preview deep link should not mutate persisted room state");
-  assert(await page.getByTestId("topbar-home-button").isVisible(), "expired screen should expose topbar home path");
+  assert(await page.getByTestId("bottom-nav-home").isVisible(), "expired screen should expose bottom home path");
 
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
   const participantDirectText = await page.locator("body").innerText();
@@ -525,11 +553,12 @@ async function main() {
   await demoResetContext.close();
 
   await page.goto(`${pageUrl}&screen=scr-00-entry`, { waitUntil: "load" });
-  await page.getByTestId("settings-button").click();
+  await page.getByTestId("bottom-nav-settings").click();
   await page.waitForSelector("[data-testid='settings-screen']");
   const settingsText = await page.locator("body").innerText();
   assert(settingsText.includes("로그인 상태") && settingsText.includes("로그아웃"), "settings screen should expose login status and logout");
   assert(settingsText.includes("개인정보") && settingsText.includes("로컬 데이터 지우기"), "settings screen should explain privacy and deletion");
+  assert(!settingsText.includes("홈으로 돌아가기"), "settings screen should not expose a duplicate home CTA");
   assert(settingsText.includes("개인정보처리방침") && settingsText.includes("문의") && settingsText.includes("보관"), "settings screen should include privacy policy, contact, and retention details");
   const privacyHref = await page.getByTestId("privacy-policy-link").getAttribute("href");
   assert(privacyHref?.includes("privacy.html"), "settings screen should link to a privacy policy document");
@@ -546,9 +575,8 @@ async function main() {
 
   await page.setViewportSize({ width: 320, height: 740 });
   await page.goto(`${pageUrl}&screen=scr-00-entry`, { waitUntil: "load" });
-  await assertButtonInInitialViewport(page, "start-create-room", "primary home CTA should stay visible at 320px width");
-  const labelsAt320 = await visibleButtonLabels(page);
-  assert(labelsAt320.includes("설정"), "settings button should remain visible at 320px width");
+  await assertButtonInInitialViewport(page, "bottom-nav-create", "bottom create tab should stay visible at 320px width");
+  await assertButtonInInitialViewport(page, "bottom-nav-settings", "bottom settings tab should remain visible at 320px width");
 
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-03-result-recommendation`, { waitUntil: "load" });
@@ -582,36 +610,41 @@ async function main() {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto(`${baseFileUrl}?reset=1&screen=scr-01-host-room`, { waitUntil: "load" });
   await page.getByTestId("room-title-input").fill("작성 중인 모임");
-  let dismissedDirtyDialog = false;
-  page.once("dialog", async (dialog) => {
-    dismissedDirtyDialog = dialog.message().includes("작성 중");
-    await dialog.dismiss();
-  });
   await page.getByTestId("bottom-nav-home").click();
-  await page.waitForTimeout(100);
-  assert(dismissedDirtyDialog, "dirty host setup should show an exit confirmation from bottom nav");
+  await page.waitForSelector('[data-testid="custom-confirm-modal"]');
+  assert((await page.getByTestId("custom-confirm-modal").innerText()).includes("작성 중"), "dirty host setup should show a custom exit confirmation from bottom nav");
+  await page.getByTestId("confirm-modal-cancel").click();
   assert(await page.locator("#scr-01-host-room").isVisible(), "dismissing dirty exit confirmation should keep the host setup screen");
-  page.once("dialog", async (dialog) => {
-    await dialog.accept();
-  });
-  await page.getByTestId("topbar-home-button").click();
+  await page.getByTestId("bottom-nav-home").click();
+  await page.waitForSelector('[data-testid="custom-confirm-modal"]');
+  await page.getByTestId("confirm-modal-confirm").click();
   await page.waitForSelector("#scr-00-entry");
-  await page.getByTestId("start-create-room").click();
+  await page.getByTestId("bottom-nav-create").click();
   await page.getByTestId("room-title-input").fill("뒤로가기 작성 중");
-  let dismissedHistoryDialog = false;
-  page.once("dialog", async (dialog) => {
-    dismissedHistoryDialog = dialog.message().includes("작성 중");
-    await dialog.dismiss();
-  });
   await page.goBack();
-  await page.waitForTimeout(100);
-  assert(dismissedHistoryDialog, "browser history navigation should guard dirty host setup");
+  await page.waitForSelector('[data-testid="custom-confirm-modal"]');
+  assert((await page.getByTestId("custom-confirm-modal").innerText()).includes("작성 중"), "browser history navigation should guard dirty host setup with a custom modal");
+  await page.getByTestId("confirm-modal-cancel").click();
   assert(await page.locator("#scr-01-host-room").isVisible(), "dismissing history dirty confirmation should keep the host setup screen");
+  await page.goBack();
+  await page.waitForSelector('[data-testid="custom-confirm-modal"]');
+  await page.getByTestId("confirm-modal-confirm").click();
+  await page.waitForSelector("#scr-00-entry");
+  assert(new URLSearchParams(new URL(page.url()).search).get("screen") === "scr-00-entry", "accepting history dirty confirmation should complete the browser back navigation");
   await page.goto(`${baseFileUrl}?reset=1&screen=scr-01-host-room`, { waitUntil: "load" });
   await assertStickyCtaDoesNotCoverBody(page, "host setup mobile CTA should not cover the last input");
   await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-02-participant-input`, { waitUntil: "load" });
   const preferenceAria = await page.getByTestId("preference-slot-1-prefer").getAttribute("aria-label");
   assert(preferenceAria?.includes("6.29 토요일") && preferenceAria.includes("가장 좋아요"), "preference buttons should name the candidate and status");
+  const scrollBeforePreference = await page.evaluate(() => {
+    const body = document.querySelector(".screenBody");
+    if (!body) return 0;
+    body.scrollTop = body.scrollHeight;
+    return body.scrollTop;
+  });
+  await page.getByTestId("preference-slot-3-available").click();
+  const scrollAfterPreference = await page.evaluate(() => document.querySelector(".screenBody")?.scrollTop || 0);
+  assert(Math.abs(scrollAfterPreference - scrollBeforePreference) <= 8, "preference selection should not jump the response screen back to the top");
   await assertStickyCtaDoesNotCoverBody(page, "participant mobile CTA should not cover preference controls");
   await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-02b-response-complete`, { waitUntil: "load" });
   await assertStickyCtaDoesNotCoverBody(page, "response-complete mobile CTA should not cover status content");

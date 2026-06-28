@@ -1,6 +1,6 @@
 ---
-version: 9
-status: bottom-tab-calendar-wheel-redesigned
+version: 10
+status: final-nav-response-inbox-redesigned
 updated: 2026-06-28
 canonical: true
 ---
@@ -35,6 +35,16 @@ canonical: true
 - 방 만들기 날짜 선택은 브라우저 기본 picker를 쓰지 않고 iPhone 캘린더 느낌의 월간 sheet로 보여준다.
 - 시간 선택은 Android 알람 설정처럼 오전/오후, 시, 분 3열 wheel로 고른다. 각 열 전체가 터치 영역이고 선택 행만 강조한다.
 - CTA와 하단 탭은 분리한다. CTA는 현재 화면의 완료 행동, 하단 탭은 앱의 주 화면 이동만 담당한다.
+
+## 2026-06-28 최종 내비게이션 / 응답함 재정렬
+
+- 상단에는 중복 `설정`/`홈` 버튼을 두지 않는다. 주요 이동은 하단 탭으로만 처리한다.
+- 홈 화면에서는 `새 모임 만들기`, `내가 만든 모임` 중복 CTA를 제거하고 현재 상태와 받은 초대 맥락만 보여준다.
+- 중앙 탭은 `만들기`가 아니라 `모임 만들기`로 읽히게 하고, 작은 화면에서도 글자가 묻히지 않게 pill 형태로 강화한다.
+- 응답 탭은 상세 응답 폼으로 바로 진입하지 않고, 받은 공유 링크 목록을 먼저 보여준다. 현재 정적 화면은 1개 링크 fixture지만 구조는 여러 링크 inbox를 기준으로 둔다.
+- 응답 현황은 `0/7 응답`처럼 받은 사람 대비 응답 수를 카드와 상세 화면에 함께 노출한다.
+- 작성 중 이동, 브라우저 뒤로가기, 모임 삭제는 기본 브라우저 confirm 대신 앱 내부 `ConfirmDialog`를 사용한다.
+- 선택 버튼을 누른 뒤 응답 화면이 상단으로 튀지 않게 scroll position을 유지한다.
 
 ## 디자인 원칙
 
@@ -174,3 +184,4 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 - 2026-06-27: `HAMMOYEO_FINAL_DELIVERY`를 최종 디자인 source of truth로 재정렬하고, final v12 token/asset/screen sample을 다음 구현 기준으로 승격.
 - 2026-06-27: final delivery docs/tokens/reference/runtime asset subset을 `docs/final-delivery/`, `docs/assets/final/`, `docs/release/assets/final/`로 선별 편입.
 - 2026-06-28: 브라우저 기본 날짜/시간 picker를 제거하고, keepthis 참고형 하단 5탭, iPhone형 calendar sheet, Android 알람형 time wheel로 교체했다. 옛 docs 경로와 작은 검증 표현은 출시 기준 `docs/release`/`최종출시제품`으로 정리했다.
+- 2026-06-28: 상단 중복 홈/설정 버튼과 홈/내 모임 중복 CTA를 제거하고, 응답 탭을 inbox-first 구조로 재정렬했다. 커스텀 확인 모달, `0/7 응답` progress pill, preference scroll 유지, 320px 대응을 디자인 계약에 추가했다.

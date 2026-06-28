@@ -7,13 +7,14 @@
 - 직접 화면 열기: `docs/release/index.html?screen=scr-00-entry`
 - 데모 데이터 화면 열기: `docs/release/index.html?demo=1&screen=scr-03-result-recommendation`
 - 목적: `HAMMOYEO_FINAL_DELIVERY` 기준의 방 생성, 참여자 응답, 추천/응답 부족/만료/closed/개인정보 흐름 확인
-- 구현된 기능: 방 생성, 하단 5탭 이동, 모임 이름 자유입력, 예상 인원 선택, iPhone형 월간 캘린더 날짜 선택, Android 알람형 3열 시간 wheel, 후보 추가/삭제, 참여자 선호 저장, deterministic 추천, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 약속 확정, closed 상태 보존, 내가 만든 모임 상태 확인/수정/삭제, 설정의 로그인 상태/로그아웃, 로컬 데이터 삭제
+- 구현된 기능: 방 생성, 하단 5탭 이동, 중앙 `모임 만들기` 탭, 모임 이름 자유입력, 예상 인원 선택, iPhone형 월간 캘린더 날짜 선택, Android 알람형 3열 시간 wheel, 후보 추가/삭제, 받은 초대 목록 우선 진입, 참여자 선호 저장, `0/7 응답`형 진행률, deterministic 추천, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 약속 확정, closed 상태 보존, 내가 만든 모임 상태 확인/수정/삭제, 앱 내부 확인 모달, 설정의 로그인 상태/로그아웃, 로컬 데이터 삭제
 - 메인 이미지: `assets/hammoyo-hero-animals.png`
 - 배경 이미지: `assets/hammoyo-animal-background.png`
 - 개별 캐릭터 asset: `assets/characters/`
 - 플랫폼 준비 산출물: `src/platform/*.mjs`, `supabase/migrations/20260624_hammoyo_backend.sql`, `supabase/functions/*`, `docs/release/platform-readiness.md`
 - 백엔드/AI 연결 코드: `src/platform/supabase-backend-adapter.mjs`, `src/platform/ai-copy-policy.mjs`, `supabase/functions/generate-share-copy/index.ts` (`deepseek-v4-pro` server-only copy polish)
 - 현재 제한: GitHub Pages 화면은 Toss account sync 전까지 브라우저 저장을 우선합니다. 같은 브라우저에서는 모임 삭제 후 기존 초대 링크를 revoked 처리하지만, 다른 기기까지 완전 무효화하려면 Apps in Toss 빌드에서 ShareAdapter와 BackendAdapter가 같은 화면 흐름을 Toss deep link/Supabase state lookup으로 연결해야 합니다.
+- UI 정책: 상단에는 중복 홈/설정 버튼을 두지 않고, 주요 이동은 하단 탭으로 처리합니다. 작성 중 이동, 브라우저 뒤로가기, 모임 삭제는 기본 브라우저 confirm 대신 앱 내부 확인 모달을 사용합니다.
 - 제출 전 필요: 공개 개인정보처리방침 URL, 공개 문의 이메일, 데이터 삭제 요청 URL, Apps in Toss 콘솔/샌드박스 검증, Google Play Data safety 입력값 확정
 - 제출 전 placeholder 페이지: `docs/release/contact.html`, `docs/release/delete-data.html`
 - 기준 문서: `docs/final-delivery/design-plan.md`, `docs/final-delivery/tokens.json`, `ai/plans/design-plan.md`, `ai/plans/implementation-plan.md`
