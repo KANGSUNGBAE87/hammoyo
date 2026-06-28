@@ -32,16 +32,36 @@ const requiredLabels = [
   "로그인 상태",
   "로그아웃",
   "현재 상태",
+  "진행 상태",
+  "비밀 투표",
+  "마지막 투표, 항상 부담되셨죠?",
+  "안 맞는 사람은 숨기고",
   "초대가 도착했어요",
   "초대 응답하기",
+  "현재 모임이 없어요",
   "개인정보",
   "로컬 데이터 지우기",
-  "공유 준비됨",
+  "정말 지울까요?",
+  "되돌릴 수 없어요",
+  "공유 준비 완료",
   "공유 화면을 열었어요",
   "내가 만든 모임",
   "모임 삭제",
   "모임 이름",
   "예상 인원",
+  "직접입력",
+  "인원 확인",
+  "이번 모임은 어떻게 정할까요?",
+  "모두 함께",
+  "많이 모이면",
+  "빨리 정하기",
+  "최소 참석 인원",
+  "익명 집계",
+  "사람은 숨기고, 상황은 보여준다",
+  "기준 바꿔서 다시 보기",
+  "방장이 합의 기준을 변경했어요",
+  "부담 있음",
+  "확인 필요",
 ];
 
 const requiredComponentMarkers = [
@@ -54,11 +74,17 @@ const requiredComponentMarkers = [
   "ShareCopyBox",
   "HostStatusCard",
   "HostRoomEditor",
-  "IOSCountSelect",
+  "CustomChoiceControl",
+  "CustomChoicePopover",
+  "DeadlineCalendarPicker",
+  "DeadlineTimeWheel",
   "BottomNav",
   "BottomNavItem",
   "BottomNavLabel",
+  "HomeHeroStatusOverlay",
+  "HeroStatusPill",
   "ResponseInbox",
+  "ResponseEmptyState",
   "ConfirmDialog",
   "IPhoneCalendarPicker",
   "ReleaseCalendarSheet",
@@ -66,8 +92,17 @@ const requiredComponentMarkers = [
   "ReleaseTimeWheel",
   "ReleaseTimeWheelColumn",
   "ReleaseTimeWheelOption",
+  "ExpectedCountPreset",
+  "CustomExpectedCountInput",
   "SettingsAccountPanel",
   "IncomingInviteCard",
+  "AgreementModeSelector",
+  "AgreementModeButton",
+  "AgreementChangeSheet",
+  "AgreementNotice",
+  "AnonymousAggregatePanel",
+  "AnonymousAggregateCard",
+  "HostAggregateMini",
   "AnimalBackground",
   "Button3D",
   "StateGraphic",
@@ -124,6 +159,13 @@ for (const forbidden of [
   "Find a time that works",
   "hammoyo-hero-animals.png",
   "hammoyo-animal-background.png",
+  "hero_animals_calendar_tight.png",
+  "최근 방:",
+  "IOSCountSelect",
+  "selectShell",
+  'data-testid="expected-count-select"',
+  'data-testid="deadline-input"',
+  "<select",
 ]) {
   if (html.toLowerCase().includes(forbidden.toLowerCase())) {
     failures.push(`Forbidden legacy value/copy remains: ${forbidden}`);
@@ -171,8 +213,16 @@ if (html.includes('data-testid="language-toggle-button"')) {
   failures.push("English language toggle should not be user-facing for Apps in Toss first release.");
 }
 
-if (!html.includes('data-testid="expected-count-select"')) {
-  failures.push("Expected count should use an iOS-like select control.");
+if (!html.includes('testPrefix: "expected-count"') || !html.includes('value: "custom"')) {
+  failures.push("Expected count should use a custom app-shaped choice popover with a direct-input option.");
+}
+
+if (!html.includes('data-testid="deadline-calendar-trigger"') || !html.includes('data-testid="deadline-calendar-sheet"')) {
+  failures.push("Deadline date should use the same iPhone-like calendar picker pattern as candidate dates.");
+}
+
+if (!html.includes('testPrefix: "deadline-time"') || !html.includes("DeadlineTimeWheel")) {
+  failures.push("Deadline time should use the app time wheel instead of a plain text input.");
 }
 
 const legacyPickerMarker = ["Apple", "DateTime", "Picker"].join("");
@@ -196,6 +246,14 @@ if (!html.includes("ReleaseTimeWheel") || !html.includes("ReleaseTimeWheelOption
   failures.push("Candidate time controls should use the vertical alarm-style time wheel.");
 }
 
+if (!html.includes("buildContinuousHourValues") || !html.includes("buildContinuousMinuteValues")) {
+  failures.push("Time wheel options should be generated in continuous hour/minute order.");
+}
+
+if (html.includes('data-time-part="period"') || html.includes('candidate-time-period-')) {
+  failures.push("Candidate time wheel should use 24-hour hour/minute columns without an AM/PM period column.");
+}
+
 if (!html.includes("bottom-nav") || !html.includes("bottom-nav-create")) {
   failures.push("Release app shell should expose a keepthis-style bottom navigation.");
 }
@@ -210,6 +268,18 @@ if (!html.includes("custom-confirm-modal") || !html.includes("confirm-modal-conf
 
 if (!html.includes("response-inbox-list") || !html.includes("받은 초대")) {
   failures.push("Response tab should expose a received-invites list before the detail response form.");
+}
+
+if (html.includes('class="HomeStatusPanel"')) {
+  failures.push("Home status should be integrated into the poster hero, not rendered as a separate HomeStatusPanel card.");
+}
+
+if (!html.includes('data-testid="home-status-overlay"') || !html.includes('data-testid="hero-status-pill"')) {
+  failures.push("Home hero should expose an integrated 3D status overlay and pill.");
+}
+
+if (!html.includes('data-testid="response-empty-state"')) {
+  failures.push("Response tab should render an empty state even when there is no current room.");
 }
 
 if (html.includes("window.confirm")) {

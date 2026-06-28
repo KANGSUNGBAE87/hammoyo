@@ -262,8 +262,8 @@
       .eyebrow,
       .microLabel {
         color: var(--brand);
-        font-size: 12px;
-        line-height: 16px;
+        font-size: 13px;
+        line-height: 18px;
         font-weight: 700;
       }
 
@@ -301,8 +301,8 @@
 
       .caption {
         color: var(--text-secondary);
-        font-size: 13px;
-        line-height: 18px;
+        font-size: 14px;
+        line-height: 20px;
       }
 
       .topline {
@@ -329,6 +329,12 @@
         line-height: 16px;
         font-weight: 700;
         white-space: normal;
+      }
+
+      .ReasonChip {
+        white-space: nowrap;
+        font-size: 13px;
+        line-height: 18px;
       }
 
       .ReasonChip.success {
@@ -359,7 +365,11 @@
       .CandidateSlotCard,
       .RecommendationHeroCard,
       .ShareCopyBox,
-      .ResponseCoverage {
+      .ResponseCoverage,
+      .AgreementModeSelector,
+      .AgreementChangeSheet,
+      .AnonymousAggregatePanel,
+      .AgreementNotice {
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
         background: rgba(255, 255, 255, 0.92);
@@ -373,7 +383,11 @@
       .surface,
       .CandidateSlotCard,
       .ShareCopyBox,
-      .ResponseCoverage {
+      .ResponseCoverage,
+      .AgreementModeSelector,
+      .AgreementChangeSheet,
+      .AnonymousAggregatePanel,
+      .AgreementNotice {
         padding: var(--card-padding);
       }
 
@@ -416,6 +430,87 @@
         box-shadow: none;
       }
 
+      .AgreementModeSelector,
+      .AgreementChangeSheet,
+      .AnonymousAggregatePanel,
+      .AgreementNotice {
+        display: grid;
+        gap: 12px;
+      }
+
+      .AgreementModeGrid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .AgreementModeButton {
+        min-height: 78px;
+        display: grid;
+        align-content: center;
+        gap: 6px;
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 249, 255, 0.92));
+        box-shadow:
+          0 6px 0 rgba(152, 162, 179, 0.11),
+          0 12px 22px rgba(28, 39, 63, 0.07),
+          inset 0 1px 0 rgba(255, 255, 255, 0.96);
+        text-align: left;
+      }
+
+      .AgreementModeButton[data-selected="true"] {
+        border-color: rgba(90, 70, 242, 0.44);
+        color: var(--brand);
+        background: linear-gradient(180deg, rgba(246, 243, 255, 0.98), rgba(234, 228, 255, 0.94));
+        box-shadow:
+          0 7px 0 rgba(73, 56, 214, 0.2),
+          0 16px 28px rgba(90, 70, 242, 0.16),
+          inset 0 1px 0 rgba(255, 255, 255, 0.96);
+      }
+
+      .AgreementModeButton strong {
+        font-size: 16px;
+        line-height: 22px;
+        font-weight: 950;
+      }
+
+      .AgreementModeButton span {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 19px;
+        font-weight: 750;
+      }
+
+      .AgreementMinimumRow {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        align-items: end;
+      }
+
+      .AnonymousAggregateList {
+        display: grid;
+        gap: 10px;
+      }
+
+      .AnonymousAggregateCard {
+        display: grid;
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid rgba(229, 232, 241, 0.94);
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.82);
+      }
+
+      .AgreementNotice {
+        border-color: rgba(90, 70, 242, 0.2);
+        background: var(--brand-soft);
+      }
+
       .slotMeta {
         display: grid;
         gap: 2px;
@@ -424,15 +519,15 @@
       .slotMeta strong,
       .ShareCopyBox strong {
         color: var(--text-primary);
-        font-size: 16px;
-        line-height: 24px;
-        font-weight: 600;
+        font-size: 18px;
+        line-height: 25px;
+        font-weight: 800;
       }
 
       .slotMeta span {
         color: var(--text-secondary);
-        font-size: 13px;
-        line-height: 18px;
+        font-size: 14px;
+        line-height: 20px;
       }
 
       .PreferenceSelector {
@@ -671,7 +766,7 @@
         gap: 4px;
         border: 0;
         border-radius: 18px;
-        color: var(--text-tertiary);
+        color: var(--text-primary);
         background: transparent;
         font-size: 11px;
         line-height: 14px;
@@ -679,33 +774,12 @@
       }
 
       .BottomNavItem::before {
+        display: none;
         content: "";
-        position: absolute;
-        inset: 5px;
-        border-radius: 16px;
-        background: var(--tab-art, none) center / contain no-repeat;
-        opacity: 0.16;
-        transform: translateY(4px) scale(1.12);
       }
 
       .BottomNavItem[data-active="true"]::before {
-        opacity: 0.24;
-      }
-
-      .BottomNavItem[data-tab-key="home"] {
-        --tab-art: url("assets/final/characters/rabbit_character_only_crop.png");
-      }
-
-      .BottomNavItem[data-tab-key="respond"] {
-        --tab-art: url("assets/final/characters/penguin_character_only_crop.png");
-      }
-
-      .BottomNavItem[data-tab-key="meetups"] {
-        --tab-art: url("assets/final/characters/bear_character_only_crop.png");
-      }
-
-      .BottomNavItem[data-tab-key="settings"] {
-        --tab-art: url("assets/final/icons/icon_settings_object.png");
+        display: none;
       }
 
       .BottomNavLabel {
@@ -713,15 +787,16 @@
         z-index: 1;
         min-width: 0;
         display: block;
-        color: currentColor;
-        font-size: 11px;
-        line-height: 14px;
+        color: #111827;
+        text-shadow: none;
+        font-size: 12px;
+        line-height: 15px;
         font-weight: 950;
         text-align: center;
       }
 
       .BottomNavItem[data-active="true"] {
-        color: var(--brand);
+        color: var(--text-primary);
       }
 
       .BottomNavIcon {
@@ -734,6 +809,7 @@
         justify-content: center;
         border-radius: var(--radius-pill);
         font-size: 19px;
+        color: #111827;
       }
 
       .BottomNavItem[data-center="true"] {
@@ -900,9 +976,9 @@
 
       .inputLabel {
         color: var(--text-secondary);
-        font-size: 13px;
-        line-height: 18px;
-        font-weight: 700;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 800;
       }
 
       .textInput {
@@ -914,6 +990,8 @@
         border-radius: var(--radius-md);
         color: var(--text-primary);
         background: var(--surface);
+        font-size: 16px;
+        line-height: 22px;
       }
 
       .textInput::placeholder {
@@ -991,50 +1069,118 @@
         background: var(--success-soft);
       }
 
-      .IOSCountSelect {
-        appearance: none;
-        -webkit-appearance: none;
+      .ExpectedCountPreset {
+        display: grid;
+        gap: 8px;
       }
 
-      .selectShell {
+      .CustomChoiceControl {
         position: relative;
         min-width: 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .CustomChoiceTrigger {
+        min-height: var(--touch-target);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 14px;
         border: 1px solid var(--border);
         border-radius: var(--radius-md);
+        color: var(--text-primary);
         background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(249, 251, 255, 0.96) 100%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 255, 0.98) 100%),
           var(--surface);
         box-shadow:
-          inset 0 -1px 0 rgba(17, 24, 39, 0.04),
-          0 1px 0 rgba(255, 255, 255, 0.9);
-        overflow: hidden;
+          0 5px 0 rgba(152, 162, 179, 0.10),
+          0 10px 18px rgba(28, 39, 63, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+        font-size: 15px;
+        line-height: 20px;
+        font-weight: 900;
+        text-align: left;
       }
 
-      .selectShell:focus-within {
-        border-color: rgba(90, 70, 242, 0.58);
-        box-shadow: 0 0 0 4px rgba(90, 70, 242, 0.1);
+      .CustomChoiceTrigger[aria-expanded="true"] {
+        border-color: rgba(90, 70, 242, 0.52);
+        box-shadow:
+          0 0 0 4px rgba(90, 70, 242, 0.10),
+          0 8px 18px rgba(90, 70, 242, 0.16);
       }
 
-      .selectShell::after {
-        content: "⌄";
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-56%);
+      .CustomChoiceChevron {
+        flex: 0 0 auto;
         color: var(--text-tertiary);
-        pointer-events: none;
         font-size: 16px;
         line-height: 1;
       }
 
-      .IOSCountSelect {
-        min-height: var(--touch-target);
+      .CustomChoicePopover {
+        position: fixed;
+        top: 150px;
+        left: 50%;
+        right: auto;
+        width: min(330px, calc(100vw - 40px));
+        transform: translateX(-50%);
+        z-index: 34;
+        display: grid;
+        gap: 6px;
+        max-height: min(312px, 58dvh);
+        padding: 8px;
+        border: 1px solid rgba(229, 232, 241, 0.92);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow:
+          0 18px 42px rgba(28, 39, 63, 0.18),
+          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+        overflow-y: auto;
+      }
+
+      .CustomChoicePopover[hidden] {
+        display: none;
+      }
+
+      .CustomChoiceOption {
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
         width: 100%;
-        min-width: 0;
-        padding: 10px 36px 10px 12px;
+        padding: 0 12px;
         border: 0;
+        border-radius: 14px;
         color: var(--text-primary);
         background: transparent;
+        font-size: 15px;
+        line-height: 20px;
+        font-weight: 900;
+        text-align: left;
+      }
+
+      .CustomChoiceOption[data-selected="true"] {
+        color: var(--surface);
+        background: var(--brand);
+        box-shadow: 0 8px 18px rgba(90, 70, 242, 0.20);
+      }
+
+      .CustomExpectedCountInput {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(116px, auto);
+        gap: 8px;
+        align-items: center;
+      }
+
+      .CustomExpectedCountInput[hidden] {
+        display: none;
+      }
+
+      .CustomExpectedCountInput .textInput {
+        min-height: 44px;
       }
 
       .candidateInputCard {
@@ -1170,7 +1316,7 @@
       .ReleaseTimeWheel {
         position: relative;
         width: 100%;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
         padding: 8px;
         border: 1px solid var(--border);
@@ -1247,16 +1393,15 @@
 
       .HomeHero {
         position: relative;
-        min-height: clamp(320px, 42vh, 420px);
+        min-height: auto;
         display: grid;
-        align-content: end;
-        gap: 14px;
-        padding: clamp(18px, 4vw, 34px);
+        align-content: start;
+        justify-items: center;
+        gap: 8px;
+        padding: clamp(12px, 3.4vw, 18px);
         border: 1px solid rgba(90, 70, 242, 0.16);
         border-radius: 28px;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(247, 248, 252, 0.66) 62%, rgba(255, 255, 255, 0.98) 100%),
-          url("assets/final/backgrounds/background_confetti.png") center / cover no-repeat;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 249, 255, 0.94) 100%);
         box-shadow:
           0 12px 0 rgba(152, 162, 179, 0.08),
           0 22px 44px rgba(28, 39, 63, 0.10),
@@ -1265,35 +1410,28 @@
       }
 
       .HomeHero::after {
+        display: none;
         content: "";
-        position: absolute;
-        inset: auto 0 0;
-        z-index: 1;
-        height: 38%;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.96));
       }
 
       .HomeHeroAnimals {
-        position: absolute;
-        z-index: 0;
-        top: 8px;
-        left: 50%;
-        width: min(360px, 92%);
+        position: relative;
+        z-index: 1;
+        width: min(230px, 68%);
         aspect-ratio: 1;
         object-fit: contain;
-        transform: translateX(-50%);
+        border-radius: 28px;
         filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.12));
       }
 
       .HomeTitleMark {
-        position: absolute;
+        position: relative;
         z-index: 2;
-        top: 18px;
-        left: 18px;
         color: var(--brand);
-        font-size: clamp(42px, 12vw, 78px);
+        font-size: clamp(44px, 13vw, 72px);
         line-height: 0.92;
         font-weight: 950;
+        text-align: center;
         text-shadow:
           0 2px 0 rgba(255, 255, 255, 0.95),
           0 12px 26px rgba(90, 70, 242, 0.22);
@@ -1303,7 +1441,10 @@
         position: relative;
         z-index: 2;
         display: grid;
-        gap: 10px;
+        justify-items: center;
+        gap: 8px;
+        width: 100%;
+        text-align: center;
       }
 
       .HomeWordmark {
@@ -1328,7 +1469,7 @@
         min-width: 0;
         display: grid;
         gap: 3px;
-        padding: 10px;
+        padding: 8px;
         border: 1px solid rgba(229, 232, 241, 0.9);
         border-radius: var(--radius-md);
         background: rgba(255, 255, 255, 0.72);
@@ -1337,8 +1478,8 @@
       .HomeMetricCard strong,
       .HostMetricPill strong {
         color: var(--text-primary);
-        font-size: 18px;
-        line-height: 23px;
+        font-size: 17px;
+        line-height: 22px;
         font-weight: 950;
       }
 
@@ -1350,12 +1491,137 @@
         font-weight: 850;
       }
 
+      .HomeHeroSlogan {
+        display: grid;
+        justify-items: center;
+        gap: 3px;
+        margin: 0;
+        text-align: center;
+      }
+
+      .HomeHeroSlogan strong {
+        color: var(--text-primary);
+        font-size: clamp(20px, 5.3vw, 26px);
+        line-height: 1.18;
+        font-weight: 950;
+      }
+
+      .HomeHeroSlogan span {
+        display: none;
+      }
+
+      .HomeHeroPrivacyMessage {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        justify-items: center;
+        gap: 4px;
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid rgba(59, 130, 246, 0.18);
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(239, 246, 255, 0.94), rgba(255, 255, 255, 0.72));
+        text-align: center;
+      }
+
+      .HomeHeroPrivacyMessage span {
+        color: #1D4ED8;
+        font-size: 13px;
+        line-height: 17px;
+        font-weight: 950;
+      }
+
+      .HomeHeroPrivacyMessage strong {
+        color: #1D4ED8;
+        font-size: clamp(20px, 5.4vw, 27px);
+        line-height: 1.16;
+        font-weight: 950;
+      }
+
+      .HomeHeroPrivacyMessage em {
+        color: var(--text-primary);
+        font-size: 14px;
+        line-height: 19px;
+        font-style: normal;
+        font-weight: 850;
+      }
+
+      .HomeHeroStatusOverlay {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        display: grid;
+        gap: 8px;
+        padding: 11px;
+        border: 1px solid rgba(180, 188, 255, 0.50);
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 247, 255, 0.88) 100%);
+        box-shadow:
+          0 10px 0 rgba(90, 70, 242, 0.10),
+          0 22px 34px rgba(28, 39, 63, 0.16),
+          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(16px);
+      }
+
+      .HeroStatusPill {
+        min-height: 44px;
+        width: min(260px, 100%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 18px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-pill);
+        color: var(--surface);
+        background: linear-gradient(180deg, #8EA0FF 0%, var(--brand) 58%, var(--brand-pressed) 100%);
+        box-shadow:
+          0 8px 0 #4433C9,
+          0 16px 24px rgba(90, 70, 242, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.44);
+        font-size: 14px;
+        line-height: 19px;
+        font-weight: 950;
+        text-align: center;
+      }
+
+      .HeroStatusMetrics {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .HeroStatusMetrics .HomeMetricCard {
+        background: rgba(255, 255, 255, 0.82);
+        text-align: center;
+      }
+
+      .HomeHeroStatusOverlay .HomeMetricCard {
+        text-align: center;
+      }
+
+      .HomeHeroStatusOverlay .emptyStateLine {
+        font-size: 13px;
+        line-height: 18px;
+      }
+
       .candidateInputHeader,
       .HostStatusCard {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 10px;
+      }
+
+      .candidateInputHeader .ReasonChip {
+        white-space: nowrap;
+      }
+
+      .candidateInputHeader .candidateActionButton {
+        width: auto;
+        min-width: 72px;
+        padding: 0 14px;
       }
 
       .candidateActionButton {
@@ -1406,6 +1672,34 @@
         opacity: 0.55;
       }
 
+      .ResponseEmptyState,
+      .CustomExpectedCountInput {
+        display: grid;
+        gap: 10px;
+      }
+
+      .ResponseEmptyState {
+        padding: var(--card-padding);
+        border: 1px solid rgba(90, 70, 242, 0.14);
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow:
+          0 8px 0 rgba(152, 162, 179, 0.08),
+          0 16px 26px rgba(28, 39, 63, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+      }
+
+      .CustomExpectedCountRow {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+      }
+
+      .CustomExpectedCountRow .candidateActionButton {
+        width: auto;
+        min-width: 96px;
+      }
+
       .linkField {
         display: grid;
         gap: 8px;
@@ -1427,6 +1721,7 @@
       }
 
       .HostStatusCard {
+        position: relative;
         padding: 14px;
         border: 1px solid var(--border);
         border-radius: var(--radius-md);
@@ -1443,6 +1738,26 @@
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
+      }
+
+      .HostUnansweredLine,
+      .HostAggregateMini {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 8px 0;
+        border-top: 1px solid rgba(229, 232, 241, 0.8);
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 17px;
+        font-weight: 750;
+      }
+
+      .HostUnansweredLine span,
+      .HostAggregateMini span {
+        min-width: 0;
+        overflow-wrap: anywhere;
       }
 
       .HostCardActions .dangerAction {
@@ -1489,6 +1804,25 @@
       .ResponseInbox {
         display: grid;
         gap: 12px;
+      }
+
+      .ResponseEmptyState {
+        display: grid;
+        justify-items: center;
+        gap: 12px;
+        padding: 22px 18px;
+        border: 1px solid rgba(90, 70, 242, 0.14);
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: var(--shadow-card);
+        text-align: center;
+      }
+
+      .ResponseEmptyState h2 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 22px;
+        line-height: 29px;
       }
 
       .ResponseInboxCard {
@@ -1566,13 +1900,25 @@
 
       .HostStatusCard .slotMeta {
         min-width: 0;
+        padding-right: 76px;
+      }
+
+      .HostCardActions .dangerAction {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        grid-column: auto;
+        width: auto;
+        min-width: 54px;
+        min-height: 32px;
+        padding: 0 12px;
       }
 
       .actionStatus {
         min-height: 20px;
         color: var(--success);
-        font-size: 13px;
-        line-height: 18px;
+        font-size: 14px;
+        line-height: 20px;
         font-weight: 700;
       }
 
@@ -1582,8 +1928,8 @@
 
       .helperText {
         color: var(--text-secondary);
-        font-size: 13px;
-        line-height: 18px;
+        font-size: 14px;
+        line-height: 21px;
       }
 
       .trustPanel {
@@ -1603,8 +1949,8 @@
 
       .emptyStateLine {
         color: var(--text-secondary);
-        font-size: 14px;
-        line-height: 20px;
+        font-size: 15px;
+        line-height: 22px;
       }
 
       .tabsPanel {
@@ -1882,6 +2228,11 @@
           grid-template-columns: 1fr;
         }
 
+        .AgreementModeGrid,
+        .AgreementMinimumRow {
+          grid-template-columns: 1fr;
+        }
+
         .IndividualLinkRow {
           grid-template-columns: 1fr;
         }
@@ -1986,7 +2337,7 @@
             "tab": "SCR-00 직접 진입 홈",
             "eyebrow": "직접 진입 홈",
             "title": "모이는 시간, 가볍게 정해요",
-            "description": "후보 시간을 정하고 친구들에게 공유하면 가장 현실적인 약속안을 정리해드려요.",
+            "description": "누가 어려운지는 숨기고, 모두가 볼 수 있는 합의 상황만 정리해드려요.",
             "primary": "새 모임 만들기",
             "secondary": "참여 중인 모임 보기"
           },
@@ -2083,6 +2434,7 @@
           "phoneLabel": "함모여 앱",
           "entryCaption": "친구들이 되는 시간을 모아 부담 없는 약속안을 만들어요.",
           "currentStatus": "현재 상태",
+          "progressStatus": "진행 상태",
           "incomingInviteTitle": "초대가 도착했어요",
           "incomingInviteBody": "{title} 모임에서 가능한 시간을 기다리고 있어요. 같은 홈 화면에서 확인하고 바로 응답할 수 있어요.",
           "incomingInviteMeta": "{count}개 후보 · {expected}명 예정",
@@ -2095,6 +2447,9 @@
           "responseInboxTitle": "받은 초대를 먼저 확인해요",
           "responseInboxBody": "공유 링크를 여러 개 받는 상황을 기준으로, 응답할 방을 고른 뒤 상세로 들어가요.",
           "responseInboxGraphicAlt": "받은 초대와 응답 상태를 나타내는 동물 그래픽",
+          "responseEmptyTitle": "현재 모임이 없어요",
+          "responseEmptyBody": "받은 초대 링크를 열거나 새 모임을 만들면 여기에서 응답할 수 있어요.",
+          "responseEmptySentHint": "내가 보낸 방은 하단의 내 모임 탭에서 관리해요.",
           "responseProgressText": "{progress} 응답",
           "responseInboxCandidateMeta": "{label} {time} 외 {count}개 후보",
           "sentRoomLabel": "내가 보낸 방",
@@ -2102,12 +2457,15 @@
           "confirmCancel": "취소",
           "confirmProceed": "이동하기",
           "confirmDelete": "삭제하기",
+          "confirmClearData": "지우기",
           "unsavedExitTitle": "작성 중인 내용이 있어요",
           "unsavedExitBody": "이 화면을 벗어나면 현재 입력이 사라질 수 있어요. 그래도 이동할까요?",
+          "clearDataConfirmTitle": "정말 지울까요?",
+          "clearDataConfirmBody": "되돌릴 수 없어요",
           "emptyRoom": "아직 만든 모임이 없어요. 새 모임을 만들면 이 화면에서 계속 확인할 수 있어요.",
           "roomUnavailable": "저장된 모임 없음",
           "draftOnlyGuide": "날짜와 시간을 고르면 친구에게 보낼 공유 문구가 만들어져요. 로그인 전에는 이 브라우저의 저장소를 기준으로 상태를 확인해요.",
-          "generalShareLink": "공유 준비됨",
+          "generalShareLink": "공유 준비 완료",
           "generalShareHint": "친구한테 공유하기를 누르면 공유 화면이 열리고, 친구는 같은 홈 화면에서 초대를 확인한 뒤 응답해요.",
           "shareSucceeded": "공유 화면을 열었어요",
           "shareCanceled": "공유를 취소했어요",
@@ -2125,8 +2483,10 @@
           "saveChanges": "변경 저장",
           "addCandidate": "후보 시간 추가",
           "removeCandidate": "삭제",
+          "expectedDirectInput": "직접입력",
+          "expectedConfirm": "인원 확인",
           "candidateLabel": "후보 {index}",
-          "recommendationBlocked": "{title}은 현재 후보 시간에서 어려움 응답이 많아 바로 확정하기 어려워요. 방장이 새 후보 시간을 열면 다시 고를 수 있게 정리할게요.",
+          "recommendationBlocked": "{title}은 현재 기준에서는 바로 추천할 후보가 아직 부족해요. 기준을 바꾸거나 새 후보 시간을 열면 기존 응답으로 다시 계산할게요.",
           "recommendationWait": "아직 {need}명 정도의 응답이 더 필요해요. 친구에게 공유해서 응답을 더 받아보세요.",
           "recommendationText": "{title}은 현재 응답 기준으로 {label} {time}이 가장 현실적인 약속안이에요. {reason} {responses}명이 답했고, {prefer}명이 가장 좋아요로 골랐어요. 이 시간으로 정리해볼게요.",
           "confirmedText": "{title} 약속이 {label} {time}로 확정됐어요. 장소/메모는 {note}입니다. 확정 뒤에는 응답 수정과 추천 재계산을 하지 않아요.",
@@ -2141,14 +2501,44 @@
           "viewRecommendation": "추천 결과 보기",
           "kakaoPasteHint": "공유 화면에서 카카오톡, 메시지, 복사 중 원하는 방법을 고를 수 있어요.",
           "recommendationTrustTitle": "왜 이 안인가요?",
-          "reasonConsensus": "어려움 응답이 없고 선호가 가장 많이 모였어요.",
+          "reasonConsensus": "부담 응답이 없고 선호가 가장 많이 모였어요.",
           "reasonAdjustment": "모두가 참석 가능하고 일부만 조금 조정하면 돼요.",
-          "reasonFallback": "모두에게 완벽하진 않지만 참석 가능 인원이 가장 많아 방장이 설명하기 쉬운 차선안이에요.",
+          "reasonFallback": "모두에게 완벽하진 않지만 참석 가능 인원이 가장 많아 방장이 설명하기 쉬운 안이에요.",
+          "agreementQuestion": "이번 모임은 어떻게 정할까요?",
+          "agreementAllTogether": "모두 함께",
+          "agreementAllTogetherBody": "한 명이라도 어려운 시간은 확정하지 않아요.",
+          "agreementThreshold": "많이 모이면",
+          "agreementThresholdBody": "정한 인원 이상 가능하면 추천해요.",
+          "agreementFastDecision": "빨리 정하기",
+          "agreementFastDecisionBody": "기준 인원을 채우는 가장 빠른 시간을 우선해요.",
+          "minimumAttendees": "최소 참석 인원",
+          "changeAgreement": "기준 바꿔서 다시 보기",
+          "agreementChangeTitle": "합의 기준 바꾸기",
+          "agreementChangeBody": "기존 응답은 그대로 두고 추천 기준만 다시 계산해요. 참여자에게 기준 변경이 표시됩니다.",
+          "applyAgreement": "이 기준으로 다시 계산하기",
+          "agreementChangedNotice": "방장이 합의 기준을 변경했어요. 기존: {previous} / 변경: {current}",
+          "anonymousAggregateTitle": "익명 집계",
+          "anonymousAggregateBody": "사람은 숨기고, 상황은 보여준다. 누가 무엇을 골랐는지는 보이지 않고, 후보별 현재 상황만 보여줘요.",
+          "preResponsePrivacy": "먼저 내 가능한 시간을 알려주세요. 응답 전에는 후보별 상세 집계를 숨겨요.",
+          "unansweredPeople": "미응답자",
+          "allPossibleLabel": "모두 가능",
+          "allPossibleBody": "모두가 가능한 시간이에요",
+          "leadingCandidateLabel": "유력 후보",
+          "leadingCandidateBody": "가장 많은 사람이 선호했어요",
+          "needsCheckLabel": "확인 필요",
+          "needsCheckBody": "한 명의 확인이 남았어요",
+          "burdenLabel": "부담 있음",
+          "burdenBody": "아직 부담이 있는 시간이에요",
+          "moreNeededLabel": "더 필요",
+          "moreNeededBody": "추천하려면 응답이 더 필요해요",
+          "similarLabel": "비슷해요",
+          "similarBody": "다른 후보와 차이가 크지 않아요",
+          "aggregateSummary": "선호 {prefer}명 · 가능 {available}명 · 확인 필요 {adjustable}명 · 부담 있음 {hardNo}명",
           "confidenceHigh": "신뢰도 높음",
           "confidenceMedium": "신뢰도 보통",
           "confidenceLow": "신뢰도 낮음",
           "confidenceNone": "추천 대기",
-          "candidateExcluded": "추천 제외",
+          "candidateExcluded": "추천 보류",
           "candidateRecommended": "추천 후보",
           "responseCount": "{count}명 응답",
           "score": "점수 {score}",
@@ -2157,8 +2547,8 @@
           "responsesMetric": "응답",
           "preferMetric": "가장 좋아요",
           "adjustMetric": "조정 필요",
-          "hardNoMetric": "어려워요 {count}명",
-          "noHardNo": "어려움 없음",
+          "hardNoMetric": "부담 있음 {count}명",
+          "noHardNo": "부담 없음",
           "otherOptions": "다른 후보 보기",
           "noAlternatives": "현재 비교 가능한 차선 후보가 없어요.",
           "confirmedCard": "확정 카드",
@@ -2284,6 +2674,38 @@
         hardNo: { icon: "−", className: "danger", score: 0 },
       };
 
+      const agreementModes = {
+        all_together: {
+          className: "success",
+          labelKey: "agreementAllTogether",
+          bodyKey: "agreementAllTogetherBody",
+        },
+        threshold: {
+          className: "brand",
+          labelKey: "agreementThreshold",
+          bodyKey: "agreementThresholdBody",
+        },
+        fast_decision: {
+          className: "warning",
+          labelKey: "agreementFastDecision",
+          bodyKey: "agreementFastDecisionBody",
+        },
+      };
+
+      function normalizeAgreementMode(mode) {
+        return Object.prototype.hasOwnProperty.call(agreementModes, mode) ? mode : "all_together";
+      }
+
+      function agreementLabel(mode) {
+        const normalized = normalizeAgreementMode(mode);
+        return locale.ui[agreementModes[normalized].labelKey];
+      }
+
+      function agreementBody(mode) {
+        const normalized = normalizeAgreementMode(mode);
+        return locale.ui[agreementModes[normalized].bodyKey];
+      }
+
       const escapeHtml = (value) =>
         String(value ?? "")
           .replaceAll("&", "&amp;")
@@ -2376,18 +2798,56 @@
         return `${String(Math.min(23, Math.max(0, hour))).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
       }
 
-      function orderedHourValues(selectedHour) {
-        const nearby = [-2, -1, 0, 1, 2]
-          .map((offset) => selectedHour + offset)
-          .filter((hour) => hour >= 0 && hour <= 23);
-        const all = Array.from({ length: 24 }, (_, hour) => hour);
-        return [...new Set([...nearby, ...all])];
+      function buildContinuousHourValues() {
+        return Array.from({ length: 24 }, (_, hour) => hour);
       }
 
-      function orderedMinuteValues(selectedMinute) {
-        const minutes = ["00", "10", "20", "30", "40", "50"];
-        const index = Math.max(0, minutes.indexOf(selectedMinute));
-        return [...minutes.slice(index), ...minutes.slice(0, index)];
+      function buildContinuousMinuteValues() {
+        return ["00", "10", "20", "30", "40", "50"];
+      }
+
+      function parseDeadlineParts(value) {
+        const fallbackDate = releaseDateValues[0] || formatDateValue(new Date());
+        const fallbackTime = "22:00";
+        const match = String(value || "").match(/(\d{1,2})\.(\d{1,2}).*?(\d{1,2}):(\d{2})/);
+        if (!match) return { date: fallbackDate, time: fallbackTime };
+        const [, month, day, hour, minute] = match;
+        const date = formatDateValue(new Date(2026, Number(month) - 1, Number(day)));
+        const parsedTime = parseTimeParts(`${hour}:${minute}`);
+        return { date, time: formatTimeValue(parsedTime.hour, parsedTime.minute) };
+      }
+
+      function formatDeadlineLabel(date, time) {
+        return `${weekdayLabel(date)} ${time}`;
+      }
+
+      function renderTimeWheel({ selectedTime, testPrefix, action, candidateIndex = null, ariaLabel, wheelTestId = "" }) {
+        const { hour, minute } = parseTimeParts(selectedTime);
+        const candidateAttr = candidateIndex === null ? "" : `data-candidate-index="${candidateIndex}"`;
+        const wheelId = wheelTestId || `${testPrefix}-wheel`;
+        const optionTestId = (part, token) => candidateIndex === null
+          ? `${testPrefix}-${part}-${token}`
+          : `${testPrefix}-${part}-${candidateIndex}-${token}`;
+        return `
+          <div class="ReleaseTimeWheel" data-testid="${escapeHtml(wheelId)}" aria-label="${escapeHtml(ariaLabel)}">
+            <div class="ReleaseTimeWheelColumn" role="radiogroup" aria-label="시">
+              ${buildContinuousHourValues()
+                .map((hourValue) => {
+                  const selected = hourValue === hour;
+                  return `<button class="ReleaseTimeWheelOption" type="button" role="radio" aria-checked="${selected}" data-selected="${selected}" data-action="${escapeHtml(action)}" ${candidateAttr} data-time-part="hour" data-time-token="${hourValue}" data-value="${escapeHtml(formatTimeValue(hourValue, minute))}" data-testid="${escapeHtml(optionTestId("hour", hourValue))}">${escapeHtml(String(hourValue).padStart(2, "0"))}</button>`;
+                })
+                .join("")}
+            </div>
+            <div class="ReleaseTimeWheelColumn" role="radiogroup" aria-label="분">
+              ${buildContinuousMinuteValues()
+                .map((minuteValue) => {
+                  const selected = minuteValue === minute;
+                  return `<button class="ReleaseTimeWheelOption" type="button" role="radio" aria-checked="${selected}" data-selected="${selected}" data-action="${escapeHtml(action)}" ${candidateAttr} data-time-part="minute" data-time-token="${escapeHtml(minuteValue)}" data-value="${escapeHtml(formatTimeValue(hour, minuteValue))}" data-testid="${escapeHtml(optionTestId("minute", minuteValue))}">${escapeHtml(minuteValue)}</button>`;
+                })
+                .join("")}
+            </div>
+          </div>
+        `;
       }
 
       function renderReleaseDateControl(candidate, index) {
@@ -2427,39 +2887,63 @@
 
       function renderReleaseTimeControl(candidate, index) {
         const selectedTime = candidate.time || releaseTimeValues[index % releaseTimeValues.length];
-        const { hour, minute } = parseTimeParts(selectedTime);
-        const period = hour < 12 ? "오전" : "오후";
-        const periodTarget = (nextPeriod) => {
-          if (nextPeriod === period) return formatTimeValue(hour, minute);
-          return formatTimeValue(nextPeriod === "오전" ? Math.max(0, hour - 12) : Math.min(23, hour + 12), minute);
-        };
         return `
           <div class="ReleaseTimeControl" data-testid="candidate-time-control-${index}">
             <input type="hidden" name="candidate-time-${index}" value="${escapeHtml(selectedTime)}" />
-            <div class="ReleaseTimeWheel" data-testid="candidate-time-wheel-${index}" aria-label="후보 ${index + 1} 시간 휠">
-              <div class="ReleaseTimeWheelColumn" role="radiogroup" aria-label="오전 오후">
-                ${["오전", "오후"]
-                  .map((label) => `<button class="ReleaseTimeWheelOption" type="button" role="radio" aria-checked="${label === period}" data-selected="${label === period}" data-action="set-candidate-time" data-candidate-index="${index}" data-time-part="period" data-time-token="${escapeHtml(label)}" data-value="${escapeHtml(periodTarget(label))}" data-testid="candidate-time-period-${index}-${escapeHtml(label)}">${escapeHtml(label)}</button>`)
-                  .join("")}
-              </div>
-              <div class="ReleaseTimeWheelColumn" role="radiogroup" aria-label="시">
-                ${orderedHourValues(hour)
-                  .map((hourValue) => {
-                    const selected = hourValue === hour;
-                    return `<button class="ReleaseTimeWheelOption" type="button" role="radio" aria-checked="${selected}" data-selected="${selected}" data-action="set-candidate-time" data-candidate-index="${index}" data-time-part="hour" data-time-token="${hourValue}" data-value="${escapeHtml(formatTimeValue(hourValue, minute))}" data-testid="candidate-time-hour-${index}-${hourValue}">${escapeHtml(String(hourValue).padStart(2, "0"))}</button>`;
-                  })
-                  .join("")}
-              </div>
-              <div class="ReleaseTimeWheelColumn" role="radiogroup" aria-label="분">
-                ${orderedMinuteValues(minute)
-                  .map((minuteValue) => {
-                    const selected = minuteValue === minute;
-                    return `<button class="ReleaseTimeWheelOption" type="button" role="radio" aria-checked="${selected}" data-selected="${selected}" data-action="set-candidate-time" data-candidate-index="${index}" data-time-part="minute" data-time-token="${escapeHtml(minuteValue)}" data-value="${escapeHtml(formatTimeValue(hour, minuteValue))}" data-testid="candidate-time-minute-${index}-${minuteValue}">${escapeHtml(minuteValue)}</button>`;
-                  })
-                  .join("")}
+            ${renderTimeWheel({
+              selectedTime,
+              testPrefix: "candidate-time",
+              action: "set-candidate-time",
+              candidateIndex: index,
+              ariaLabel: `후보 ${index + 1} 시간 휠`,
+              wheelTestId: `candidate-time-wheel-${index}`,
+            })}
+            <span class="ReleaseTimeWheelHint">열 전체를 위아래로 움직이며 고를 수 있어요.</span>
+          </div>
+        `;
+      }
+
+      function renderDeadlineControl(room) {
+        const { date, time } = parseDeadlineParts(room.deadlineLabel);
+        const deadlineLabel = formatDeadlineLabel(date, time);
+        const isOpen = appState.openDeadlineCalendar;
+        return `
+          <div class="DeadlineControl" data-testid="deadline-control">
+            <input type="hidden" name="deadline" value="${escapeHtml(deadlineLabel)}" />
+            <div class="DeadlineCalendarPicker IPhoneCalendarPicker" data-testid="deadline-calendar-picker">
+              <button class="CalendarTrigger" type="button" data-testid="deadline-calendar-trigger" data-action="toggle-deadline-calendar" aria-expanded="${isOpen}" aria-label="응답 마감 날짜 ${escapeHtml(weekdayLabel(date))}">
+                <span>${escapeHtml(weekdayLabel(date))}</span><span aria-hidden="true">⌄</span>
+              </button>
+              <div class="ReleaseCalendarSheet" data-testid="deadline-calendar-sheet" ${isOpen ? "" : "hidden"}>
+                <div class="ReleaseCalendarHeader">
+                  <strong>${escapeHtml(releaseMonthLabel(date))}</strong>
+                  <div class="ReleaseCalendarNav" aria-label="월 이동">
+                    <button type="button" data-action="set-deadline-date" data-value="${escapeHtml(shiftMonthDateValue(date, -1))}" aria-label="이전 달">‹</button>
+                    <button type="button" data-action="set-deadline-date" data-value="${escapeHtml(shiftMonthDateValue(date, 1))}" aria-label="다음 달">›</button>
+                  </div>
+                </div>
+                <div class="ReleaseCalendarWeekdays" aria-hidden="true">
+                  ${["일", "월", "화", "수", "목", "금", "토"].map((day) => `<span>${day}</span>`).join("")}
+                </div>
+                <div class="ReleaseCalendarGrid" role="grid" aria-label="응답 마감 날짜 선택">
+                  ${releaseCalendarDates(date)
+                    .map((calendarDate) => {
+                      const selected = calendarDate.value === date;
+                      return `<button class="ReleaseCalendarDay" type="button" role="gridcell" aria-selected="${selected}" data-selected="${selected}" data-outside="${calendarDate.outside}" data-action="set-deadline-date" data-value="${escapeHtml(calendarDate.value)}" data-testid="deadline-calendar-day-${escapeHtml(calendarDate.value)}">${escapeHtml(calendarDate.day)}</button>`;
+                    })
+                    .join("")}
+                </div>
               </div>
             </div>
-            <span class="ReleaseTimeWheelHint">열 전체를 위아래로 움직이며 고를 수 있어요.</span>
+            <div class="DeadlineTimeWheel ReleaseTimeControl" data-testid="deadline-time-control">
+              ${renderTimeWheel({
+                selectedTime: time,
+                testPrefix: "deadline-time",
+                action: "set-deadline-time",
+                ariaLabel: "응답 마감 시간 휠",
+              })}
+              <span class="ReleaseTimeWheelHint">마감 시간도 10분 단위로 고를 수 있어요.</span>
+            </div>
           </div>
         `;
       }
@@ -2472,6 +2956,12 @@
           title: room.title,
           expectedCount: room.expectedCount,
           deadlineLabel: room.deadlineLabel,
+          agreementMode: normalizeAgreementMode(room.agreementMode),
+          minimumAttendees: agreementMinimum(room),
+          agreementRevision: room.agreementRevision || 0,
+          previousAgreementMode: room.previousAgreementMode || null,
+          previousMinimumAttendees: room.previousMinimumAttendees || null,
+          agreementChangedAt: room.agreementChangedAt || null,
           participants: namedParticipants(room),
           candidates: room.candidates.map((candidate) => ({
             id: candidate.id,
@@ -2507,6 +2997,12 @@
           title: snapshot.title || localizedDemoFixture().title,
           expectedCount: snapshot.expectedCount || 4,
           deadlineLabel: snapshot.deadlineLabel || localizedDemoFixture().deadlineLabel,
+          agreementMode: snapshot.agreementMode,
+          minimumAttendees: snapshot.minimumAttendees,
+          agreementRevision: snapshot.agreementRevision || 0,
+          previousAgreementMode: snapshot.previousAgreementMode || null,
+          previousMinimumAttendees: snapshot.previousMinimumAttendees || null,
+          agreementChangedAt: snapshot.agreementChangedAt || null,
           participants: Array.isArray(snapshot.participants) ? snapshot.participants : [],
           candidates: snapshot.candidates.slice(0, MAX_CANDIDATES),
           responses: [],
@@ -2567,6 +3063,24 @@
       function minimumResponses(expectedCount) {
         const safeExpected = Number.isFinite(Number(expectedCount)) ? Number(expectedCount) : 4;
         return Math.max(3, Math.ceil(safeExpected * 0.6));
+      }
+
+      function defaultMinimumAttendees(expectedCount) {
+        return minimumResponses(expectedCount);
+      }
+
+      function normalizeMinimumAttendees(value, expectedCount) {
+        const expected = clampNumber(expectedCount, 3, 20, 7);
+        return clampNumber(value, 2, expected, defaultMinimumAttendees(expected));
+      }
+
+      function agreementMinimum(room) {
+        return normalizeMinimumAttendees(room?.minimumAttendees, room?.expectedCount || 7);
+      }
+
+      function requiredResponsesForAgreement(room) {
+        const mode = normalizeAgreementMode(room?.agreementMode);
+        return mode === "all_together" ? minimumResponses(room?.expectedCount || 7) : agreementMinimum(room);
       }
 
       function participantIdForIndex(index) {
@@ -2665,6 +3179,14 @@
           participants: normalizeParticipants(options.participants, expectedCount),
           candidates,
           responses: (options.responses || []).map(normalizeResponse),
+          agreementMode: normalizeAgreementMode(options.agreementMode),
+          minimumAttendees: normalizeMinimumAttendees(options.minimumAttendees, expectedCount),
+          agreementRevision: clampNumber(options.agreementRevision, 0, 999, 0),
+          previousAgreementMode: options.previousAgreementMode ? normalizeAgreementMode(options.previousAgreementMode) : null,
+          previousMinimumAttendees: options.previousMinimumAttendees
+            ? normalizeMinimumAttendees(options.previousMinimumAttendees, expectedCount)
+            : null,
+          agreementChangedAt: options.agreementChangedAt || null,
           status: options.status || "collecting",
           selectedCandidateId: options.selectedCandidateId || null,
           shareUrl: options.shareUrl || "",
@@ -2691,6 +3213,8 @@
           const status = normalizeStatus(response.preferences[candidate.id]);
           counts[status] += 1;
         });
+        const mode = normalizeAgreementMode(room.agreementMode);
+        const minimum = agreementMinimum(room);
         const answered = Object.values(counts).reduce((sum, value) => sum + value, 0);
         const score =
           counts.prefer * statusMeta.prefer.score +
@@ -2698,7 +3222,11 @@
           counts.adjustable * statusMeta.adjustable.score +
           counts.hardNo * statusMeta.hardNo.score;
         const hardNoRatio = answered > 0 ? counts.hardNo / answered : 0;
-        const excluded = counts.hardNo > 0;
+        const positiveCount = counts.prefer + counts.available;
+        const flexibleCount = positiveCount + counts.adjustable;
+        const hardBlocked = mode === "all_together" && counts.hardNo > 0;
+        const meetsMinimum = mode === "all_together" ? !hardBlocked && flexibleCount >= answered : positiveCount >= minimum;
+        const excluded = hardBlocked;
         return {
           candidate,
           order,
@@ -2708,19 +3236,29 @@
           hardNoCount: counts.hardNo,
           hardNoRatio,
           preferCount: counts.prefer,
-          positiveCount: counts.prefer + counts.available,
+          positiveCount,
+          flexibleCount,
+          meetsMinimum,
           excluded,
+          eligible: meetsMinimum && !excluded,
         };
       }
 
       function rankCandidates(room) {
         const responseCount = room.responses.length;
-        const threshold = minimumResponses(room.expectedCount);
-        const enough = responseCount >= threshold;
+        const agreementMode = normalizeAgreementMode(room.agreementMode);
+        const minimum = requiredResponsesForAgreement(room);
+        const minimumAttendees = agreementMinimum(room);
+        const enough = responseCount >= minimum;
         const items = room.candidates
           .map((candidate, index) => summarizeCandidate(room, candidate, index))
           .sort((a, b) => {
+            if (a.eligible !== b.eligible) return Number(b.eligible) - Number(a.eligible);
             if (a.excluded !== b.excluded) return Number(a.excluded) - Number(b.excluded);
+            if (agreementMode === "fast_decision" && a.eligible && b.eligible) {
+              const timeCompare = String(a.candidate.starts_at || "").localeCompare(String(b.candidate.starts_at || ""));
+              if (timeCompare !== 0) return timeCompare;
+            }
             if (a.score !== b.score) return b.score - a.score;
             if (a.preferCount !== b.preferCount) return b.preferCount - a.preferCount;
             if (a.positiveCount !== b.positiveCount) return b.positiveCount - a.positiveCount;
@@ -2728,7 +3266,7 @@
             if (a.candidate.starts_at !== b.candidate.starts_at) return String(a.candidate.starts_at || "").localeCompare(String(b.candidate.starts_at || ""));
             return a.order - b.order;
           });
-        const eligible = items.filter((item) => !item.excluded);
+        const eligible = items.filter((item) => item.eligible);
         const top = enough ? eligible[0] || null : null;
         const second = top ? eligible.find((item) => item.candidate.id !== top.candidate.id) : null;
         const scoreGap = top && second ? top.score - second.score : top ? Math.max(0, top.score) : 0;
@@ -2747,7 +3285,9 @@
         }[confidence];
         return {
           responseCount,
-          minimum: threshold,
+          minimum,
+          minimumAttendees,
+          agreementMode,
           enough,
           items,
           top,
@@ -2891,9 +3431,16 @@
           hostFormError: "",
           responseError: "",
           openCalendarIndex: null,
+          customExpectedCountOpen: false,
+          customExpectedCountValue: "",
           lastSubmittedAt: null,
           lastResponseId: null,
           showResponseInbox: false,
+          agreementSheetOpen: false,
+          pendingAgreementMode: "",
+          pendingMinimumAttendees: "",
+          openChoicePopover: "",
+          openDeadlineCalendar: false,
         };
       }
 
@@ -2913,9 +3460,16 @@
           hostFormError: "",
           responseError: "",
           openCalendarIndex: null,
+          customExpectedCountOpen: false,
+          customExpectedCountValue: "",
           lastSubmittedAt: null,
           lastResponseId: null,
           showResponseInbox: false,
+          agreementSheetOpen: false,
+          pendingAgreementMode: "",
+          pendingMinimumAttendees: "",
+          openChoicePopover: "",
+          openDeadlineCalendar: false,
         };
       }
 
@@ -2965,9 +3519,16 @@
           hostFormError: raw.hostFormError || "",
           responseError: raw.responseError || "",
           openCalendarIndex: raw.openCalendarIndex ?? null,
+          customExpectedCountOpen: Boolean(raw.customExpectedCountOpen),
+          customExpectedCountValue: String(raw.customExpectedCountValue || ""),
           lastSubmittedAt: raw.lastSubmittedAt || null,
           lastResponseId: raw.lastResponseId || null,
           showResponseInbox: Boolean(raw.showResponseInbox),
+          agreementSheetOpen: Boolean(raw.agreementSheetOpen),
+          pendingAgreementMode: raw.pendingAgreementMode || "",
+          pendingMinimumAttendees: raw.pendingMinimumAttendees || "",
+          openChoicePopover: raw.openChoicePopover || "",
+          openDeadlineCalendar: Boolean(raw.openDeadlineCalendar),
         };
       }
 
@@ -3026,7 +3587,6 @@
         let changed = false;
         if (appState.inviteContext?.status === "deleted") return "scr-05-link-expired";
         const roomRequiredScreens = [
-          "scr-02-participant-input",
           "scr-03-result-recommendation",
           "scr-04-insufficient-response",
           "scr-06-room-closed",
@@ -3058,12 +3618,16 @@
         return params.get("response") === "inbox" ? "inbox" : "detail";
       }
 
-      function clearLocalData() {
+      function performClearLocalData() {
         localStorage.removeItem(currentStorageKey());
         appState = createFreshState();
         appState.copyStatus = "";
         hasUnsavedEdits = false;
         selectScreen("scr-00-entry");
+      }
+
+      function clearLocalData() {
+        requestConfirmation({ kind: "clear-local-data" });
       }
 
       function shouldConfirmNavigation(action) {
@@ -3078,11 +3642,22 @@
           return;
         }
         const isDelete = pendingConfirmation.kind === "delete-room";
-        const title = isDelete ? locale.ui.deleteRoom : locale.ui.unsavedExitTitle;
+        const isClearData = pendingConfirmation.kind === "clear-local-data";
+        const title = isDelete
+          ? locale.ui.deleteRoom
+          : isClearData
+            ? locale.ui.clearDataConfirmTitle
+            : locale.ui.unsavedExitTitle;
         const body = isDelete
           ? locale.ui.deleteRoomConfirm
-          : locale.ui.unsavedExitBody;
-        const confirmLabel = isDelete ? locale.ui.confirmDelete : locale.ui.confirmProceed;
+          : isClearData
+            ? locale.ui.clearDataConfirmBody
+            : locale.ui.unsavedExitBody;
+        const confirmLabel = isDelete
+          ? locale.ui.confirmDelete
+          : isClearData
+            ? locale.ui.confirmClearData
+            : locale.ui.confirmProceed;
         const cancelLabel = locale.ui.confirmCancel;
         confirmModalRoot.innerHTML = `
           <div class="ConfirmDialog" role="presentation">
@@ -3093,7 +3668,7 @@
               </div>
               <div class="buttonRow two">
                 <button class="quietButton Button3D" type="button" data-action="confirm-modal-cancel" data-testid="confirm-modal-cancel">${escapeHtml(cancelLabel)}</button>
-                <button class="${isDelete ? "secondaryButton" : "primaryButton"} Button3D" type="button" data-action="confirm-modal-confirm" data-testid="confirm-modal-confirm">${escapeHtml(confirmLabel)}</button>
+                <button class="${isDelete || isClearData ? "secondaryButton" : "primaryButton"} Button3D" type="button" data-action="confirm-modal-confirm" data-testid="confirm-modal-confirm">${escapeHtml(confirmLabel)}</button>
               </div>
             </section>
           </div>
@@ -3127,6 +3702,10 @@
         if (!confirmation) return;
         if (confirmation.kind === "delete-room") {
           performDeleteHostedRoom(confirmation.roomId);
+          return;
+        }
+        if (confirmation.kind === "clear-local-data") {
+          performClearLocalData();
           return;
         }
         if (confirmation.kind === "history") {
@@ -3196,6 +3775,90 @@
         `;
       }
 
+      function consensusStateForCandidate(item, ranked) {
+        if (!ranked.enough) {
+          return { key: "moreNeeded", className: "warning", label: locale.ui.moreNeededLabel, body: locale.ui.moreNeededBody };
+        }
+        if (item.counts.hardNo >= 2) {
+          return { key: "burden", className: "warning", label: locale.ui.burdenLabel, body: locale.ui.burdenBody };
+        }
+        if (item.counts.hardNo === 0 && item.counts.adjustable === 0 && item.flexibleCount >= ranked.responseCount) {
+          return { key: "allPossible", className: "success", label: locale.ui.allPossibleLabel, body: locale.ui.allPossibleBody };
+        }
+        if (item.counts.hardNo === 0 && item.counts.adjustable === 1) {
+          return { key: "needsCheck", className: "warning", label: locale.ui.needsCheckLabel, body: locale.ui.needsCheckBody };
+        }
+        if (ranked.top?.candidate.id === item.candidate.id) {
+          const second = ranked.items.find((candidateItem) => candidateItem.eligible && candidateItem.candidate.id !== item.candidate.id);
+          if (second && ranked.scoreGap <= 1) {
+            return { key: "similar", className: "brand", label: locale.ui.similarLabel, body: locale.ui.similarBody };
+          }
+          return { key: "leading", className: "brand", label: locale.ui.leadingCandidateLabel, body: locale.ui.leadingCandidateBody };
+        }
+        return { key: "moreNeeded", className: "brand", label: locale.ui.similarLabel, body: locale.ui.similarBody };
+      }
+
+      function aggregateLine(item) {
+        return formatTemplate(locale.ui.aggregateSummary, {
+          prefer: item.counts.prefer,
+          available: item.counts.available,
+          adjustable: item.counts.adjustable,
+          hardNo: item.counts.hardNo,
+        });
+      }
+
+      function canSeeAnonymousAggregate(room) {
+        return Boolean(room && (!room.isSharedLink || appState.lastSubmittedAt || room.status === "closed"));
+      }
+
+      function agreementChangeNotice(room) {
+        if (!room?.agreementChangedAt || !room.previousAgreementMode) return "";
+        return `
+          <section class="AgreementNotice" data-testid="agreement-change-notice">
+            ${reasonChip("brand", "기준 변경")}
+            <p class="helperText">${escapeHtml(formatTemplate(locale.ui.agreementChangedNotice, {
+              previous: agreementLabel(room.previousAgreementMode),
+              current: agreementLabel(room.agreementMode),
+            }))}</p>
+          </section>
+        `;
+      }
+
+      function anonymousAggregatePanel(room, options = {}) {
+        if (!canSeeAnonymousAggregate(room) && !options.force) return "";
+        const ranked = rankCandidates(room);
+        const items = options.limit ? ranked.items.slice(0, options.limit) : ranked.items;
+        return `
+          <section class="AnonymousAggregatePanel" data-testid="anonymous-aggregate-panel" aria-label="${escapeHtml(locale.ui.anonymousAggregateTitle)}">
+            <div class="topline">
+              <div class="slotMeta">
+                <strong>${escapeHtml(locale.ui.anonymousAggregateTitle)}</strong>
+                <span>${escapeHtml(locale.ui.anonymousAggregateBody)}</span>
+              </div>
+              ${reasonChip(agreementModes[ranked.agreementMode].className, agreementLabel(ranked.agreementMode))}
+            </div>
+            <div class="AnonymousAggregateList">
+              ${items
+                .map((item, index) => {
+                  const state = consensusStateForCandidate(item, ranked);
+                  return `<article class="AnonymousAggregateCard" data-testid="anonymous-aggregate-card-${index}">
+                    <div class="topline">
+                      <div class="slotMeta">
+                        <strong>${escapeHtml(item.candidate.label)} ${escapeHtml(item.candidate.time)}</strong>
+                        <span>${escapeHtml(item.candidate.note)}</span>
+                      </div>
+                      ${reasonChip(state.className, state.label)}
+                    </div>
+                    <p class="caption">${escapeHtml(aggregateLine(item))}</p>
+                    <p class="helperText">${escapeHtml(state.body)}</p>
+                  </article>`;
+                })
+                .join("")}
+            </div>
+          </section>
+        `;
+      }
+
       function candidateSlotCard(slot, options = {}) {
         const selectedStatus = normalizeStatus(options.selectedStatus || "available");
         const summary = options.summary;
@@ -3203,9 +3866,11 @@
         const disabled = Boolean(options.disabled);
         let chip = reasonChip(statusMeta[selectedStatus].className, locale.status[selectedStatus]);
         if (summary) {
+          const ranked = options.ranked || { enough: true, top: selected ? summary : null, items: [summary], scoreGap: 0, agreementMode: "all_together", responseCount: summary.answered };
+          const state = consensusStateForCandidate(summary, ranked);
           if (summary.excluded) chip = reasonChip("danger", locale.ui.candidateExcluded);
-          else if (selected) chip = reasonChip("brand", locale.ui.candidateRecommended);
-          else chip = reasonChip("success", formatTemplate(locale.ui.responseCount, { count: summary.answered }));
+          else if (selected) chip = reasonChip(state.className, state.label);
+          else chip = reasonChip(state.className, state.label);
         }
         return `
           <article class="CandidateSlotCard" data-selected="${selected}" data-disabled="${disabled}">
@@ -3216,7 +3881,7 @@
               </div>
               ${chip}
             </div>
-            ${summary ? `<p class="caption">${escapeHtml(formatTemplate(locale.ui.score, { score: summary.score }))} · ${escapeHtml(locale.status.prefer)} ${summary.counts.prefer} · ${escapeHtml(locale.status.available)} ${summary.counts.available} · ${escapeHtml(locale.status.adjustable)} ${summary.counts.adjustable} · ${escapeHtml(locale.status.hardNo)} ${summary.counts.hardNo}</p>` : ""}
+            ${summary ? `<p class="caption">${escapeHtml(aggregateLine(summary))}</p>` : ""}
             ${options.withSelector ? preferenceSelector(slot, selectedStatus, disabled) : ""}
           </article>
         `;
@@ -3245,7 +3910,7 @@
         const percent = Math.min(100, Math.round((ranked.responseCount / room.expectedCount) * 100));
         const need = Math.max(0, ranked.minimum - ranked.responseCount);
         const label = state === "blocked"
-          ? `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했지만, 추천 가능한 후보가 남지 않았어요.`
+          ? `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했지만, 현재 기준에 맞는 후보가 없어요.`
           : state === "low"
             ? `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했어요. ${need}명만 더 답하면 추천을 시작해요.`
             : `${room.expectedCount}명 중 ${ranked.responseCount}명이 답했어요.`;
@@ -3264,7 +3929,21 @@
       }
 
       function responseInbox(room) {
-        if (!room) return "";
+        if (!room) {
+          return `
+            <section class="ResponseInbox" data-testid="response-inbox-list" aria-labelledby="response-empty-title">
+              <section class="ResponseEmptyState" data-testid="response-empty-state">
+                ${reasonChip("brand", locale.ui.responseInboxLabel)}
+                <h2 id="response-empty-title">${escapeHtml(locale.ui.responseEmptyTitle)}</h2>
+                <p class="helperText">${escapeHtml(locale.ui.responseEmptyBody)}</p>
+              </section>
+              <section class="surface compactSection" aria-label="${escapeHtml(locale.ui.sentRoomLabel)}">
+                ${reasonChip("success", locale.ui.sentRoomLabel)}
+                <p class="helperText">${escapeHtml(locale.ui.responseEmptySentHint)}</p>
+              </section>
+            </section>
+          `;
+        }
         const statusLabel = room.status === "closed"
           ? locale.ui.responseInboxStatusClosed
           : appState.lastSubmittedAt
@@ -3272,7 +3951,6 @@
             : locale.ui.responseInboxStatusPending;
         return `
           <section class="ResponseInbox" data-testid="response-inbox-list" aria-labelledby="response-inbox-title">
-            ${stateGraphic("low", locale.ui.responseInboxGraphicAlt)}
             <div class="section">
               <span class="eyebrow">${escapeHtml(locale.ui.responseInboxLabel)}</span>
               <h1 id="response-inbox-title">${escapeHtml(locale.ui.responseInboxTitle)}</h1>
@@ -3291,6 +3969,26 @@
               <p class="helperText">${escapeHtml(locale.ui.sentRoomHint)}</p>
             </section>
           </section>
+        `;
+      }
+
+      function homeHeroStatusOverlay({ stats, hostedCount, candidateCount, savedRoomLine }) {
+        const answeredLabel = stats ? `${stats.answered}/${stats.expected}` : "0/0";
+        const missingLabel = stats ? `${stats.missing}명` : `${hostedCount}개`;
+        const missingTitle = stats ? "미응답" : "내 모임";
+        return `
+          <div class="HomeHeroStatusOverlay" data-testid="home-status-overlay" aria-label="${escapeHtml(locale.ui.currentStatus)}">
+            <div class="HeroStatusPill" data-testid="hero-status-pill">
+              <span>${escapeHtml(locale.ui.currentStatus)}</span>
+              <strong>${escapeHtml(locale.ui.progressStatus)}</strong>
+            </div>
+            <div class="HeroStatusMetrics" aria-label="현재 모임 상태">
+              <div class="HomeMetricCard"><strong>${escapeHtml(answeredLabel)}</strong><span>응답</span></div>
+              <div class="HomeMetricCard"><strong>${escapeHtml(missingLabel)}</strong><span>${escapeHtml(missingTitle)}</span></div>
+              <div class="HomeMetricCard"><strong>${escapeHtml(candidateCount)}</strong><span>후보</span></div>
+            </div>
+            <p class="emptyStateLine">${escapeHtml(savedRoomLine)}</p>
+          </div>
         `;
       }
 
@@ -3319,7 +4017,10 @@
         const shareUrl = room.shareUrl || buildGeneralShareUrl(room);
         return `
           <section class="linkField" aria-label="${escapeHtml(locale.ui.generalShareLink)}">
-            ${reasonChip("brand", locale.ui.generalShareLink)}
+            <div class="slotMeta">
+              <strong>${escapeHtml(locale.ui.generalShareLink)}</strong>
+              <span>비밀 투표 링크가 준비됐어요.</span>
+            </div>
             <p class="helperText">${escapeHtml(locale.ui.generalShareHint)}</p>
             <input class="textInput compactLinkInput" data-testid="general-share-link" value="${escapeHtml(shareUrl)}" readonly />
             ${individualParticipantLinks(room)}
@@ -3364,6 +4065,23 @@
         `;
       }
 
+      function unansweredParticipantsLine(stats) {
+        if (!stats?.missingParticipants?.length) return "모두 응답했어요";
+        return stats.missingParticipants.map((participant) => participant.name).join(", ");
+      }
+
+      function hostMiniAggregate(room, ranked = rankCandidates(room)) {
+        const top = ranked.top || ranked.items[0];
+        if (!top) return "";
+        const state = consensusStateForCandidate(top, ranked);
+        return `
+          <div class="HostAggregateMini" data-testid="host-anonymous-aggregate">
+            ${reasonChip(state.className, state.label)}
+            <span>${escapeHtml(top.candidate.label)} ${escapeHtml(top.candidate.time)} · ${escapeHtml(aggregateLine(top))}</span>
+          </div>
+        `;
+      }
+
       function hostStatusCard(room, index) {
         const ranked = rankCandidates(room);
         const stats = participantStats(room);
@@ -3383,6 +4101,11 @@
               <div class="HostMetricPill"><strong>미응답 ${stats.missing}명</strong><span>남은 사람</span></div>
               <div class="HostMetricPill"><strong>${room.candidates.length}개</strong><span>후보</span></div>
             </div>
+            <div class="HostUnansweredLine" data-testid="host-unanswered-list-${index}">
+              ${reasonChip("brand", locale.ui.unansweredPeople)}
+              <span>${escapeHtml(unansweredParticipantsLine(stats))}</span>
+            </div>
+            ${hostMiniAggregate(room, ranked)}
             <div class="HostCardActions" data-testid="host-card-actions-${index}">
               <button class="candidateActionButton" type="button" data-action="open-room-status" data-room-id="${escapeHtml(room.id)}" data-testid="open-room-status-${index}">상태</button>
               <button class="candidateActionButton" type="button" data-action="edit-host-room" data-room-id="${escapeHtml(room.id)}" data-testid="edit-host-room-${index}">수정</button>
@@ -3426,7 +4149,9 @@
       }
 
       function renderCandidateInputs(room) {
-        const candidates = [...room.candidates, ...localizedDefaultCandidates()].slice(0, Math.max(3, room.candidates.length));
+        const candidates = room.candidates.length
+          ? room.candidates.slice(0, MAX_CANDIDATES)
+          : localizedDefaultCandidates().slice(0, 3);
         return candidates
           .map((candidate, index) => `
             <div class="candidateInputCard HostRoomEditor">
@@ -3454,11 +4179,138 @@
           `<button class="candidateActionButton" type="button" data-action="add-candidate" data-testid="add-candidate-button" ${candidates.length >= MAX_CANDIDATES ? "disabled" : ""}>${escapeHtml(locale.ui.addCandidate)}</button>`;
       }
 
-      function expectedCountOptions(selected) {
-        const current = clampNumber(selected, 3, 20, 7);
-        return Array.from({ length: 18 }, (_, index) => index + 3)
-          .map((count) => `<option value="${count}" ${count === current ? "selected" : ""}>${count}명</option>`)
-          .join("");
+      function renderCustomChoiceControl({ name, value, options, testPrefix, ariaLabel }) {
+        const selected = options.find((option) => String(option.value) === String(value)) || options[0];
+        const isOpen = appState.openChoicePopover === testPrefix;
+        return `
+          <div class="CustomChoiceControl" data-testid="${escapeHtml(testPrefix)}-control">
+            <input type="hidden" name="${escapeHtml(name)}" value="${escapeHtml(selected.value)}" />
+            <button class="CustomChoiceTrigger Button3D" type="button" data-action="toggle-choice-popover" data-choice="${escapeHtml(testPrefix)}" data-testid="${escapeHtml(testPrefix)}-trigger" aria-expanded="${isOpen}" aria-label="${escapeHtml(ariaLabel)}">
+              <span>${escapeHtml(selected.label)}</span>
+              <span class="CustomChoiceChevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="CustomChoicePopover" data-testid="${escapeHtml(testPrefix)}-popover" role="listbox" ${isOpen ? "" : "hidden"}>
+              ${options
+                .map((option) => {
+                  const optionSelected = String(option.value) === String(selected.value);
+                  return `<button class="CustomChoiceOption" type="button" role="option" aria-selected="${optionSelected}" data-selected="${optionSelected}" data-action="set-choice-value" data-choice="${escapeHtml(testPrefix)}" data-choice-name="${escapeHtml(name)}" data-choice-value="${escapeHtml(option.value)}" data-testid="${escapeHtml(testPrefix)}-option-${escapeHtml(option.value)}">
+                    <span>${escapeHtml(option.label)}</span>
+                    <span aria-hidden="true">${optionSelected ? "✓" : ""}</span>
+                  </button>`;
+                })
+                .join("")}
+            </div>
+          </div>
+        `;
+      }
+
+      function expectedCountChoices() {
+        return [
+          ...Array.from({ length: 8 }, (_, index) => {
+            const count = index + 3;
+            return { value: String(count), label: `${count}명` };
+          }),
+          { value: "custom", label: locale.ui.expectedDirectInput },
+        ];
+      }
+
+      function renderExpectedCountControl(room) {
+        const current = clampNumber(room.expectedCount, 3, 20, 7);
+        const customOpen = appState.customExpectedCountOpen || current > 10;
+        const customValue = appState.customExpectedCountValue || String(clampNumber(room.expectedCount, 3, 20, 11));
+        const choiceValue = customOpen ? "custom" : String(current);
+        return `
+          <div class="ExpectedCountPreset">
+            ${renderCustomChoiceControl({
+              name: "expected-count",
+              value: choiceValue,
+              options: expectedCountChoices(),
+              testPrefix: "expected-count",
+              ariaLabel: "예상 인원 선택",
+            })}
+            <div class="CustomExpectedCountInput" ${customOpen ? "" : "hidden"}>
+              <input class="textInput" data-testid="expected-count-custom-input" name="expected-count-custom" type="number" inputmode="numeric" min="3" max="20" step="1" value="${escapeHtml(customValue)}" aria-label="${escapeHtml(locale.ui.expectedDirectInput)}" />
+              <button class="candidateActionButton Button3D" type="button" data-action="confirm-expected-count" data-testid="expected-count-confirm-button">${escapeHtml(locale.ui.expectedConfirm)}</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function minimumAttendeeChoices(room) {
+        const expected = clampNumber(room.expectedCount, 3, 20, 7);
+        return Array.from({ length: expected - 1 }, (_, index) => {
+          const count = index + 2;
+          return { value: String(count), label: `${count}명` };
+        });
+      }
+
+      function renderAgreementModeSelector(room, options = {}) {
+        const mode = normalizeAgreementMode(room.agreementMode);
+        const selectName = options.selectName || "minimum-attendees";
+        const testPrefix = options.testPrefix || "agreement";
+        const minimumValue = String(agreementMinimum(room));
+        return `
+          <section class="AgreementModeSelector" data-testid="${escapeHtml(testPrefix)}-mode-selector" aria-label="${escapeHtml(locale.ui.agreementQuestion)}">
+            <input type="hidden" name="agreement-mode" value="${escapeHtml(mode)}" />
+            <div class="topline">
+              <div class="slotMeta">
+                <strong>${escapeHtml(locale.ui.agreementQuestion)}</strong>
+                <span>${escapeHtml(agreementBody(mode))}</span>
+              </div>
+              ${reasonChip(agreementModes[mode].className, agreementLabel(mode))}
+            </div>
+            <div class="AgreementModeGrid" role="radiogroup" aria-label="${escapeHtml(locale.ui.agreementQuestion)}">
+              ${Object.keys(agreementModes)
+                .map((key) => {
+                  const selected = key === mode;
+                  return `<button class="AgreementModeButton" type="button" role="radio" aria-checked="${selected}" data-selected="${selected}" data-action="${escapeHtml(options.action || "set-agreement-mode")}" data-agreement-mode="${key}" data-testid="${escapeHtml(testPrefix)}-mode-${key}">
+                    <strong>${escapeHtml(agreementLabel(key))}</strong>
+                    <span>${escapeHtml(agreementBody(key))}</span>
+                  </button>`;
+                })
+                .join("")}
+            </div>
+            <div class="AgreementMinimumRow" ${mode === "all_together" ? "hidden" : ""}>
+              <span class="helperText">${escapeHtml(locale.ui.agreementThresholdBody)}</span>
+              <label class="inputGroup" data-testid="${escapeHtml(testPrefix)}-minimum-attendees">
+                <span class="inputLabel">${escapeHtml(locale.ui.minimumAttendees)}</span>
+                ${renderCustomChoiceControl({
+                  name: selectName,
+                  value: minimumValue,
+                  options: minimumAttendeeChoices(room),
+                  testPrefix: `${testPrefix}-minimum`,
+                  ariaLabel: locale.ui.minimumAttendees,
+                })}
+              </label>
+            </div>
+          </section>
+        `;
+      }
+
+      function renderAgreementChangeSheet(room) {
+        if (!appState.agreementSheetOpen) return "";
+        const draftRoom = {
+          ...room,
+          agreementMode: pendingResultAgreementMode(),
+          minimumAttendees: appState.pendingMinimumAttendees || room.minimumAttendees,
+        };
+        return `
+          <section class="AgreementChangeSheet" data-testid="agreement-change-sheet" aria-label="${escapeHtml(locale.ui.agreementChangeTitle)}">
+            <div class="topline">
+              <div class="slotMeta">
+                <strong>${escapeHtml(locale.ui.agreementChangeTitle)}</strong>
+                <span>${escapeHtml(locale.ui.agreementChangeBody)}</span>
+              </div>
+              ${reasonChip(agreementModes[normalizeAgreementMode(draftRoom.agreementMode)].className, agreementLabel(draftRoom.agreementMode))}
+            </div>
+            ${renderAgreementModeSelector(draftRoom, {
+              action: "set-result-agreement-mode",
+              selectName: "result-minimum-attendees",
+              testPrefix: "result-agreement",
+            })}
+            <button class="primaryButton Button3D" type="button" data-action="apply-agreement-mode" data-testid="apply-agreement-mode-button">${escapeHtml(locale.ui.applyAgreement)}</button>
+          </section>
+        `;
       }
 
       function renderParticipantRosterInputs(room) {
@@ -3519,34 +4371,33 @@
           const savedRoomLine = hasIncomingInvite
             ? formatTemplate(locale.ui.incomingInviteBody, { title: appState.room.title })
             : appState.room
-            ? `최근 방: ${appState.room.title} · ${ranked.responseCount}명 응답`
+            ? `현재 모임 · ${appState.room.title} · ${ranked.responseCount}명 응답`
             : locale.ui.emptyRoom;
           return `
             <section id="scr-00-entry" class="screen" aria-labelledby="entry-title">
               <div class="screenBody">
                 <section class="HomeHero" aria-label="함모여 시작">
-                  <img class="HomeHeroAnimals" src="assets/final/hero/hero_animals_calendar_tight.png" alt="" aria-hidden="true" />
                   <strong class="HomeTitleMark" aria-hidden="true">함모여</strong>
                   <div class="HomeHeroContent">
-                    <div class="section">
-                      <span class="eyebrow">${escapeHtml(locale.brand.name)}</span>
-                      <h1 id="entry-title">${escapeHtml(hasIncomingInvite ? "받은 초대를 먼저 확인해요" : copy.title)}</h1>
-                      <p>${escapeHtml(copy.description)}</p>
+                    <div class="HomeHeroSlogan">
+                      <strong id="entry-title">${escapeHtml(hasIncomingInvite ? "받은 초대를 먼저 확인해요" : copy.title)}</strong>
+                      <span>${escapeHtml(copy.description)}</span>
+                    </div>
+                    <div class="HomeHeroPrivacyMessage" data-testid="home-privacy-message">
+                      <span>비밀 투표</span>
+                      <strong>마지막 투표, 항상 부담되셨죠?</strong>
+                      <em>안 맞는 사람은 숨기고, 합의 상황만 함께 봐요.</em>
                     </div>
                   </div>
+                  <img class="HomeHeroAnimals" src="assets/final/hero/hero_animals_calendar_full_square.png" alt="" aria-hidden="true" />
+                  ${homeHeroStatusOverlay({
+                    stats,
+                    hostedCount,
+                    candidateCount: appState.room ? `${appState.room.candidates.length}개` : "0개",
+                    savedRoomLine,
+                  })}
                 </section>
                 ${hasIncomingInvite ? incomingInviteCard(appState.room) : ""}
-                <div class="HomeStatusPanel">
-                  ${reasonChip("brand", locale.ui.currentStatus)}
-                  <div class="HomeStatusGrid" aria-label="현재 모임 상태">
-                    <div class="HomeMetricCard"><strong>${escapeHtml(stats ? `${stats.answered}/${stats.expected}` : "0/0")}</strong><span>응답</span></div>
-                    <div class="HomeMetricCard"><strong>${escapeHtml(stats ? `${stats.missing}명` : `${hostedCount}개`)}</strong><span>${stats ? "미응답" : "내 모임"}</span></div>
-                    <div class="HomeMetricCard"><strong>${escapeHtml(appState.room ? `${appState.room.candidates.length}개` : "0개")}</strong><span>후보</span></div>
-                  </div>
-                  <p class="caption">${escapeHtml(locale.ui.entryCaption)}</p>
-                  <p class="emptyStateLine">${escapeHtml(savedRoomLine)}</p>
-                  ${hostedCount ? `<p class="helperText">${escapeHtml(locale.ui.savedMeetupsTitle)} ${hostedCount}</p>` : ""}
-                </div>
                 ${hasIncomingInvite ? `<p class="guideNote">${escapeHtml(locale.ui.responseInboxHint)}</p>` : ""}
               </div>
             </section>
@@ -3568,17 +4419,14 @@
                   <div class="formGrid">
                     <label class="inputGroup">
                       <span class="inputLabel">예상 인원</span>
-                      <span class="selectShell">
-                        <select class="IOSCountSelect" data-testid="expected-count-select" name="expected-count">
-                          ${expectedCountOptions(room.expectedCount)}
-                        </select>
-                      </span>
+                      ${renderExpectedCountControl(room)}
                     </label>
                     <label class="inputGroup">
                       <span class="inputLabel">응답 마감</span>
-                      <input class="textInput" data-testid="deadline-input" name="deadline" value="${escapeHtml(room.deadlineLabel)}" />
+                      ${renderDeadlineControl(room)}
                     </label>
                   </div>
+                  ${renderAgreementModeSelector(room)}
                   ${renderParticipantRosterInputs(room)}
                   ${renderCandidateInputs(room)}
                 </form>
@@ -3595,7 +4443,15 @@
         "scr-02-participant-input": () => {
           const copy = screenCopy("scr-02-participant-input");
           const room = appState.room;
-          if (!room) return renderers["scr-00-entry"]();
+          if (!room) {
+            return `
+              <section id="scr-02-participant-input" class="screen" aria-labelledby="response-empty-title">
+                <div class="screenBody">
+                  ${responseInbox(null)}
+                </div>
+              </section>
+            `;
+          }
           const ranked = rankCandidates(room);
           if (appState.showResponseInbox) {
             return `
@@ -3617,6 +4473,8 @@
                   ${reasonChip("brand", room.title)}
                   <span class="progressPill">${escapeHtml(responseProgressText(room))}</span>
                 </div>
+                ${agreementChangeNotice(room)}
+                <p class="guideNote" data-testid="pre-response-privacy-note">${escapeHtml(locale.ui.preResponsePrivacy)}</p>
                 ${renderParticipantPicker(room, isClosed)}
                 <label class="inputGroup">
                   <span class="inputLabel">${roster.length ? "선택한 이름" : "내 이름 또는 별명"}</span>
@@ -3673,6 +4531,8 @@
                 </div>
                 <span class="progressPill">${escapeHtml(responseProgressText(room))}</span>
                 ${responseCoverage(room, coverageState)}
+                ${agreementChangeNotice(room)}
+                ${anonymousAggregatePanel(room)}
                 <p class="guideNote">${escapeHtml(locale.ui.copyReminderHint)}</p>
                 ${appState.copyStatus ? `<p class="actionStatus" data-testid="copy-status">${escapeHtml(appState.copyStatus)}</p>` : ""}
               </div>
@@ -3698,6 +4558,7 @@
               candidateSlotCard(item.candidate, {
                 summary: item,
                 selected: false,
+                ranked,
               }),
             )
             .join("");
@@ -3709,6 +4570,7 @@
                   <div class="RecommendationHeroContent">
                     <div class="topline">
                       ${reasonChip("brand", ranked.confidenceLabel)}
+                      ${reasonChip(agreementModes[ranked.agreementMode].className, agreementLabel(ranked.agreementMode))}
                       ${avatarStack(ranked.responseCount)}
                     </div>
                     <div class="section">
@@ -3728,11 +4590,15 @@
                     </div>
                     <div class="topline" aria-label="${escapeHtml(locale.ui.recommendationReason)}">
                       ${reasonChip("success", formatTemplate(locale.ui.responseCount, { count: ranked.responseCount }))}
-                      ${reasonChip("brand", formatTemplate(locale.ui.score, { score: top.score }))}
+                      ${reasonChip("brand", aggregateLine(top))}
                       ${top.counts.hardNo > 0 ? reasonChip("warning", formatTemplate(locale.ui.hardNoMetric, { count: top.counts.hardNo })) : reasonChip("success", locale.ui.noHardNo)}
                     </div>
                   </div>
                 </article>
+                ${agreementChangeNotice(room)}
+                ${anonymousAggregatePanel(room)}
+                <button class="candidateActionButton Button3D" type="button" data-action="toggle-agreement-sheet" data-testid="toggle-agreement-sheet-button">${escapeHtml(locale.ui.changeAgreement)}</button>
+                ${renderAgreementChangeSheet(room)}
                 <div class="compactSection" aria-label="${escapeHtml(locale.ui.otherOptions)}">
                   ${alternatives || `<p class="emptyStateLine">${escapeHtml(locale.ui.noAlternatives)}</p>`}
                 </div>
@@ -3753,9 +4619,9 @@
           if (!room) return renderers["scr-00-entry"]();
           const ranked = rankCandidates(room);
           const needsNewOptions = ranked.enough && !ranked.top;
-          const title = needsNewOptions ? "새 후보 시간이 필요해요" : copy.title;
+          const title = needsNewOptions ? "기준을 다시 보거나 후보를 더 열어봐요" : copy.title;
           const description = needsNewOptions
-            ? `${room.title}은 현재 후보 시간마다 어려움 응답이 많아요. 방장이 새 후보를 열면 다시 고를 수 있어요.`
+            ? `${room.title}은 현재 기준을 만족하는 후보가 아직 없어요. 기준을 바꾸면 기존 응답으로 다시 계산할 수 있어요.`
             : `${room.title}은 아직 응답이 조금 더 필요해요. 집계가 충분해지면 추천을 보여드려요.`;
           const secondaryLabel = isDemoMode() ? locale.ui.sampleResult : locale.ui.goHome;
           return `
@@ -3768,9 +4634,11 @@
                   <p>${escapeHtml(description)}</p>
                 </div>
                 ${responseCoverage(room, needsNewOptions ? "blocked" : "low")}
+                ${agreementChangeNotice(room)}
+                ${anonymousAggregatePanel(room)}
                 ${generalShareLinkBox(room)}
                 ${shareCopyBox(room, ranked)}
-                <p class="guideNote">${needsNewOptions ? "관계 안전을 위해 어려움이 많은 후보는 밀어붙이지 않아요." : "조금 더 모이면 방장이 설명하기 쉬운 추천안을 만들 수 있어요."}</p>
+                <p class="guideNote">${needsNewOptions ? "사람별 선택은 숨기고, 합의 상황만 기준에 맞춰 다시 보여드려요." : "조금 더 모이면 방장이 설명하기 쉬운 추천안을 만들 수 있어요."}</p>
               </div>
               ${stickyBottomCTA(copy.primary, secondaryLabel, {
                 primaryAction: "copy-invite",
@@ -3986,11 +4854,20 @@
           .map((item) => {
             const active = item.screens.includes(activeScreen);
             return `<button class="BottomNavItem" type="button" data-tab-key="${escapeHtml(item.key)}" data-active="${active}" data-center="${item.center ? "true" : "false"}" aria-current="${active ? "page" : "false"}" ${actionAttrs(item.action, item.testId)}>
-              <span class="BottomNavIcon" aria-hidden="true">${escapeHtml(item.icon)}</span>
+              ${item.center ? `<span class="BottomNavIcon" aria-hidden="true">${escapeHtml(item.icon)}</span>` : ""}
               <span class="BottomNavLabel">${escapeHtml(item.label)}</span>
             </button>`;
           })
           .join("");
+      }
+
+      function centerSelectedTimeWheelOptions(root = screenRoot) {
+        root.querySelectorAll(".ReleaseTimeWheelColumn").forEach((column) => {
+          const selected = column.querySelector('[data-selected="true"]');
+          if (selected) {
+            column.scrollTop = selected.offsetTop - (column.clientHeight - selected.offsetHeight) / 2;
+          }
+        });
       }
 
       function render(screen) {
@@ -4009,6 +4886,7 @@
         renderBottomNav(current);
         renderedScreen = current;
         renderedResponseMode = current === "scr-02-participant-input" ? responseModeFromUrl() : "detail";
+        requestAnimationFrame(() => centerSelectedTimeWheelOptions(screenRoot));
       }
 
       function readRoomForm() {
@@ -4026,7 +4904,15 @@
             note: form?.querySelector(`[name="candidate-note-${index}"]`)?.value || fallback.note,
           };
         });
-        const expectedCount = form?.querySelector('[name="expected-count"]')?.value || 7;
+        const expectedCountChoice = form?.querySelector('[name="expected-count"]')?.value || 7;
+        const customExpectedCount = form?.querySelector('[name="expected-count-custom"]')?.value || appState.customExpectedCountValue || appState.hostDraft?.expectedCount || 11;
+        const expectedCount = expectedCountChoice === "custom"
+          ? clampNumber(customExpectedCount, 3, 20, 11)
+          : clampNumber(expectedCountChoice, 3, 20, 7);
+        const agreementMode = normalizeAgreementMode(form?.querySelector('[name="agreement-mode"]')?.value);
+        const minimumAttendees = agreementMode === "all_together"
+          ? defaultMinimumAttendees(expectedCount)
+          : normalizeMinimumAttendees(form?.querySelector('[name="minimum-attendees"]')?.value, expectedCount);
         const participants = Array.from({ length: clampNumber(expectedCount, 3, 20, 7) }, (_, index) => ({
           id: participantIdForIndex(index),
           name: form?.querySelector(`[name="participant-name-${index}"]`)?.value || "",
@@ -4037,6 +4923,8 @@
           deadlineLabel: form?.querySelector('[name="deadline"]')?.value || "오늘 22:00",
           participants,
           candidates: candidateInputs,
+          agreementMode,
+          minimumAttendees,
           responses: [],
           status: "collecting",
         };
@@ -4058,10 +4946,21 @@
         const existingRoom = appState.editingRoomId
           ? (appState.hostRooms || []).find((savedRoom) => savedRoom.id === appState.editingRoomId) || appState.room
           : null;
+        const previousMode = existingRoom ? normalizeAgreementMode(existingRoom.agreementMode) : null;
+        const previousMinimum = existingRoom ? agreementMinimum(existingRoom) : null;
+        const nextMode = normalizeAgreementMode(formRoom.agreementMode);
+        const nextMinimum = normalizeMinimumAttendees(formRoom.minimumAttendees, formRoom.expectedCount);
+        const agreementChanged = Boolean(existingRoom && (previousMode !== nextMode || previousMinimum !== nextMinimum));
         const room = createDemoRoom({
           ...formRoom,
           id: existingRoom?.id,
           responses: existingRoom?.responses || [],
+          agreementMode: nextMode,
+          minimumAttendees: nextMinimum,
+          agreementRevision: agreementChanged ? (existingRoom?.agreementRevision || 0) + 1 : existingRoom?.agreementRevision || 0,
+          previousAgreementMode: agreementChanged ? previousMode : existingRoom?.previousAgreementMode || null,
+          previousMinimumAttendees: agreementChanged ? previousMinimum : existingRoom?.previousMinimumAttendees || null,
+          agreementChangedAt: agreementChanged ? new Date().toISOString() : existingRoom?.agreementChangedAt || null,
           status: existingRoom?.status || "collecting",
           selectedCandidateId: existingRoom?.selectedCandidateId || null,
           shareUrl: existingRoom?.shareUrl || "",
@@ -4094,6 +4993,13 @@
           lastSubmittedAt: null,
           lastResponseId: null,
           showResponseInbox: false,
+          customExpectedCountOpen: false,
+          customExpectedCountValue: "",
+          agreementSheetOpen: false,
+          pendingAgreementMode: "",
+          pendingMinimumAttendees: "",
+          openChoicePopover: "",
+          openDeadlineCalendar: false,
         };
         appState.draftPreferences = getDraftPreferences(appState.room);
         saveState();
@@ -4103,6 +5009,68 @@
       function persistHostDraftFromForm() {
         appState.hostDraft = createDemoRoom({ ...readRoomForm(), status: "draft" });
         appState.hostDraft.status = "draft";
+      }
+
+      function confirmExpectedCountInput() {
+        const input = screenRoot.querySelector('[name="expected-count-custom"]');
+        appState.customExpectedCountOpen = true;
+        appState.customExpectedCountValue = String(clampNumber(input?.value || appState.customExpectedCountValue, 3, 20, 11));
+        persistHostDraftFromForm();
+        hasUnsavedEdits = true;
+        saveState();
+        render("scr-01-host-room");
+      }
+
+      function setDraftAgreementMode(mode) {
+        const form = screenRoot.querySelector("[data-room-form]");
+        const input = form?.querySelector('[name="agreement-mode"]');
+        if (input) input.value = normalizeAgreementMode(mode);
+        appState.openChoicePopover = "";
+        persistHostDraftFromForm();
+        hasUnsavedEdits = true;
+        saveState();
+        render("scr-01-host-room");
+      }
+
+      function pendingResultAgreementMode() {
+        return normalizeAgreementMode(appState.pendingAgreementMode || appState.room?.agreementMode);
+      }
+
+      function setResultAgreementMode(mode) {
+        appState.pendingAgreementMode = normalizeAgreementMode(mode);
+        appState.pendingMinimumAttendees = appState.pendingMinimumAttendees || String(agreementMinimum(appState.room));
+        appState.openChoicePopover = "";
+        saveState();
+        render("scr-03-result-recommendation");
+      }
+
+      function applyAgreementModeFromSheet() {
+        if (!appState.room) return;
+        const previousMode = normalizeAgreementMode(appState.room.agreementMode);
+        const previousMinimum = agreementMinimum(appState.room);
+        const nextMode = pendingResultAgreementMode();
+        const minimumInput = screenRoot.querySelector('[name="result-minimum-attendees"]');
+        const nextMinimum = nextMode === "all_together"
+          ? defaultMinimumAttendees(appState.room.expectedCount)
+          : normalizeMinimumAttendees(appState.pendingMinimumAttendees || minimumInput?.value || appState.room.minimumAttendees, appState.room.expectedCount);
+        const changed = previousMode !== nextMode || previousMinimum !== nextMinimum;
+        appState.room.agreementMode = nextMode;
+        appState.room.minimumAttendees = nextMinimum;
+        if (changed) {
+          appState.room.previousAgreementMode = previousMode;
+          appState.room.previousMinimumAttendees = previousMinimum;
+          appState.room.agreementRevision = (appState.room.agreementRevision || 0) + 1;
+          appState.room.agreementChangedAt = new Date().toISOString();
+        }
+        appState.pendingAgreementMode = "";
+        appState.pendingMinimumAttendees = "";
+        appState.openChoicePopover = "";
+        appState.agreementSheetOpen = false;
+        refreshRoomStatus(appState.room);
+        appState.room.shareUrl = buildGeneralShareUrl(appState.room);
+        syncActiveRoomToHostRooms();
+        saveState();
+        selectScreen(rankCandidates(appState.room).top ? "scr-03-result-recommendation" : "scr-04-insufficient-response", true);
       }
 
       function upsertHostRoom(room, rooms = []) {
@@ -4151,15 +5119,106 @@
 
       function syncTimeWheelSelection(control, value) {
         const { hour, minute } = parseTimeParts(value);
-        const period = hour < 12 ? "오전" : "오후";
         control?.querySelectorAll("[data-time-part]").forEach((button) => {
           const selected =
-            (button.dataset.timePart === "period" && button.dataset.timeToken === period) ||
             (button.dataset.timePart === "hour" && Number(button.dataset.timeToken) === hour) ||
             (button.dataset.timePart === "minute" && button.dataset.timeToken === minute);
           button.dataset.selected = String(selected);
           button.setAttribute("aria-checked", String(selected));
         });
+        centerSelectedTimeWheelOptions(control);
+      }
+
+      function rerenderAfterChoice(choice) {
+        if (choice?.startsWith("result-agreement")) {
+          render("scr-03-result-recommendation");
+          return;
+        }
+        render(currentScreen());
+      }
+
+      function toggleChoicePopover(choice) {
+        if (screenRoot.querySelector("[data-room-form]")) persistHostDraftFromForm();
+        appState.openChoicePopover = appState.openChoicePopover === choice ? "" : choice;
+        saveState();
+        rerenderAfterChoice(choice);
+      }
+
+      function setCustomChoiceValue(target) {
+        const choice = target.dataset.choice || "";
+        const value = target.dataset.choiceValue || "";
+        const name = target.dataset.choiceName || "";
+        const form = screenRoot.querySelector("[data-room-form]");
+        appState.openChoicePopover = "";
+        if (choice === "expected-count") {
+          const input = form?.querySelector(`[name="${name}"]`);
+          if (input) input.value = value;
+          appState.customExpectedCountOpen = value === "custom";
+          if (value === "custom") {
+            appState.customExpectedCountValue = String(clampNumber(appState.customExpectedCountValue || appState.hostDraft?.expectedCount || 11, 3, 20, 11));
+          } else {
+            appState.customExpectedCountValue = "";
+          }
+          appState.hostFormError = "";
+          persistHostDraftFromForm();
+          hasUnsavedEdits = true;
+          saveState();
+          render("scr-01-host-room");
+          return;
+        }
+        if (choice === "agreement-minimum") {
+          const input = form?.querySelector(`[name="${name}"]`);
+          if (input) input.value = value;
+          appState.hostFormError = "";
+          persistHostDraftFromForm();
+          hasUnsavedEdits = true;
+          saveState();
+          render("scr-01-host-room");
+          return;
+        }
+        if (choice === "result-agreement-minimum") {
+          appState.pendingMinimumAttendees = value;
+          saveState();
+          render("scr-03-result-recommendation");
+        }
+      }
+
+      function setDeadlineChoice(target, field) {
+        const form = screenRoot.querySelector("[data-room-form]");
+        const input = form?.querySelector('[name="deadline"]');
+        if (!input) return;
+        const current = parseDeadlineParts(input.value);
+        let nextDate = current.date;
+        let nextTime = current.time;
+        if (field === "date") {
+          nextDate = target.dataset.value || current.date;
+        }
+        if (field === "time") {
+          const currentTime = parseTimeParts(current.time);
+          const part = target.dataset.timePart;
+          const token = target.dataset.timeToken;
+          let nextHour = currentTime.hour;
+          let nextMinute = currentTime.minute;
+          if (part === "hour") nextHour = Math.min(23, Math.max(0, Number.parseInt(token, 10) || 0));
+          if (part === "minute") nextMinute = buildContinuousMinuteValues().includes(token) ? token : currentTime.minute;
+          nextTime = formatTimeValue(nextHour, nextMinute);
+          syncTimeWheelSelection(target.closest(".ReleaseTimeControl"), nextTime);
+        }
+        input.value = formatDeadlineLabel(nextDate, nextTime);
+        if (field === "date") {
+          const trigger = screenRoot.querySelector('[data-testid="deadline-calendar-trigger"] span');
+          if (trigger) trigger.textContent = weekdayLabel(nextDate);
+          const grid = target.closest('[role="grid"]');
+          grid?.querySelectorAll("[data-selected]").forEach((button) => {
+            const selected = button === target;
+            button.dataset.selected = String(selected);
+            button.setAttribute("aria-selected", String(selected));
+          });
+          const sheet = screenRoot.querySelector('[data-testid="deadline-calendar-sheet"]');
+          if (sheet) sheet.hidden = true;
+          appState.openDeadlineCalendar = false;
+        }
+        hasUnsavedEdits = true;
       }
 
       function setCandidateChoice(target, field) {
@@ -4174,13 +5233,7 @@
           const token = target.dataset.timeToken;
           let nextHour = current.hour;
           let nextMinute = current.minute;
-          if (part === "period") {
-            const nextPeriod = token === "오전" ? "오전" : "오후";
-            const currentPeriod = current.hour < 12 ? "오전" : "오후";
-            if (nextPeriod !== currentPeriod) {
-              nextHour = nextPeriod === "오전" ? Math.max(0, current.hour - 12) : Math.min(23, current.hour + 12);
-            }
-          } else if (part === "hour") {
+          if (part === "hour") {
             nextHour = Math.min(23, Math.max(0, Number.parseInt(token, 10) || 0));
           } else if (part === "minute") {
             nextMinute = ["00", "10", "20", "30", "40", "50"].includes(token) ? token : current.minute;
@@ -4435,7 +5488,9 @@
       function openParticipationTab() {
         appState.copyStatus = "";
         if (!appState.room) {
-          selectScreen("scr-00-entry");
+          appState.showResponseInbox = true;
+          saveState();
+          selectScreen("scr-02-participant-input", false, { responseMode: "inbox" });
           return;
         }
         if (appState.inviteContext?.status === "deleted" || appState.room.status === "expired") {
@@ -4514,8 +5569,34 @@
           selectScreen(ranked.top ? "scr-03-result-recommendation" : "scr-02-participant-input");
         }
         if (action === "create-room") createRoomFromForm();
+        if (action === "set-agreement-mode") setDraftAgreementMode(target.dataset.agreementMode);
+        if (action === "toggle-agreement-sheet") {
+          appState.agreementSheetOpen = !appState.agreementSheetOpen;
+          appState.pendingAgreementMode = normalizeAgreementMode(appState.room?.agreementMode);
+          appState.pendingMinimumAttendees = String(agreementMinimum(appState.room));
+          appState.openChoicePopover = "";
+          saveState();
+          render("scr-03-result-recommendation");
+        }
+        if (action === "set-result-agreement-mode") setResultAgreementMode(target.dataset.agreementMode);
+        if (action === "apply-agreement-mode") applyAgreementModeFromSheet();
         if (action === "add-candidate") addCandidateToDraft();
         if (action === "remove-candidate") removeCandidateFromDraft(Number(target.dataset.candidateIndex || 0));
+        if (action === "confirm-expected-count") confirmExpectedCountInput();
+        if (action === "toggle-choice-popover") toggleChoicePopover(target.dataset.choice || "");
+        if (action === "set-choice-value") setCustomChoiceValue(target);
+        if (action === "toggle-deadline-calendar") {
+          const sheet = screenRoot.querySelector('[data-testid="deadline-calendar-sheet"]');
+          const shouldOpen = sheet?.hidden;
+          screenRoot.querySelectorAll(".ReleaseCalendarSheet").forEach((node) => {
+            node.hidden = true;
+          });
+          if (sheet) sheet.hidden = !shouldOpen;
+          target.setAttribute("aria-expanded", String(Boolean(shouldOpen)));
+          appState.openDeadlineCalendar = Boolean(shouldOpen);
+        }
+        if (action === "set-deadline-date") setDeadlineChoice(target, "date");
+        if (action === "set-deadline-time") setDeadlineChoice(target, "time");
         if (action === "toggle-candidate-calendar") {
           const index = Number(target.dataset.candidateIndex || 0);
           const sheet = screenRoot.querySelector(`[data-testid="candidate-calendar-sheet-${index}"]`);
@@ -4631,6 +5712,17 @@
 
       screenRoot.addEventListener("change", (event) => {
         if (event.target.matches('[name="expected-count"]')) {
+          const isCustom = event.target.value === "custom";
+          appState.customExpectedCountOpen = isCustom;
+          appState.customExpectedCountValue = isCustom
+            ? String(clampNumber(appState.customExpectedCountValue || appState.hostDraft?.expectedCount || 11, 3, 20, 11))
+            : "";
+          appState.hostFormError = "";
+          persistHostDraftFromForm();
+          hasUnsavedEdits = true;
+          render("scr-01-host-room");
+        }
+        if (event.target.matches('[name="minimum-attendees"]')) {
           appState.hostFormError = "";
           persistHostDraftFromForm();
           hasUnsavedEdits = true;
@@ -4640,7 +5732,10 @@
 
       window.HAMMOYEO_APP_TESTS = {
         minimumResponses,
+        agreementMinimum,
+        requiredResponsesForAgreement,
         rankCandidates,
+        summarizeCandidate,
         buildShareText,
         buildCopyTextForAction,
         createDemoRoom,

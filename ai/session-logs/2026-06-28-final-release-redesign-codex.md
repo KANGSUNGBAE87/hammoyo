@@ -261,3 +261,158 @@ Date: 2026-06-28
 
 - GitHub Pages deployment was not run in this implementation pass.
 - Supabase-backed multi-device roster and per-person link tracking remain future backend work; current release page still stores state in browser storage and share payloads.
+
+## Later Update: Poster Hero And Empty Response Tab Pass
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 이전 구현 이후 논의한 홈 poster hero, 3D 진행 상태, 응답 탭 empty state, 직접입력 인원, 24시간제 time wheel, 로컬 데이터 삭제 확인 팝업을 서브에이전트와 함께 구현.
+- 응답 탭은 현재 모임이 없어도 눌리고, `현재 모임이 없어요` empty state를 보여야 함.
+
+### Subagent Inputs
+
+- `ui-fixer`: `docs/release/index.html`에서 hero status overlay, response empty state, expected count direct input, 24-hour time wheel, clear-local-data confirm을 구현하고 기능 검증을 통과했다고 보고.
+- `reviewer`: final diff review requested after integration.
+
+### Decisions
+
+- 홈의 별도 `HomeStatusPanel`은 제거하고, `HomeHeroStatusOverlay` / `HeroStatusPill`을 poster hero 하단에 통합한다.
+- 응답 탭은 `appState.room`이 없어도 `scr-02-participant-input&response=inbox`로 진입하며, 받은 초대 empty state와 내가 보낸 방 안내를 함께 보여준다.
+- 예상 인원 select는 `3~10 + 직접입력`으로 제한하고, 직접입력 확인 후 참여자 입력 칸 수를 동기화한다.
+- 시간 wheel은 오전/오후 열을 제거하고 0~23시 hour/minute 2열로 유지한다.
+- 로컬 데이터 삭제는 기존 custom confirm modal을 재사용하고, 취소 시 storage를 보존한다.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-design.mjs`
+- `scripts/verify-release-functional.mjs`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+
+### Verification
+
+- `npm run build` passed.
+- `git diff --check` passed.
+- `docs/release/index.html` and `docs/index.html` are identical (`cmp_exit=0`).
+- Playwright visual QA screenshots:
+  - `/tmp/hammoyo-agreement-create-panel-390.png`
+  - `/tmp/hammoyo-anonymous-result-panel-390.png`
+  - `/tmp/hammoyo-agreement-sheet-panel-390.png`
+- Playwright visual QA screenshots:
+  - `/tmp/hammoyo-home-390-v4.png`
+  - `/tmp/hammoyo-home-320-v4.png`
+  - `/tmp/hammoyo-response-empty-390-v4.png`
+  - `/tmp/hammoyo-host-custom-390-v4.png`
+
+### Remaining Risks
+
+- GitHub Pages deployment was not run yet in this pass.
+- Empty response tab is local-state based; truly knowing who has not responded still requires server-backed invite tracking or per-person links.
+
+## Later Update: Anonymous Consensus And Agreement Criteria Pass
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 첨부된 새 방향대로 함모여를 `개별 선택은 비공개, 현재 합의 상황은 공개` 구조로 변경.
+- 별도 의견은 나중에 주고, P1/P1.5/P2까지 서브에이전트를 활용해 구현.
+- 구현 후 부족하거나 충돌되는 부분은 다시 조정.
+
+### Subagent Inputs
+
+- Native Codex subagents `planner` and `reviewer` were attempted first, but both failed immediately due to usage-limit exhaustion.
+- Claude CLI first-party auth status was valid, but the delegated read-only review failed with API 401.
+- Antigravity/Gemini read-only UX/QA review completed and recommended: hide candidate aggregates before response, show anonymous aggregates after response and to host, add agreement modes, keep individual choices hidden, and expand functional/design tests.
+
+### Decisions
+
+- Product principle is now `사람은 숨기고, 상황은 보여준다`.
+- Participant detail before response shows only progress and privacy guidance; candidate-level aggregate counts are hidden until after submission.
+- Response-complete, recommendation, insufficient-response host contexts, and my-meetups host cards now use anonymous aggregate/status summaries without person-choice matrices.
+- Room model now includes `agreementMode`, `minimumAttendees`, `agreementRevision`, previous criterion fields, and `agreementChangedAt`.
+- Agreement modes:
+  - `all_together`: default; any burden response can hold a candidate back.
+  - `threshold`: recommends a candidate when host-selected minimum attendees are available.
+  - `fast_decision`: recommends the earliest candidate that reaches the minimum attendees.
+- Changing agreement criteria keeps existing responses and recalculates recommendation; a criterion-change notice is shown.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-design.mjs`
+- `scripts/verify-release-functional.mjs`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+
+### Verification
+
+- `node scripts/verify-release-functional.mjs` passed.
+- `npm run build` passed.
+- `git diff --check` passed.
+- `docs/release/index.html` and `docs/index.html` are identical (`cmp_exit=0`).
+
+### Remaining Risks
+
+- 네이티브 Codex 서브에이전트와 Claude delegated review는 환경/사용량 문제로 완료되지 못해 이번 pass는 Antigravity 보조 검토 + main Codex 통합 검증으로 마무리했다.
+- 현재 GitHub Pages 정적 앱은 localStorage/share payload 기반이라, 다른 기기에서 같은 방의 실시간 응답 집계를 공유하려면 Supabase-backed room/response 저장소가 필요하다.
+- 기준 변경 notice는 새 share payload 또는 같은 저장 상태를 보는 사용자에게 표시된다. 이미 오래전에 받은 정적 링크만 다시 열면 최신 기준 변경을 서버 없이 알 수 없다.
+
+## Later Update: Secret Vote Hero And Custom Form Controls Pass
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 홈 첫 화면에서 전체 hero 이미지와 이미지 아래 현재 진행상태가 보이도록 재구성.
+- 비밀 투표 가치를 첫 설명에서 강하게 강조하고, 파란색 문장으로 "마지막 투표, 항상 부담되셨죠?" 흐름을 보여주기.
+- 하단 탭의 희미한 그림 제거, 글자 중심 정렬.
+- 모든 dropdown/native calendar 기본형을 앱에 맞는 custom control로 바꾸고, 이 원칙을 전역지침에 반영.
+- 응답 마감도 iPhone-like calendar와 24시간/10분 단위 time wheel로 바꾸기.
+- 후보 삭제 시 카드가 실제로 사라지도록 보장.
+
+### Subagent Inputs
+
+- Native Codex subagent `019f0e5d-7a06-7e83-b1a6-87b4f49f9fec` read-only UX review found P0 issues: home hero overlay structure, response tab decorative graphic, native select usage, deadline plain input, discontinuous time wheel, weak candidate delete verification.
+- Native Codex subagent `019f0e5d-d138-74b1-8264-db9debcdb4e5` read-only verifier review blocked the previous state due to native `select`, plain deadline input, stale tests, and weak visual regressions.
+
+### Decisions
+
+- Home hero now leads with a blue `비밀 투표` message and keeps the animal/calendar image in-flow, followed by the current status card.
+- Bottom navigation no longer uses background animal/object art on the tab items; non-center tabs are text-only.
+- Expected count and minimum attendees use `CustomChoiceControl` and `CustomChoicePopover` instead of native select.
+- Deadline uses the same visual calendar system as candidate dates plus the release time wheel.
+- Time wheel data order is continuous: hours `00` through `23`, minutes `00,10,20,30,40,50`; the selected item is centered inside the wheel column without scrolling the whole screen.
+- Candidate deletion no longer pads back to three cards automatically; removing a third candidate leaves two cards until the user adds another.
+- Global design preflight now records the custom dropdown/calendar/time-control rule.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-design.mjs`
+- `scripts/verify-release-functional.mjs`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+- `/Users/kangsungbae/Documents/지식저장소/docs/workflows/design-preflight.md`
+- `/Users/kangsungbae/.codex/memories/extensions/ad_hoc/notes/2026-06-28-225452-custom-form-controls-calendar.md`
+
+### Verification
+
+- `npm run build` passed.
+- Playwright screenshots checked:
+  - `/tmp/hammoyo-home-390-v3.png`
+  - `/tmp/hammoyo-home-320-v3.png`
+  - `/tmp/hammoyo-create-390-v3.png`
+  - `/tmp/hammoyo-create-count-open-v2.png`
+  - `/tmp/hammoyo-create-calendar-open.png`
+
+### Remaining Risks
+
+- Static GitHub Pages/localStorage still cannot know cross-device response state without Supabase-backed room/response storage.
+- Native browser controls are now blocked in this release HTML, but future projects need the global design preflight and memory note to be read before UI implementation.

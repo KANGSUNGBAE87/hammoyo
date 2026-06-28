@@ -69,6 +69,72 @@ async function assertButtonInInitialViewport(page, testId, message) {
   assert(result.visible && result.top >= 0 && result.bottom <= result.viewportHeight, message);
 }
 
+async function assertHomeHeroOverlayClearance(page, message) {
+  const result = await page.evaluate(() => {
+    const overlay = document.querySelector('[data-testid="home-status-overlay"]');
+    const nav = document.querySelector(".BottomNav");
+    if (!overlay || !nav) return { ok: false, reason: "missing overlay or nav" };
+    const overlayRect = overlay.getBoundingClientRect();
+    const navRect = nav.getBoundingClientRect();
+    return {
+      ok: overlayRect.bottom <= navRect.top - 8,
+      overlayBottom: Math.round(overlayRect.bottom),
+      navTop: Math.round(navRect.top),
+    };
+  });
+  assert(result.ok, `${message}: ${JSON.stringify(result)}`);
+}
+
+async function assertHomeHeroImageAndStatusFlow(page) {
+  const result = await page.evaluate(() => {
+    const image = document.querySelector(".HomeHeroAnimals");
+    const overlay = document.querySelector('[data-testid="home-status-overlay"]');
+    if (!image || !overlay) return { ok: false, reason: "missing hero image or status" };
+    const imageRect = image.getBoundingClientRect();
+    const overlayRect = overlay.getBoundingClientRect();
+    const overlayStyle = getComputedStyle(overlay);
+    return {
+      ok:
+        imageRect.width >= Math.min(210, window.innerWidth * 0.53) &&
+        imageRect.height >= Math.min(210, window.innerWidth * 0.53) &&
+        overlayStyle.position !== "absolute" &&
+        overlayRect.top >= imageRect.bottom - 8,
+      imageWidth: Math.round(imageRect.width),
+      imageHeight: Math.round(imageRect.height),
+      imageBottom: Math.round(imageRect.bottom),
+      overlayTop: Math.round(overlayRect.top),
+      overlayPosition: overlayStyle.position,
+    };
+  });
+  assert(result.ok, `home hero should show the full image with status below it: ${JSON.stringify(result)}`);
+}
+
+async function chooseCustomOption(page, prefix, value) {
+  await page.getByTestId(`${prefix}-trigger`).click();
+  await page.getByTestId(`${prefix}-option-${value}`).click();
+}
+
+async function assertNoNativeSelects(page, message) {
+  const count = await page.locator("select").count();
+  assert(count === 0, `${message}: found ${count} native select element(s)`);
+}
+
+async function assertAgreementModeVertical(page, prefix = "agreement") {
+  const result = await page.evaluate((testPrefix) => {
+    const buttons = ["all_together", "threshold", "fast_decision"]
+      .map((key) => document.querySelector(`[data-testid="${testPrefix}-mode-${key}"]`))
+      .filter(Boolean);
+    if (buttons.length !== 3) return { ok: false, reason: "missing agreement buttons", count: buttons.length };
+    const rects = buttons.map((button) => button.getBoundingClientRect());
+    return {
+      ok: rects[0].top < rects[1].top && rects[1].top < rects[2].top && rects.every((rect) => rect.height >= 64),
+      tops: rects.map((rect) => Math.round(rect.top)),
+      heights: rects.map((rect) => Math.round(rect.height)),
+    };
+  }, prefix);
+  assert(result.ok, `agreement options should be stacked vertical cards: ${JSON.stringify(result)}`);
+}
+
 async function assertStickyCtaDoesNotCoverBody(page, message) {
   const result = await page.evaluate(() => {
     const screenBody = document.querySelector(".screenBody");
@@ -119,7 +185,36 @@ async function main() {
   assert(!cleanEntryText.includes("최근 방:"), "clean entry should not expose a fake recent room");
   assert(cleanEntryText.includes("아직 만든 모임이 없어요"), "clean entry should explain that no room exists yet");
   assert(cleanEntryText.includes("현재 상태"), "entry should show a concise current status card");
+  assert(cleanEntryText.includes("진행 상태"), "entry should show a larger integrated progress-status label");
+  assert(cleanEntryText.includes("비밀 투표"), "entry should emphasize secret voting as the first product promise");
+  assert(cleanEntryText.includes("마지막 투표, 항상 부담되셨죠?"), "entry should use the stronger secret-vote headline");
+  const privacyMessageColor = await page.getByTestId("home-privacy-message").locator("strong").evaluate((node) => getComputedStyle(node).color);
+  const privacyRgb = privacyMessageColor.match(/\d+/g)?.slice(0, 3).map(Number) || [];
+  assert(
+    privacyRgb.length === 3 && privacyRgb[2] > privacyRgb[0] && privacyRgb[2] > privacyRgb[1],
+    `secret-vote headline should be visibly blue: ${privacyMessageColor}`,
+  );
   assert(!cleanEntryText.includes("EN") && !cleanEntryText.includes("앱 준비"), "entry should not expose language or app-ready pills");
+  assert((await page.locator(".HomeStatusPanel").count()) === 0, "entry status should be integrated into the poster hero instead of a separate card");
+  assert(await page.getByTestId("home-status-overlay").isVisible(), "entry should expose a hero-integrated status overlay");
+  assert(await page.getByTestId("hero-status-pill").isVisible(), "entry should expose a larger 3D hero status pill");
+  await assertHomeHeroImageAndStatusFlow(page);
+  const homeTitleAlignment = await page.evaluate(() => {
+    const hero = document.querySelector(".HomeHero");
+    const title = document.querySelector(".HomeTitleMark");
+    if (!hero || !title) return null;
+    const heroRect = hero.getBoundingClientRect();
+    const titleRect = title.getBoundingClientRect();
+    return {
+      heroCenter: Math.round(heroRect.left + heroRect.width / 2),
+      titleCenter: Math.round(titleRect.left + titleRect.width / 2),
+      textAlign: getComputedStyle(title).textAlign,
+    };
+  });
+  assert(
+    homeTitleAlignment && Math.abs(homeTitleAlignment.heroCenter - homeTitleAlignment.titleCenter) <= 3 && homeTitleAlignment.textAlign === "center",
+    `entry title should be centered in the poster hero: ${JSON.stringify(homeTitleAlignment)}`,
+  );
   const cleanEntryStorage = await page.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
   assert(cleanEntryStorage === null, "clean entry should not persist a placeholder room");
   assert((await page.locator('[data-testid="settings-button"]').count()) === 0, "topbar should not expose a duplicate settings button");
@@ -128,7 +223,24 @@ async function main() {
   assert((await page.locator('[data-testid="open-host-dashboard-button"]').count()) === 0, "home should not expose a duplicate my-meetups CTA");
   assert(await page.getByTestId("bottom-nav-settings").isVisible(), "entry should expose settings through bottom navigation");
   assert((await page.getByTestId("bottom-nav-create").innerText()).includes("모임"), "bottom create tab should use a readable create label");
+  const inactiveNavLabelColor = await page.getByTestId("bottom-nav-meetups").locator(".BottomNavLabel").evaluate((node) => getComputedStyle(node).color);
+  const inactiveNavRgb = inactiveNavLabelColor.match(/\d+/g)?.slice(0, 3).map(Number) || [];
+  assert(
+    inactiveNavRgb.length === 3 && inactiveNavRgb.every((channel) => channel <= 80),
+    `inactive bottom nav labels should use a dark readable text color: ${inactiveNavLabelColor}`,
+  );
   assert((await page.locator('[data-testid="language-toggle-button"]').count()) === 0, "entry should not expose a language switcher");
+  const navDecorStatus = await page.getByTestId("bottom-nav-home").evaluate((node) => getComputedStyle(node, "::before").display);
+  assert(navDecorStatus === "none", `bottom nav should not render faint decorative animal backgrounds: ${navDecorStatus}`);
+  await page.getByTestId("bottom-nav-respond").click();
+  await page.waitForSelector("#scr-02-participant-input");
+  assert(await page.getByTestId("response-empty-state").isVisible(), "response tab should be clickable without a room and show an empty state");
+  assert((await page.getByTestId("response-inbox-list").locator(".StateGraphicImage").count()) === 0, "empty response inbox should not show decorative state graphics");
+  const emptyResponseText = await page.getByTestId("response-empty-state").innerText();
+  assert(emptyResponseText.includes("현재 모임이 없어요"), "empty response tab should explain that there is no current meeting");
+  assert(new URLSearchParams(new URL(page.url()).search).get("response") === "inbox", "empty response tab should keep inbox route state instead of bouncing home");
+  await page.getByTestId("bottom-nav-home").click();
+  await page.waitForSelector("#scr-00-entry");
 
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.goto(baseFileUrl, { waitUntil: "load" });
@@ -177,6 +289,30 @@ async function main() {
       ],
     });
     const constrained = api.rankCandidates(hardNoConstraintRoom);
+    const thresholdRoom = api.createDemoRoom({
+      expectedCount: 5,
+      agreementMode: "threshold",
+      minimumAttendees: 4,
+      candidates: hardNoConstraintRoom.candidates,
+      responses: hardNoConstraintRoom.responses,
+    });
+    const thresholdRanked = api.rankCandidates(thresholdRoom);
+    const fastDecisionRoom = api.createDemoRoom({
+      expectedCount: 5,
+      agreementMode: "fast_decision",
+      minimumAttendees: 3,
+      candidates: [
+        { id: "slot-1", date: "2026-07-07", label: "7.7 화요일", time: "20:00", note: "강남역" },
+        { id: "slot-2", date: "2026-07-06", label: "7.6 월요일", time: "19:00", note: "잠실" },
+        { id: "slot-3", date: "2026-07-08", label: "7.8 수요일", time: "18:00", note: "홍대" },
+      ],
+      responses: [
+        { alias: "A", preferences: { "slot-1": "prefer", "slot-2": "available", "slot-3": "hardNo" } },
+        { alias: "B", preferences: { "slot-1": "prefer", "slot-2": "available", "slot-3": "hardNo" } },
+        { alias: "C", preferences: { "slot-1": "prefer", "slot-2": "available", "slot-3": "hardNo" } },
+      ],
+    });
+    const fastDecision = api.rankCandidates(fastDecisionRoom);
     const sameDayTieRoom = api.createDemoRoom({
       expectedCount: 3,
       candidates: [
@@ -198,6 +334,10 @@ async function main() {
       excluded: ranked.items.filter((item) => item.excluded).map((item) => item.candidate.id),
       constraintTopId: constrained.top?.candidate.id,
       constraintExcluded: constrained.items.filter((item) => item.excluded).map((item) => item.candidate.id),
+      thresholdTopId: thresholdRanked.top?.candidate.id,
+      thresholdExcluded: thresholdRanked.items.filter((item) => item.excluded).map((item) => item.candidate.id),
+      thresholdMinimum: thresholdRanked.minimum,
+      fastDecisionTopId: fastDecision.top?.candidate.id,
       sameDayTieTopId: sameDayTie.top?.candidate.id,
       shareCopy: api.buildShareText(room, ranked),
       copyTexts: api.buildCopyTextForAction
@@ -222,6 +362,10 @@ async function main() {
     assert(algorithmChecks.excluded.includes("slot-3"), "candidate with any hard-no response should be excluded");
     assert(algorithmChecks.constraintTopId === "slot-2", "a single hard-no should make a candidate ineligible even when its score is high");
     assert(algorithmChecks.constraintExcluded.includes("slot-1"), "hard-no constrained candidate should be marked excluded");
+    assert(algorithmChecks.thresholdTopId === "slot-1", "threshold mode should allow a candidate with one burden response when the minimum attendee count is met");
+    assert(algorithmChecks.thresholdExcluded.length === 0, "threshold mode should not mark burden responses as person-level exclusions");
+    assert(algorithmChecks.thresholdMinimum === 4, "threshold mode should use host-selected minimum attendees as the recommendation threshold");
+    assert(algorithmChecks.fastDecisionTopId === "slot-2", "fast decision mode should prefer the earliest eligible candidate");
     assert(algorithmChecks.sameDayTieTopId === "slot-2", "same-day tied candidates should use the earlier time before host order");
     assert(
       algorithmChecks.shareCopy.includes("6.29 토요일 18:30"),
@@ -253,8 +397,27 @@ async function main() {
   await page.getByTestId("bottom-nav-create").click();
   await page.waitForSelector("#scr-01-host-room");
   await page.getByTestId("room-title-input").fill("금요일 저녁 모임");
-  await page.getByTestId("expected-count-select").selectOption("7");
-  assert(await page.getByTestId("expected-count-select").evaluate((node) => node.closest(".selectShell") !== null), "expected count should use an iOS-like select shell");
+  await assertNoNativeSelects(page, "host setup should not use browser-native dropdowns");
+  assert(await page.getByTestId("agreement-mode-selector").isVisible(), "host setup should ask for the agreement mode");
+  assert((await page.getByTestId("agreement-mode-all_together").getAttribute("data-selected")) === "true", "agreement mode should default to all together");
+  await assertAgreementModeVertical(page);
+  await page.getByTestId("agreement-mode-threshold").click();
+  assert(await page.getByTestId("agreement-minimum-attendees").isVisible(), "threshold agreement mode should expose minimum attendees");
+  await page.getByTestId("agreement-mode-all_together").click();
+  await page.getByTestId("expected-count-trigger").click();
+  const expectedCountOptions = await page.locator('[data-testid^="expected-count-option-"]').evaluateAll((buttons) =>
+    buttons.map((button) => button.getAttribute("data-choice-value")),
+  );
+  assert(expectedCountOptions.includes("custom"), "expected-count control should include a direct-input option");
+  assert(!expectedCountOptions.includes("11"), "expected-count presets should stop at 10 before direct input");
+  await page.getByTestId("expected-count-trigger").click();
+  await chooseCustomOption(page, "expected-count", "custom");
+  await page.waitForSelector('[data-testid="expected-count-custom-input"]');
+  await page.getByTestId("expected-count-custom-input").fill("11");
+  await page.getByTestId("expected-count-confirm-button").click();
+  await page.waitForSelector('[data-testid="participant-name-input-10"]');
+  await chooseCustomOption(page, "expected-count", "7");
+  assert(await page.getByTestId("expected-count-trigger").evaluate((node) => node.closest(".CustomChoiceControl") !== null), "expected count should use an app-shaped custom choice control");
   await page.waitForSelector('[data-testid="participant-name-input-6"]');
   assert((await page.locator('[data-testid^="participant-name-input-"]').count()) === 7, "host setup should require one participant name field per expected person");
   await page.getByTestId("create-room-button").click();
@@ -265,6 +428,25 @@ async function main() {
   }
   assert(await page.getByTestId("candidate-calendar-trigger-0").evaluate((node) => node.closest(".IPhoneCalendarPicker") !== null), "candidate dates should use the iPhone-like calendar picker");
   assert(await page.getByTestId("candidate-time-wheel-0").evaluate((node) => node.closest(".ReleaseTimeWheel") !== null), "candidate times should use the alarm-style wheel");
+  assert(await page.getByTestId("deadline-calendar-trigger").evaluate((node) => node.closest(".DeadlineCalendarPicker") !== null), "deadline date should use the iPhone-like calendar picker");
+  await page.getByTestId("deadline-calendar-trigger").click();
+  assert(await page.getByTestId("deadline-calendar-sheet").isVisible(), "deadline calendar should open from the deadline date button");
+  await page.getByTestId("deadline-calendar-day-2026-07-05").click();
+  await page.getByTestId("deadline-time-hour-22").click();
+  await page.getByTestId("deadline-time-minute-00").click();
+  assert((await page.locator('[data-testid^="candidate-time-period-"]').count()) === 0, "candidate time wheel should use 24-hour time without AM/PM period buttons");
+  const timeWheelColumnCount = await page.getByTestId("candidate-time-wheel-0").locator(".ReleaseTimeWheelColumn").count();
+  assert(timeWheelColumnCount === 2, "candidate time wheel should expose only hour and minute columns");
+  const hourSequence = await page
+    .getByTestId("candidate-time-wheel-0")
+    .locator('[data-time-part="hour"]')
+    .evaluateAll((buttons) => buttons.map((button) => Number(button.getAttribute("data-time-token"))));
+  assert(hourSequence.length === 24 && hourSequence.every((value, index) => value === index), `hour wheel should stay continuous from 00 to 23: ${hourSequence.join(",")}`);
+  const minuteSequence = await page
+    .getByTestId("candidate-time-wheel-0")
+    .locator('[data-time-part="minute"]')
+    .evaluateAll((buttons) => buttons.map((button) => button.getAttribute("data-time-token")));
+  assert(minuteSequence.join(",") === "00,10,20,30,40,50", `minute wheel should stay continuous in 10-minute steps: ${minuteSequence.join(",")}`);
   assert((await page.getByTestId("candidate-calendar-sheet-0").isVisible()) === false, "candidate calendar should stay closed until the date button is pressed");
   await page.getByTestId("candidate-calendar-trigger-0").click();
   assert(await page.getByTestId("candidate-calendar-sheet-0").isVisible(), "candidate calendar should open as an overlay sheet from the date button");
@@ -278,15 +460,18 @@ async function main() {
   await page.getByTestId("candidate-time-hour-1-17").click();
   await page.getByTestId("candidate-time-minute-1-00").click();
   await page.getByTestId("candidate-note-input-1").fill("잠실");
-  await page.getByTestId("add-candidate-button").click();
-  await page.getByTestId("candidate-calendar-trigger-3").click();
-  assert(await page.getByTestId("candidate-calendar-day-3-2026-07-07").isVisible(), "host should be able to add a fourth candidate slot");
-  await page.getByTestId("candidate-calendar-day-3-2026-07-07").click();
-  await page.getByTestId("candidate-time-hour-3-19").click();
-  await page.getByTestId("candidate-time-minute-3-30").click();
-  await page.getByTestId("candidate-note-input-3").fill("성수");
+  await page.getByTestId("candidate-note-input-2").fill("삭제될 후보");
   await page.getByTestId("remove-candidate-2").click();
-  assert((await page.locator("[data-testid^='candidate-date-control-']").count()) === 3, "host should be able to remove a candidate slot");
+  assert((await page.locator("[data-testid^='candidate-date-control-']").count()) === 2, "host should be able to remove an initial candidate slot");
+  assert(!(await page.locator("body").innerText()).includes("삭제될 후보"), "removed candidate content should disappear from the editor");
+  await page.getByTestId("add-candidate-button").click();
+  await page.getByTestId("candidate-calendar-trigger-2").click();
+  assert(await page.getByTestId("candidate-calendar-day-2-2026-07-07").isVisible(), "host should be able to add a third candidate slot again");
+  await page.getByTestId("candidate-calendar-day-2-2026-07-07").click();
+  await page.getByTestId("candidate-time-hour-2-19").click();
+  await page.getByTestId("candidate-time-minute-2-30").click();
+  await page.getByTestId("candidate-note-input-2").fill("성수");
+  assert((await page.locator("[data-testid^='candidate-date-control-']").count()) === 3, "host should keep three candidate slots before sharing");
   await page.getByTestId("create-room-button").click();
 
   const createdRoom = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
@@ -294,13 +479,15 @@ async function main() {
   assert(createdRoom?.room?.participants?.length === 7, "created room should persist the required participant roster");
   assert(createdRoom?.room?.participants?.every((participant) => participant.name), "created participant roster should keep each required name");
   assert(createdRoom?.room?.status === "collecting", "created room should enter collecting status");
+  assert(createdRoom?.room?.agreementMode === "all_together", "created room should persist the default agreement mode");
+  assert(typeof createdRoom?.room?.minimumAttendees === "number", "created room should persist a normalized minimum attendee value");
   assert(createdRoom?.room?.shareUrl?.includes("join="), "created room should persist a general share link");
   assert(createdRoom?.hostRooms?.length === 1, "created room should be listed in my meetups");
   assert(createdRoom?.room?.candidates?.[0]?.date === "2026-07-05", "date picker value should be persisted on the candidate");
   assert(createdRoom?.room?.candidates?.[0]?.label.includes("7.5"), "date picker value should be formatted for display");
   const afterCreateText = await page.locator("body").innerText();
   assert(afterCreateText.includes("응답이 조금 더 필요해요"), "host create CTA should land on invite-copy ready state");
-  assert(afterCreateText.includes("공유 준비됨"), "host create result should show the share-ready card");
+  assert(afterCreateText.includes("공유 준비 완료"), "host create result should show the share-ready card");
   assert(afterCreateText.includes("친구한테 공유하기"), "host create result should expose friend-share wording");
   const generalShareLink = await page.getByTestId("general-share-link").inputValue();
   assert(generalShareLink.includes("join=") && generalShareLink.includes("screen=scr-00-entry"), "general share link should open the shared home invite screen");
@@ -312,6 +499,8 @@ async function main() {
   await page.getByTestId("response-inbox-open-0").click();
   await page.waitForSelector("#scr-02-participant-input");
   await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "detail");
+  assert(await page.getByTestId("pre-response-privacy-note").isVisible(), "participant detail should explain that candidate aggregates are hidden before response");
+  assert((await page.locator('[data-testid="anonymous-aggregate-panel"]').count()) === 0, "participant detail should not show candidate aggregate counts before submitting");
   assert(await page.getByTestId("participant-picker-list").isVisible(), "respondent should choose their name from the host roster before answering");
   await page.getByTestId("participant-picker-민지").click();
   assert((await page.getByTestId("participant-name-input").inputValue()) === "민지", "participant picker should fill the selected respondent name");
@@ -358,13 +547,15 @@ async function main() {
   assert(dashboardText.includes("내가 만든 모임") && dashboardText.includes("금요일 저녁 모임"), "my meetups dashboard should show the created room");
   assert(dashboardText.includes("0명 응답"), "my meetups dashboard should show the current response count");
   assert(dashboardText.includes("미응답 7명"), "my meetups dashboard should summarize unanswered roster members");
+  assert(dashboardText.includes("미응답자") && dashboardText.includes("성배") && dashboardText.includes("민지"), "host dashboard should show unanswered names for response management");
+  assert(dashboardText.includes("익명 집계") || (await page.locator('[data-testid="host-anonymous-aggregate"]').count()) > 0, "host dashboard should summarize anonymous aggregate status");
   assert((await page.locator('[data-testid="dashboard-create-room-button"]').count()) === 0, "my meetups should not expose duplicate create CTA");
   const firstCardActionGrid = await page.getByTestId("host-card-actions-0").evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length);
   assert(firstCardActionGrid >= 3, "my meetups card actions should use a compact 3+1 layout instead of a single vertical stack");
   await page.getByTestId("edit-host-room-0").click();
   await page.waitForSelector("#scr-01-host-room");
   await page.getByTestId("room-title-input").fill("수정된 금요일 모임");
-  await page.getByTestId("expected-count-select").selectOption("9");
+  await chooseCustomOption(page, "expected-count", "9");
   await page.waitForSelector('[data-testid="participant-name-input-8"]');
   await page.getByTestId("participant-name-input-7").fill("서윤");
   await page.getByTestId("participant-name-input-8").fill("태오");
@@ -427,6 +618,10 @@ async function main() {
   assert((await page.getByTestId("response-form-error").innerText()).includes("명단"), "roster-based response should require choosing my name first");
   await page.getByTestId("participant-picker-성배").click();
   await page.getByTestId("submit-response-button").click();
+  await page.waitForSelector('[data-testid="anonymous-aggregate-panel"]');
+  const firstAggregateText = await page.getByTestId("anonymous-aggregate-panel").innerText();
+  assert(firstAggregateText.includes("익명 집계") && firstAggregateText.includes("선호"), "response complete should show anonymous aggregate after submitting");
+  assert(!firstAggregateText.includes("성배") && !firstAggregateText.includes("민지"), "anonymous aggregate should not reveal participant names");
   const firstRosterResponseState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(
     firstRosterResponseState?.room?.responses?.[0]?.alias === "성배" &&
@@ -482,6 +677,19 @@ async function main() {
   const resultText = await page.getByTestId("recommendation-card").innerText();
   assert(resultText.includes("추천 1순위"), "recommendation card should show primary recommendation label");
   assert(resultText.includes("6.29 토요일 18:30"), "recommendation card should show computed top candidate");
+  assert(await page.getByTestId("anonymous-aggregate-panel").isVisible(), "recommendation screen should show anonymous aggregate status");
+  await page.getByTestId("toggle-agreement-sheet-button").click();
+  await page.waitForSelector('[data-testid="agreement-change-sheet"]');
+  await page.getByTestId("result-agreement-mode-threshold").click();
+  await assertAgreementModeVertical(page, "result-agreement");
+  await chooseCustomOption(page, "result-agreement-minimum", "4");
+  await page.getByTestId("apply-agreement-mode-button").click();
+  await page.waitForSelector('[data-testid="agreement-change-notice"]');
+  const changedAgreementState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:demo:v1")));
+  assert(changedAgreementState?.room?.agreementMode === "threshold", "changing agreement mode should persist the new criterion");
+  assert(changedAgreementState?.room?.agreementRevision >= 1, "changing agreement mode should record a visible revision");
+  assert((changedAgreementState?.room?.responses || []).length >= 5, "changing agreement mode should keep existing responses for recalculation");
+  assert((await page.getByTestId("agreement-change-notice").innerText()).includes("기준을 변경"), "participants should see an agreement-change notice");
 
   await page.getByTestId("copy-share-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
@@ -518,7 +726,8 @@ async function main() {
 
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
   const participantDirectText = await page.locator("body").innerText();
-  assert(participantDirectText.includes("아직 만든 모임이 없어요"), "participant direct link without a room should not render a fake response form");
+  assert(participantDirectText.includes("현재 모임이 없어요"), "participant direct link without a room should show the response empty state");
+  assert(await page.getByTestId("response-empty-state").isVisible(), "participant direct link without a room should render a response empty state");
 
   await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-05-link-expired`, { waitUntil: "load" });
   await page.goto(`${baseFileUrl}?demo=1&screen=scr-02-participant-input`, { waitUntil: "load" });
@@ -610,7 +819,17 @@ async function main() {
   await page.getByTestId("logout-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
   assert((await page.getByTestId("copy-status").innerText()).includes("로그아웃"), "logout action should show status feedback");
+  await page.evaluate(() => localStorage.setItem("hammoyo:release:v1", JSON.stringify({ version: 1, room: null, hostRooms: [{ id: "saved-room" }] })));
   await page.getByTestId("clear-local-data-button").click();
+  await page.waitForSelector("[data-testid='custom-confirm-modal']");
+  const clearConfirmText = await page.getByTestId("custom-confirm-modal").innerText();
+  assert(clearConfirmText.includes("정말 지울까요?") && clearConfirmText.includes("되돌릴 수 없어요"), "clear local data should use a custom irreversible-warning confirmation");
+  await page.getByTestId("confirm-modal-cancel").click();
+  const storageAfterClearCancel = await page.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
+  assert(storageAfterClearCancel !== null, "canceling clear local data should preserve localStorage");
+  await page.getByTestId("clear-local-data-button").click();
+  await page.waitForSelector("[data-testid='custom-confirm-modal']");
+  await page.getByTestId("confirm-modal-confirm").click();
   const storageAfterClear = await page.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
   assert(storageAfterClear === null, "clear local data action should remove release localStorage");
 
@@ -618,6 +837,7 @@ async function main() {
   await page.goto(`${pageUrl}&screen=scr-00-entry`, { waitUntil: "load" });
   await assertButtonInInitialViewport(page, "bottom-nav-create", "bottom create tab should stay visible at 320px width");
   await assertButtonInInitialViewport(page, "bottom-nav-settings", "bottom settings tab should remain visible at 320px width");
+  await assertHomeHeroImageAndStatusFlow(page);
 
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-03-result-recommendation`, { waitUntil: "load" });
