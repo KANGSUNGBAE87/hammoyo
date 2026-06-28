@@ -34,7 +34,7 @@
         --radius-pill: 999px;
         --touch-target: 44px;
         --bottom-cta-height: 56px;
-        --bottom-nav-height: 86px;
+        --bottom-nav-height: 124px;
         --mobile-cta-reserved: 160px;
         --shadow-card: 0 8px 24px rgba(28, 39, 63, 0.08);
         --shadow-floating: 0 12px 36px rgba(63, 63, 120, 0.14);
@@ -125,10 +125,9 @@
         z-index: 0;
         pointer-events: none;
         background:
-          linear-gradient(180deg, rgba(247, 248, 252, 0.62) 0%, rgba(247, 248, 252, 0.88) 48%, rgba(247, 248, 252, 0.98) 100%),
-          url("assets/final/backgrounds/background_sparse_pattern_example.png") center top / cover no-repeat,
-          url("assets/final/hero/hero_animals_calendar_full_square.png") center bottom 28px / min(86%, 360px) no-repeat;
-        opacity: 0.34;
+          linear-gradient(180deg, rgba(247, 248, 252, 0.50) 0%, rgba(247, 248, 252, 0.86) 54%, rgba(247, 248, 252, 0.98) 100%),
+          url("assets/final/backgrounds/background_sparse_pattern_example.png") center top / cover no-repeat;
+        opacity: 0.24;
       }
 
       .topbar,
@@ -243,6 +242,7 @@
         display: flex;
         flex-direction: column;
         gap: var(--section-gap);
+        overflow-anchor: none;
       }
 
       .screenBody > * {
@@ -741,67 +741,141 @@
       .BottomNav {
         flex-shrink: 0;
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(76px, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(102px, 1.65fr) minmax(0, 1fr) minmax(0, 1fr);
         align-items: end;
-        gap: 4px;
+        gap: 6px;
         min-height: var(--bottom-nav-height);
         margin: 0 10px;
-        padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
-        border: 1px solid var(--border);
+        padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px));
+        border: 1px solid rgba(164, 177, 219, 0.34);
         border-bottom: 0;
-        border-radius: 24px 24px 0 0;
-        background: rgba(255, 255, 255, 0.96);
-        box-shadow: 0 -12px 30px rgba(71, 102, 146, 0.15);
+        border-radius: 28px 28px 0 0;
+        background:
+          radial-gradient(circle at 50% -20%, rgba(237, 235, 255, 0.72) 0%, rgba(237, 235, 255, 0) 48%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(247, 250, 255, 0.93) 100%);
+        box-shadow: 0 -16px 36px rgba(71, 102, 146, 0.17);
         backdrop-filter: blur(18px);
       }
 
       .BottomNavItem {
         position: relative;
+        isolation: isolate;
         overflow: hidden;
         min-width: 0;
-        min-height: 58px;
+        min-height: 84px;
+        padding: 10px 4px 12px;
         display: grid;
         align-content: center;
         justify-items: center;
-        gap: 4px;
+        gap: 6px;
         border: 0;
-        border-radius: 18px;
+        border-radius: 22px;
         color: var(--text-primary);
         background: transparent;
-        font-size: 11px;
-        line-height: 14px;
-        font-weight: 900;
+        box-shadow: none;
+        transition:
+          transform var(--motion-base) var(--ease-standard),
+          box-shadow var(--motion-base) var(--ease-standard);
       }
 
       .BottomNavItem::before {
-        display: none;
         content: "";
+        position: absolute;
+        inset: 2px 4px 8px;
+        z-index: 0;
+        background-image: var(--nav-art, none);
+        background-position: center 68%;
+        background-repeat: no-repeat;
+        background-size: contain;
+        mix-blend-mode: multiply;
+        opacity: 0.52;
+        transform: scale(1);
+        -webkit-mask-image: radial-gradient(ellipse at 50% 56%, #000 0%, #000 46%, rgba(0, 0, 0, 0.62) 62%, transparent 84%);
+        mask-image: radial-gradient(ellipse at 50% 56%, #000 0%, #000 46%, rgba(0, 0, 0, 0.62) 62%, transparent 84%);
+        transition:
+          transform var(--motion-base) var(--ease-standard),
+          opacity var(--motion-base) var(--ease-standard);
       }
 
-      .BottomNavItem[data-active="true"]::before {
+      .BottomNavItem::after {
+        content: "";
+        position: absolute;
+        top: 14px;
+        right: -4px;
+        width: 1px;
+        height: calc(100% - 28px);
+        border-radius: var(--radius-pill);
+        background: linear-gradient(180deg, rgba(141, 158, 204, 0) 0%, rgba(141, 158, 204, 0.56) 50%, rgba(141, 158, 204, 0) 100%);
+        opacity: 0.72;
+      }
+
+      .BottomNavItem:last-child::after {
         display: none;
+      }
+
+      .BottomNavItem[data-nav-art="home"] {
+        --nav-art: url("assets/final/characters/rabbit_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-nav-art="respond"] {
+        --nav-art: url("assets/final/characters/penguin_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-nav-art="create"] {
+        --nav-art: url("assets/final/characters/dog_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-nav-art="meetups"] {
+        --nav-art: url("assets/final/characters/bear_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-nav-art="settings"] {
+        --nav-art: url("assets/final/characters/cat_character_only_crop.png");
       }
 
       .BottomNavLabel {
         position: relative;
-        z-index: 1;
+        z-index: 2;
         min-width: 0;
         display: block;
+        padding: 0 2px;
         color: #111827;
-        text-shadow: none;
-        font-size: 12px;
-        line-height: 15px;
+        background: transparent;
+        text-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.96),
+          0 0 10px rgba(255, 255, 255, 0.88);
+        font-size: clamp(16px, 4.6vw, 26px);
+        line-height: 1.05;
         font-weight: 950;
+        letter-spacing: 0;
         text-align: center;
+        white-space: nowrap;
+        word-break: keep-all;
       }
 
       .BottomNavItem[data-active="true"] {
         color: var(--text-primary);
+        background: radial-gradient(circle at 50% 74%, rgba(237, 235, 255, 0.72) 0%, rgba(237, 235, 255, 0) 64%);
+        box-shadow:
+          inset 0 -2px 0 rgba(107, 92, 255, 0.48),
+          0 10px 22px rgba(107, 92, 255, 0.10);
+      }
+
+      .BottomNavItem[data-active="true"]::before {
+        transform: scale(1.1);
+        opacity: 0.82;
+      }
+
+      .BottomNavItem[data-active="true"] .BottomNavLabel {
+        color: var(--brand-pressed);
+        font-weight: 950;
+        background: transparent;
+        box-shadow: none;
       }
 
       .BottomNavIcon {
         position: relative;
-        z-index: 1;
+        z-index: 2;
         width: 28px;
         height: 28px;
         display: inline-flex;
@@ -813,21 +887,21 @@
       }
 
       .BottomNavItem[data-center="true"] {
-        margin-top: -32px;
+        margin-top: -40px;
         color: var(--brand);
       }
 
       .BottomNavItem[data-center="true"] .BottomNavLabel {
-        width: min(76px, 100%);
+        width: min(102px, 100%);
         max-width: 100%;
-        margin-top: 2px;
-        padding: 3px 4px;
+        margin-top: 0;
+        padding: 0 3px;
         border-radius: var(--radius-pill);
-        color: var(--surface);
-        background: var(--brand);
-        box-shadow: 0 5px 12px rgba(90, 70, 242, 0.24);
-        font-size: 12px;
-        line-height: 14px;
+        color: var(--text-primary);
+        background: transparent;
+        box-shadow: none;
+        font-size: clamp(14px, 3.1vw, 17px);
+        line-height: 1.05;
         white-space: nowrap;
       }
 
@@ -842,6 +916,62 @@
           0 18px 32px rgba(90, 70, 242, 0.28),
           inset 0 1px 0 rgba(255, 255, 255, 0.44);
         font-size: 34px;
+      }
+
+      .BottomNavItem[data-center="true"]::before {
+        inset: 4px 10px 20px;
+        background-position: center 60%;
+        background-size: contain;
+        opacity: 0.72;
+      }
+
+      .BottomNavItem[data-center="true"]::after {
+        right: -6px;
+      }
+
+      .BottomNavItem[data-center="true"][data-active="true"] .BottomNavLabel {
+        color: var(--brand-pressed);
+        background: transparent;
+      }
+
+      @media (max-width: 360px) {
+        :root {
+          --bottom-nav-height: 116px;
+        }
+
+        .BottomNav {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(84px, 1.45fr) minmax(0, 1fr) minmax(0, 1fr);
+          gap: 5px;
+          margin: 0 8px;
+          padding: 8px 8px calc(9px + env(safe-area-inset-bottom, 0px));
+        }
+
+        .BottomNavItem {
+          min-height: 78px;
+          padding: 8px 2px 10px;
+          border-radius: 20px;
+        }
+
+        .BottomNavLabel {
+          padding: 4px 3px;
+          font-size: 16px;
+        }
+
+        .BottomNavItem[data-center="true"] {
+          margin-top: -36px;
+        }
+
+        .BottomNavItem[data-center="true"] .BottomNavLabel {
+          width: min(84px, 100%);
+          padding: 6px 5px;
+          font-size: 13px;
+        }
+
+        .BottomNavItem[data-center="true"] .BottomNavIcon {
+          width: 58px;
+          height: 58px;
+          font-size: 30px;
+        }
       }
 
       .buttonRow {
@@ -1393,35 +1523,77 @@
 
       .HomeHero {
         position: relative;
-        min-height: auto;
+        isolation: isolate;
+        min-height: clamp(436px, 66svh, 580px);
         display: grid;
-        align-content: start;
-        justify-items: center;
-        gap: 8px;
-        padding: clamp(12px, 3.4vw, 18px);
-        border: 1px solid rgba(90, 70, 242, 0.16);
+        align-content: stretch;
+        justify-items: stretch;
+        gap: 12px;
+        padding: clamp(16px, 4vw, 24px);
         border-radius: 28px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 249, 255, 0.94) 100%);
+        border: 0;
+        background:
+          radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.10) 30%, rgba(255, 255, 255, 0) 54%),
+          linear-gradient(180deg, rgba(255, 250, 244, 0.96) 0%, rgba(244, 247, 255, 0.42) 42%, rgba(236, 240, 255, 0.88) 100%);
         box-shadow:
-          0 12px 0 rgba(152, 162, 179, 0.08),
-          0 22px 44px rgba(28, 39, 63, 0.10),
-          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+          inset 0 1px 0 rgba(255, 255, 255, 0.94),
+          0 16px 30px rgba(28, 39, 63, 0.08);
         overflow: hidden;
       }
 
+      .HomeHero::before,
       .HomeHero::after {
-        display: none;
         content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .HomeHero::before {
+        z-index: 1;
+        background:
+          linear-gradient(180deg, rgba(252, 246, 237, 0.22) 0%, rgba(252, 246, 237, 0.04) 24%, rgba(36, 52, 84, 0.08) 56%, rgba(21, 29, 47, 0.26) 100%),
+          radial-gradient(circle at 50% 54%, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.18) 64%, rgba(255, 255, 255, 0.32) 100%);
+      }
+
+      .HomeHero::after {
+        z-index: 2;
+        inset: auto 0 0;
+        height: 46%;
+        background: linear-gradient(180deg, rgba(17, 24, 39, 0) 0%, rgba(17, 24, 39, 0.12) 34%, rgba(17, 24, 39, 0.48) 100%);
+      }
+
+      .HomeHero > * {
+        position: relative;
+      }
+
+      .HomeHero > :not(.HomeHeroAnimals) {
+        z-index: 3;
+      }
+
+      .HomeHero > .HomeHeroAnimals {
+        z-index: 0;
+      }
+
+      .HomeHero > .HomeHeroStatusOverlay {
+        z-index: 4;
       }
 
       .HomeHeroAnimals {
-        position: relative;
-        z-index: 1;
-        width: min(230px, 68%);
+        position: absolute;
+        left: 50%;
+        bottom: 72px;
+        transform: translateX(-50%);
+        width: min(520px, calc(100% + 86px));
         aspect-ratio: 1;
         object-fit: contain;
-        border-radius: 28px;
-        filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.12));
+        opacity: 0.9;
+        filter:
+          drop-shadow(0 18px 36px rgba(15, 23, 42, 0.14))
+          saturate(1.04);
+        mix-blend-mode: multiply;
+        -webkit-mask-image: radial-gradient(ellipse at 50% 52%, #000 0%, #000 48%, rgba(0, 0, 0, 0.72) 62%, transparent 78%);
+        mask-image: radial-gradient(ellipse at 50% 52%, #000 0%, #000 48%, rgba(0, 0, 0, 0.72) 62%, transparent 78%);
       }
 
       .HomeTitleMark {
@@ -1438,12 +1610,13 @@
       }
 
       .HomeHeroContent {
-        position: relative;
-        z-index: 2;
         display: grid;
         justify-items: center;
-        gap: 8px;
+        align-content: start;
+        gap: 12px;
         width: 100%;
+        max-width: min(100%, 520px);
+        margin: 0 auto;
         text-align: center;
       }
 
@@ -1494,16 +1667,19 @@
       .HomeHeroSlogan {
         display: grid;
         justify-items: center;
-        gap: 3px;
+        gap: 5px;
         margin: 0;
         text-align: center;
       }
 
       .HomeHeroSlogan strong {
-        color: var(--text-primary);
+        color: #101828;
         font-size: clamp(20px, 5.3vw, 26px);
         line-height: 1.18;
         font-weight: 950;
+        text-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.88),
+          0 14px 28px rgba(255, 255, 255, 0.38);
       }
 
       .HomeHeroSlogan span {
@@ -1511,16 +1687,16 @@
       }
 
       .HomeHeroPrivacyMessage {
-        position: relative;
-        z-index: 2;
         display: grid;
         justify-items: center;
         gap: 4px;
         width: 100%;
-        padding: 10px 12px;
-        border: 1px solid rgba(59, 130, 246, 0.18);
-        border-radius: 22px;
-        background: linear-gradient(180deg, rgba(239, 246, 255, 0.94), rgba(255, 255, 255, 0.72));
+        max-width: min(100%, 450px);
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        backdrop-filter: none;
         text-align: center;
       }
 
@@ -1532,52 +1708,54 @@
       }
 
       .HomeHeroPrivacyMessage strong {
-        color: #1D4ED8;
-        font-size: clamp(20px, 5.4vw, 27px);
-        line-height: 1.16;
+        color: #133EAF;
+        font-size: clamp(20px, 5vw, 27px);
+        line-height: 1.18;
         font-weight: 950;
+        text-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.92),
+          0 12px 30px rgba(255, 255, 255, 0.72);
       }
 
       .HomeHeroPrivacyMessage em {
-        color: var(--text-primary);
+        color: #1F2937;
         font-size: 14px;
         line-height: 19px;
         font-style: normal;
         font-weight: 850;
+        text-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.9),
+          0 10px 22px rgba(255, 255, 255, 0.76);
       }
 
       .HomeHeroStatusOverlay {
-        position: relative;
-        z-index: 3;
         width: 100%;
         display: grid;
         gap: 8px;
-        padding: 11px;
-        border: 1px solid rgba(180, 188, 255, 0.50);
-        border-radius: 28px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 247, 255, 0.88) 100%);
-        box-shadow:
-          0 10px 0 rgba(90, 70, 242, 0.10),
-          0 22px 34px rgba(28, 39, 63, 0.16),
-          inset 0 1px 0 rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(16px);
+        margin-top: auto;
+        padding: 12px;
+        border: 0;
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(244, 247, 255, 0.24) 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
+        backdrop-filter: blur(20px) saturate(1.1);
       }
 
       .HeroStatusPill {
         min-height: 44px;
-        width: min(260px, 100%);
+        width: fit-content;
+        max-width: 100%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 0 18px;
-        border: 1px solid transparent;
+        padding: 0 16px;
+        border: 0;
         border-radius: var(--radius-pill);
         color: var(--surface);
         background: linear-gradient(180deg, #8EA0FF 0%, var(--brand) 58%, var(--brand-pressed) 100%);
         box-shadow:
-          0 8px 0 #4433C9,
-          0 16px 24px rgba(90, 70, 242, 0.2),
+          0 10px 20px rgba(90, 70, 242, 0.22),
           inset 0 1px 0 rgba(255, 255, 255, 0.44);
         font-size: 14px;
         line-height: 19px;
@@ -1592,13 +1770,176 @@
         gap: 6px;
       }
 
+      .HomeHostedRooms {
+        display: grid;
+        gap: 6px;
+        width: 100%;
+      }
+
+      .HomeHostedRoomButton {
+        width: 100%;
+        min-height: 44px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.30);
+        border-radius: 16px;
+        color: #FFFFFF;
+        background: rgba(255, 255, 255, 0.16);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+        backdrop-filter: blur(10px);
+        text-align: left;
+      }
+
+      .HomeHostedRoomButton strong {
+        min-width: 0;
+        color: inherit;
+        font-size: 14px;
+        line-height: 18px;
+        font-weight: 950;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-shadow: 0 6px 16px rgba(15, 23, 42, 0.30);
+      }
+
+      .HomeHostedRoomButton span {
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 900;
+        white-space: nowrap;
+        text-shadow: 0 6px 16px rgba(15, 23, 42, 0.26);
+      }
+
+      .HeroStatusContext {
+        display: grid;
+        justify-items: start;
+        gap: 3px;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        text-align: left;
+      }
+
+      .HeroStatusContext span {
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 950;
+        text-shadow: 0 2px 10px rgba(15, 23, 42, 0.34);
+      }
+
+      .HeroStatusContext strong {
+        color: #FFFFFF;
+        font-size: clamp(22px, 5.9vw, 30px);
+        line-height: 1.12;
+        font-weight: 950;
+        letter-spacing: 0;
+        overflow-wrap: anywhere;
+        text-shadow: 0 10px 22px rgba(15, 23, 42, 0.42);
+      }
+
+      .HeroStatusContext em {
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 13px;
+        line-height: 18px;
+        font-style: normal;
+        font-weight: 850;
+        text-shadow: 0 8px 18px rgba(15, 23, 42, 0.34);
+      }
+
       .HeroStatusMetrics .HomeMetricCard {
-        background: rgba(255, 255, 255, 0.82);
+        border: 0;
+        background: rgba(255, 255, 255, 0.22);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26);
         text-align: center;
+        backdrop-filter: blur(10px);
       }
 
       .HomeHeroStatusOverlay .HomeMetricCard {
         text-align: center;
+      }
+
+      .HomeHeroStatusOverlay .HomeMetricCard strong,
+      .HomeHeroStatusOverlay .HomeMetricCard span {
+        text-shadow: 0 6px 16px rgba(15, 23, 42, 0.22);
+      }
+
+      @media (max-width: 380px) {
+        .HomeHero {
+          min-height: 378px;
+          padding: 14px 14px 18px;
+        }
+
+        .HomeHeroAnimals {
+          bottom: 102px;
+          width: min(392px, calc(100% + 72px));
+        }
+
+        .HomeHeroContent {
+          max-width: min(100%, 284px);
+        }
+
+        .HomeHeroPrivacyMessage {
+          max-width: min(100%, 276px);
+          padding: 9px 11px 10px;
+        }
+
+        .HeroStatusMetrics {
+          gap: 5px;
+        }
+
+        .HomeHeroStatusOverlay {
+          gap: 4px;
+          padding: 8px;
+        }
+
+        .HeroStatusContext {
+          gap: 2px;
+        }
+
+        .HeroStatusContext span {
+          font-size: 11px;
+          line-height: 14px;
+        }
+
+        .HeroStatusContext strong {
+          font-size: 20px;
+          line-height: 1.08;
+        }
+
+        .HeroStatusContext em {
+          font-size: 12px;
+          line-height: 15px;
+        }
+
+        .HeroStatusPill {
+          min-height: 26px;
+          padding: 0 10px;
+          font-size: 11px;
+          line-height: 14px;
+        }
+
+        .HeroStatusMetrics .HomeMetricCard {
+          gap: 1px;
+          padding: 3px 4px;
+          border-radius: 12px;
+        }
+
+        .HeroStatusMetrics .HomeMetricCard strong {
+          font-size: 14px;
+          line-height: 16px;
+        }
+
+        .HeroStatusMetrics .HomeMetricCard span {
+          font-size: 9px;
+          line-height: 11px;
+        }
       }
 
       .HomeHeroStatusOverlay .emptyStateLine {
@@ -2137,6 +2478,332 @@
         line-height: 14px;
       }
 
+      /* UI readability and poster-layout overrides */
+      .screen--poster {
+        gap: 0;
+        padding: 0;
+        padding-bottom: 0;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: 100%;
+      }
+
+      .screen--poster .screenBody {
+        flex: 1 1 auto;
+        min-height: 100%;
+        height: 100%;
+        gap: 0;
+        padding: 0;
+      }
+
+      .screen--poster .HomeHero {
+        min-height: 100%;
+        height: 100%;
+        width: 100%;
+        padding: clamp(20px, 5vw, 30px);
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .screen--poster .HomeHeroAnimals {
+        bottom: 112px;
+        width: min(560px, calc(100% + 104px));
+      }
+
+      .screen--poster .HomeHeroStatusOverlay {
+        padding: 14px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(244, 247, 255, 0.18) 100%);
+      }
+
+      .BottomNavItem::before {
+        background-position: center center;
+        background-size: contain;
+      }
+
+      .BottomNavItem[data-nav-art="home"] {
+        --nav-art: url("assets/final/characters/rabbit_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-nav-art="respond"] {
+        --nav-art: url("assets/final/characters/penguin_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-nav-art="create"] {
+        --nav-art: url("assets/final/characters/dog_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-nav-art="meetups"] {
+        --nav-art: url("assets/final/characters/bear_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-nav-art="settings"] {
+        --nav-art: url("assets/final/characters/cat_character_only_crop.png");
+      }
+
+      .BottomNavItem[data-center="true"]::before {
+        background-position: center center;
+        background-size: contain;
+      }
+
+      .primaryButton,
+      .secondaryButton,
+      .quietButton {
+        font-size: 18px;
+        line-height: 27px;
+      }
+
+      .candidateActionButton,
+      .helperText,
+      .caption,
+      .guideNote,
+      .progressPill,
+      .ReasonChip,
+      .ConfirmDialogPanel p,
+      .actionStatus,
+      .settingsItem span,
+      .HostUnansweredLine,
+      .HostAggregateMini,
+      .IndividualLinks summary {
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .metric span,
+      .HomeMetricCard span,
+      .HostMetricPill span,
+      .HeroStatusContext span,
+      .slotMeta span,
+      .fieldRow span,
+      .RosterInputGrid .inputLabel,
+      .brandHomeButton span,
+      .brandMark span,
+      .topbarButton,
+      .compactLinkInput,
+      .IndividualLinkRow span,
+      .ReleaseCalendarWeekdays span,
+      .ReleaseTimeWheelHint {
+        font-size: 15px;
+        line-height: 21px;
+      }
+
+      .metric b,
+      .HomeMetricCard strong,
+      .slotMeta strong,
+      .ShareCopyBox strong {
+        font-size: 24px;
+        line-height: 31px;
+      }
+
+      .HostMetricPill strong {
+        font-size: clamp(20px, 5vw, 24px);
+        line-height: 1.18;
+        white-space: nowrap;
+      }
+
+      .ReleaseCalendarDay,
+      .ReleaseTimeWheelOption {
+        font-size: 17px;
+        line-height: 23px;
+      }
+
+      .settingsItem strong,
+      .trustPanel strong {
+        font-size: 18px;
+        line-height: 27px;
+      }
+
+      .HomeHeroPrivacyMessage span,
+      .HeroStatusPill,
+      .linkField input,
+      .ParticipantPickerButton {
+        font-size: 16px;
+        line-height: 22px;
+      }
+
+      .HomeHeroPrivacyMessage em,
+      .emptyStateLine,
+      .HomeHeroStatusOverlay .emptyStateLine {
+        font-size: 17px;
+        line-height: 25px;
+      }
+
+      .HeroStatusContext em {
+        font-size: 16px;
+        line-height: 23px;
+      }
+
+      .surface,
+      .CandidateSlotCard,
+      .RecommendationHeroCard,
+      .ShareCopyBox,
+      .ResponseCoverage,
+      .AgreementModeSelector,
+      .AgreementChangeSheet,
+      .AnonymousAggregatePanel,
+      .AgreementNotice,
+      .ResponseInboxCard,
+      .ResponseEmptyState,
+      .HostStatusCard,
+      .SentRoomsFolder {
+        width: 100%;
+      }
+
+      .compactSection,
+      .HostStatusCard,
+      .HostStatusMetrics,
+      .HostCardActions,
+      .HostUnansweredLine,
+      .HostAggregateMini,
+      .IndividualLinks,
+      .IndividualLinkList,
+      .linkField {
+        width: 100%;
+        max-width: none;
+        justify-self: stretch;
+      }
+
+      .HostStatusCard {
+        justify-items: stretch;
+      }
+
+      .HostCardActions {
+        width: 100%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .HostCardActions .candidateActionButton:not(.dangerAction) {
+        min-width: 0;
+      }
+
+      .SentRoomsFolder {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border: 1px solid rgba(90, 70, 242, 0.16);
+        border-radius: var(--radius-xl);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(247, 249, 255, 0.92) 100%);
+        box-shadow:
+          0 7px 0 rgba(152, 162, 179, 0.08),
+          0 16px 26px rgba(28, 39, 63, 0.07),
+          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+      }
+
+      .SentRoomsFolder summary {
+        cursor: pointer;
+        list-style: none;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .SentRoomsFolder summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .SentRoomsSummaryText {
+        min-width: 0;
+        display: grid;
+        gap: 3px;
+      }
+
+      .SentRoomsSummaryText strong {
+        color: var(--text-primary);
+        font-size: 20px;
+        line-height: 28px;
+        font-weight: 950;
+      }
+
+      .SentRoomsSummaryText span {
+        color: var(--text-secondary);
+        font-size: 15px;
+        line-height: 22px;
+        font-weight: 800;
+      }
+
+      .SentRoomsChevron {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-pill);
+        color: var(--brand);
+        background: var(--brand-soft);
+        font-size: 17px;
+        font-weight: 950;
+      }
+
+      .SentRoomsFolder[open] .SentRoomsChevron {
+        transform: rotate(90deg);
+      }
+
+      .SentRoomList {
+        display: grid;
+        gap: 8px;
+      }
+
+      .SentRoomItem {
+        width: 100%;
+        min-height: 72px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        padding: 13px 14px;
+        border: 1px solid rgba(229, 232, 241, 0.95);
+        border-radius: var(--radius-lg);
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow:
+          0 5px 0 rgba(152, 162, 179, 0.08),
+          0 12px 20px rgba(28, 39, 63, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.98);
+        text-align: left;
+      }
+
+      .SentRoomItemText {
+        min-width: 0;
+        display: grid;
+        gap: 4px;
+      }
+
+      .SentRoomItemText strong {
+        color: var(--text-primary);
+        font-size: 18px;
+        line-height: 25px;
+        font-weight: 950;
+        overflow-wrap: anywhere;
+      }
+
+      .SentRoomItemText span {
+        color: var(--text-secondary);
+        font-size: 15px;
+        line-height: 21px;
+        font-weight: 800;
+      }
+
+      .buttonRow {
+        grid-template-columns: 1fr;
+      }
+
+      .buttonRow.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .CustomExpectedCountRow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .CustomExpectedCountRow .candidateActionButton {
+        min-width: 0;
+      }
+
+      .IndividualLinkRow {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+      }
+
       @keyframes screenEnter {
         from {
           opacity: 0;
@@ -2191,11 +2858,20 @@
           animation: none;
         }
 
+        .screen--poster {
+          padding-bottom: 0;
+        }
+
         .screenBody {
           flex: 1 1 auto;
           min-height: 0;
           overflow-y: auto;
           padding-bottom: 8px;
+        }
+
+        .screen--poster .screenBody {
+          overflow: hidden;
+          padding-bottom: 0;
         }
 
         .StickyBottomCTA {
@@ -2254,6 +2930,40 @@
         h1 {
           font-size: 26px;
           line-height: 34px;
+        }
+
+        .screen--poster .HomeHero {
+          padding: 18px 14px 18px;
+        }
+
+        .screen--poster .HomeHeroAnimals {
+          bottom: 122px;
+          width: min(392px, calc(100% + 52px));
+        }
+
+        .HeroStatusContext span {
+          font-size: 13px;
+          line-height: 18px;
+        }
+
+        .HeroStatusContext em {
+          font-size: 14px;
+          line-height: 20px;
+        }
+
+        .HeroStatusPill {
+          font-size: 13px;
+          line-height: 18px;
+        }
+
+        .HeroStatusMetrics .HomeMetricCard strong {
+          font-size: 16px;
+          line-height: 20px;
+        }
+
+        .HeroStatusMetrics .HomeMetricCard span {
+          font-size: 12px;
+          line-height: 16px;
         }
       }
 
@@ -2454,6 +3164,10 @@
           "responseInboxCandidateMeta": "{label} {time} 외 {count}개 후보",
           "sentRoomLabel": "내가 보낸 방",
           "sentRoomHint": "내가 만든 모임은 하단의 내 모임 탭에서 관리해요.",
+          "sentRoomFolderTitle": "내가 보낸 방 {count}개",
+          "sentRoomFolderBody": "방장이 만든 모임은 여기서도 바로 펼쳐서 확인해요.",
+          "sentRoomFolderEmpty": "아직 내가 보낸 방이 없어요.",
+          "sentRoomItemMeta": "{progress} 응답 · 후보 {candidateCount}개",
           "confirmCancel": "취소",
           "confirmProceed": "이동하기",
           "confirmDelete": "삭제하기",
@@ -3905,6 +4619,47 @@
         });
       }
 
+      function sentRoomsFolder() {
+        const rooms = (appState.hostRooms || [])
+          .filter((room) => room && !room.isSharedLink)
+          .map((room) => createDemoRoom(room));
+        const count = rooms.length;
+        return `
+          <details class="SentRoomsFolder" data-testid="sent-rooms-folder" open>
+            <summary>
+              <span class="SentRoomsSummaryText">
+                <strong>${escapeHtml(formatTemplate(locale.ui.sentRoomFolderTitle, { count }))}</strong>
+                <span>${escapeHtml(count ? locale.ui.sentRoomFolderBody : locale.ui.sentRoomFolderEmpty)}</span>
+              </span>
+              <span class="SentRoomsChevron" aria-hidden="true">›</span>
+            </summary>
+            ${
+              count
+                ? `<div class="SentRoomList" data-testid="sent-room-list">
+                    ${rooms
+                      .map((room, index) => {
+                        const stats = participantStats(room);
+                        const progress = `${stats.answered}/${stats.expected}`;
+                        const meta = formatTemplate(locale.ui.sentRoomItemMeta, {
+                          progress,
+                          candidateCount: room.candidates.length,
+                        });
+                        return `<button class="SentRoomItem" type="button" data-action="open-room-status" data-room-id="${escapeHtml(room.id)}" data-testid="sent-room-item-${index}">
+                          <span class="SentRoomItemText">
+                            <strong>${escapeHtml(room.title)}</strong>
+                            <span>${escapeHtml(meta)}</span>
+                          </span>
+                          ${reasonChip(stats.answered ? "success" : "brand", stats.answered ? locale.ui.responseInboxSubmitted : locale.ui.responseInboxStatusPending)}
+                        </button>`;
+                      })
+                      .join("")}
+                  </div>`
+                : ""
+            }
+          </details>
+        `;
+      }
+
       function responseCoverage(room, state = "enough") {
         const ranked = rankCandidates(room);
         const percent = Math.min(100, Math.round((ranked.responseCount / room.expectedCount) * 100));
@@ -3937,10 +4692,7 @@
                 <h2 id="response-empty-title">${escapeHtml(locale.ui.responseEmptyTitle)}</h2>
                 <p class="helperText">${escapeHtml(locale.ui.responseEmptyBody)}</p>
               </section>
-              <section class="surface compactSection" aria-label="${escapeHtml(locale.ui.sentRoomLabel)}">
-                ${reasonChip("success", locale.ui.sentRoomLabel)}
-                <p class="helperText">${escapeHtml(locale.ui.responseEmptySentHint)}</p>
-              </section>
+              ${sentRoomsFolder()}
             </section>
           `;
         }
@@ -3964,20 +4716,43 @@
               <span class="progressPill">${escapeHtml(responseProgressText(room))}</span>
               <span class="helperText">${escapeHtml(responseInboxCandidateMeta(room))}</span>
             </button>
-            <section class="surface compactSection" aria-label="${escapeHtml(locale.ui.sentRoomLabel)}">
-              ${reasonChip("success", locale.ui.sentRoomLabel)}
-              <p class="helperText">${escapeHtml(locale.ui.sentRoomHint)}</p>
-            </section>
+            ${sentRoomsFolder()}
           </section>
         `;
       }
 
-      function homeHeroStatusOverlay({ stats, hostedCount, candidateCount, savedRoomLine }) {
+      function homeHostedRoomsSummary(rooms = []) {
+        const hostedRooms = rooms
+          .filter((room) => room && !room.isSharedLink)
+          .map((room) => createDemoRoom(room));
+        if (hostedRooms.length <= 1) return "";
+        return `
+          <div class="HomeHostedRooms" data-testid="home-hosted-rooms" aria-label="내 모임 요약">
+            ${hostedRooms
+              .slice(0, 3)
+              .map((room, index) => {
+                const stats = participantStats(room);
+                return `<button class="HomeHostedRoomButton" type="button" data-action="open-room-status" data-room-id="${escapeHtml(room.id)}" data-testid="home-hosted-room-${index}">
+                  <strong>${escapeHtml(room.title)}</strong>
+                  <span>${escapeHtml(`${stats.answered}/${stats.expected} 응답`)}</span>
+                </button>`;
+              })
+              .join("")}
+          </div>
+        `;
+      }
+
+      function homeHeroStatusOverlay({ stats, hostedCount, candidateCount, statusEyebrow, statusTitle, statusMeta, hostedRooms = [] }) {
         const answeredLabel = stats ? `${stats.answered}/${stats.expected}` : "0/0";
         const missingLabel = stats ? `${stats.missing}명` : `${hostedCount}개`;
         const missingTitle = stats ? "미응답" : "내 모임";
         return `
           <div class="HomeHeroStatusOverlay" data-testid="home-status-overlay" aria-label="${escapeHtml(locale.ui.currentStatus)}">
+            <div class="HeroStatusContext" data-testid="hero-status-room">
+              <span>${escapeHtml(statusEyebrow)}</span>
+              <strong data-testid="hero-status-title">${escapeHtml(statusTitle)}</strong>
+              <em>${escapeHtml(statusMeta)}</em>
+            </div>
             <div class="HeroStatusPill" data-testid="hero-status-pill">
               <span>${escapeHtml(locale.ui.currentStatus)}</span>
               <strong>${escapeHtml(locale.ui.progressStatus)}</strong>
@@ -3987,7 +4762,7 @@
               <div class="HomeMetricCard"><strong>${escapeHtml(missingLabel)}</strong><span>${escapeHtml(missingTitle)}</span></div>
               <div class="HomeMetricCard"><strong>${escapeHtml(candidateCount)}</strong><span>후보</span></div>
             </div>
-            <p class="emptyStateLine">${escapeHtml(savedRoomLine)}</p>
+            ${homeHostedRoomsSummary(hostedRooms)}
           </div>
         `;
       }
@@ -4366,15 +5141,36 @@
           const copy = screenCopy("scr-00-entry");
           const ranked = appState.room ? rankCandidates(appState.room) : null;
           const stats = appState.room ? participantStats(appState.room) : null;
-          const hostedCount = appState.hostRooms?.length || 0;
+          const hostedRooms = (appState.hostRooms || []).filter((room) => room && !room.isSharedLink).map((room) => createDemoRoom(room));
+          const hostedCount = hostedRooms.length;
+          const hasMultipleHostedRooms = !appState.room?.isSharedLink && hostedCount > 1;
+          const aggregateStats = hasMultipleHostedRooms
+            ? hostedRooms.reduce(
+                (acc, room) => {
+                  const roomStats = participantStats(room);
+                  acc.answered += roomStats.answered;
+                  acc.expected += roomStats.expected;
+                  acc.missing += roomStats.missing;
+                  return acc;
+                },
+                { answered: 0, expected: 0, missing: 0 },
+              )
+            : stats;
+          const aggregateCandidateCount = hasMultipleHostedRooms
+            ? `${hostedRooms.reduce((sum, room) => sum + room.candidates.length, 0)}개`
+            : appState.room ? `${appState.room.candidates.length}개` : "0개";
           const hasIncomingInvite = Boolean(appState.room?.isSharedLink && appState.inviteContext?.status === "valid");
-          const savedRoomLine = hasIncomingInvite
-            ? formatTemplate(locale.ui.incomingInviteBody, { title: appState.room.title })
+          const statusEyebrow = hasIncomingInvite ? "받은 초대 상태" : hostedCount ? "내 모임 상태" : locale.ui.currentStatus;
+          const statusTitle = hasMultipleHostedRooms ? `내 모임 ${hostedCount}개` : appState.room ? appState.room.title : "아직 만든 모임이 없어요";
+          const statusMeta = hasIncomingInvite
+            ? `${ranked.responseCount}명 응답 · 후보 ${appState.room.candidates.length}개`
+            : hasMultipleHostedRooms
+            ? `${aggregateStats.answered}명 응답 · 후보 ${aggregateCandidateCount}`
             : appState.room
-            ? `현재 모임 · ${appState.room.title} · ${ranked.responseCount}명 응답`
-            : locale.ui.emptyRoom;
+            ? `${ranked.responseCount}명 응답 · 후보 ${appState.room.candidates.length}개 · 내 모임 ${hostedCount}개`
+            : "새 모임을 만들면 이 화면에서 계속 확인할 수 있어요.";
           return `
-            <section id="scr-00-entry" class="screen" aria-labelledby="entry-title">
+            <section id="scr-00-entry" class="screen screen--poster" aria-labelledby="entry-title">
               <div class="screenBody">
                 <section class="HomeHero" aria-label="함모여 시작">
                   <strong class="HomeTitleMark" aria-hidden="true">함모여</strong>
@@ -4391,10 +5187,13 @@
                   </div>
                   <img class="HomeHeroAnimals" src="assets/final/hero/hero_animals_calendar_full_square.png" alt="" aria-hidden="true" />
                   ${homeHeroStatusOverlay({
-                    stats,
+                    stats: aggregateStats,
                     hostedCount,
-                    candidateCount: appState.room ? `${appState.room.candidates.length}개` : "0개",
-                    savedRoomLine,
+                    candidateCount: aggregateCandidateCount,
+                    statusEyebrow,
+                    statusTitle,
+                    statusMeta,
+                    hostedRooms,
                   })}
                 </section>
                 ${hasIncomingInvite ? incomingInviteCard(appState.room) : ""}
@@ -4454,10 +5253,11 @@
           }
           const ranked = rankCandidates(room);
           if (appState.showResponseInbox) {
+            const incomingRoom = room.isSharedLink ? room : null;
             return `
               <section id="scr-02-participant-input" class="screen" aria-labelledby="response-inbox-title">
                 <div class="screenBody">
-                  ${responseInbox(room)}
+                  ${responseInbox(incomingRoom)}
                 </div>
               </section>
             `;
@@ -4853,7 +5653,7 @@
         bottomNavRoot.innerHTML = bottomNavItems
           .map((item) => {
             const active = item.screens.includes(activeScreen);
-            return `<button class="BottomNavItem" type="button" data-tab-key="${escapeHtml(item.key)}" data-active="${active}" data-center="${item.center ? "true" : "false"}" aria-current="${active ? "page" : "false"}" ${actionAttrs(item.action, item.testId)}>
+            return `<button class="BottomNavItem" type="button" data-tab-key="${escapeHtml(item.key)}" data-nav-art="${escapeHtml(item.key)}" data-active="${active}" data-center="${item.center ? "true" : "false"}" aria-current="${active ? "page" : "false"}" ${actionAttrs(item.action, item.testId)}>
               ${item.center ? `<span class="BottomNavIcon" aria-hidden="true">${escapeHtml(item.icon)}</span>` : ""}
               <span class="BottomNavLabel">${escapeHtml(item.label)}</span>
             </button>`;
@@ -5652,14 +6452,19 @@
           if (!appState.room) return;
           if (isTerminalRoom(appState.room)) return;
           const previousScrollTop = screenRoot.querySelector(".screenBody")?.scrollTop || 0;
+          const restorePreferenceScroll = () => {
+            const nextBody = screenRoot.querySelector(".screenBody");
+            if (nextBody) nextBody.scrollTop = previousScrollTop;
+          };
           hasUnsavedEdits = true;
           appState.draftPreferences = getDraftPreferences(appState.room);
           appState.draftPreferences[target.dataset.candidateId] = normalizeStatus(target.dataset.status);
           appState.copyStatus = "";
           saveState();
           render(currentScreen());
-          const nextBody = screenRoot.querySelector(".screenBody");
-          if (nextBody) nextBody.scrollTop = previousScrollTop;
+          restorePreferenceScroll();
+          requestAnimationFrame(restorePreferenceScroll);
+          setTimeout(restorePreferenceScroll, 0);
         }
         if (action === "select-participant") {
           if (!appState.room) return;

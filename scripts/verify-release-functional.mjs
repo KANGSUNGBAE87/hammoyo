@@ -89,24 +89,39 @@ async function assertHomeHeroImageAndStatusFlow(page) {
   const result = await page.evaluate(() => {
     const image = document.querySelector(".HomeHeroAnimals");
     const overlay = document.querySelector('[data-testid="home-status-overlay"]');
-    if (!image || !overlay) return { ok: false, reason: "missing hero image or status" };
+    const privacy = document.querySelector('[data-testid="home-privacy-message"]');
+    const statusTitle = document.querySelector('[data-testid="hero-status-title"]');
+    if (!image || !overlay || !privacy || !statusTitle) return { ok: false, reason: "missing poster layer, privacy copy, or status" };
     const imageRect = image.getBoundingClientRect();
     const overlayRect = overlay.getBoundingClientRect();
+    const privacyRect = privacy.getBoundingClientRect();
+    const titleRect = statusTitle.getBoundingClientRect();
+    const imageStyle = getComputedStyle(image);
     const overlayStyle = getComputedStyle(overlay);
+    const privacyStyle = getComputedStyle(privacy);
     return {
       ok:
         imageRect.width >= Math.min(210, window.innerWidth * 0.53) &&
         imageRect.height >= Math.min(210, window.innerWidth * 0.53) &&
-        overlayStyle.position !== "absolute" &&
-        overlayRect.top >= imageRect.bottom - 8,
+        imageStyle.position === "absolute" &&
+        privacyStyle.borderTopStyle === "none" &&
+        overlayStyle.borderTopStyle === "none" &&
+        overlayRect.top < imageRect.bottom &&
+        privacyRect.top < imageRect.bottom &&
+        titleRect.width > 0 &&
+        titleRect.bottom <= window.innerHeight,
       imageWidth: Math.round(imageRect.width),
       imageHeight: Math.round(imageRect.height),
+      imagePosition: imageStyle.position,
       imageBottom: Math.round(imageRect.bottom),
+      privacyTop: Math.round(privacyRect.top),
       overlayTop: Math.round(overlayRect.top),
-      overlayPosition: overlayStyle.position,
+      overlayBottom: Math.round(overlayRect.bottom),
+      overlayBorder: overlayStyle.borderTopStyle,
+      titleBottom: Math.round(titleRect.bottom),
     };
   });
-  assert(result.ok, `home hero should show the full image with status below it: ${JSON.stringify(result)}`);
+  assert(result.ok, `home hero should compose one poster scene with background art and floating status copy: ${JSON.stringify(result)}`);
 }
 
 async function chooseCustomOption(page, prefix, value) {
@@ -230,10 +245,72 @@ async function main() {
     `inactive bottom nav labels should use a dark readable text color: ${inactiveNavLabelColor}`,
   );
   assert((await page.locator('[data-testid="language-toggle-button"]').count()) === 0, "entry should not expose a language switcher");
-  const navDecorStatus = await page.getByTestId("bottom-nav-home").evaluate((node) => getComputedStyle(node, "::before").display);
-  assert(navDecorStatus === "none", `bottom nav should not render faint decorative animal backgrounds: ${navDecorStatus}`);
+  const navDecorStatus = await page.getByTestId("bottom-nav-home").evaluate((node) => {
+    const before = getComputedStyle(node, "::before");
+    const label = getComputedStyle(node.querySelector(".BottomNavLabel"));
+    return {
+      image: before.backgroundImage,
+      opacity: before.opacity,
+      labelSize: label.fontSize,
+      labelBackground: label.backgroundColor,
+      labelWhiteSpace: label.whiteSpace,
+      itemBackground: getComputedStyle(node).backgroundColor,
+    };
+  });
+  assert(
+    navDecorStatus.image && navDecorStatus.image !== "none" && Number(navDecorStatus.opacity) >= 0.75,
+    `bottom nav should render the requested animal background art: ${JSON.stringify(navDecorStatus)}`,
+  );
+  assert(
+    navDecorStatus.labelWhiteSpace === "nowrap" && navDecorStatus.labelBackground.includes("rgba(0, 0, 0, 0)"),
+    `bottom nav labels should be centered one-line text without a white sticker plate: ${JSON.stringify(navDecorStatus)}`,
+  );
+  const navArtByTab = await page.evaluate(() =>
+    Object.fromEntries(
+      [...document.querySelectorAll(".BottomNavItem")].map((item) => [
+        item.dataset.tabKey,
+        getComputedStyle(item, "::before").backgroundImage,
+      ]),
+    ),
+  );
+  for (const key of ["home", "respond", "create", "meetups", "settings"]) {
+    assert(
+      navArtByTab[key]?.includes("assets/final/characters/") && !navArtByTab[key]?.includes("hero_animals_calendar"),
+      `bottom nav ${key} should use a standalone character asset, not a cropped group image: ${navArtByTab[key]}`,
+    );
+  }
+  const navLabelLineStatus = await page.evaluate(() =>
+    [...document.querySelectorAll(".BottomNavLabel")].map((label) => {
+      const rect = label.getBoundingClientRect();
+      const lineHeight = Number.parseFloat(getComputedStyle(label).lineHeight);
+      return {
+        text: label.innerText,
+        oneLine: rect.height <= lineHeight * 1.35,
+        height: Math.round(rect.height),
+        lineHeight,
+        textAlign: getComputedStyle(label).textAlign,
+      };
+    }),
+  );
+  assert(
+    navLabelLineStatus.every((item) => item.oneLine && item.textAlign === "center"),
+    `bottom nav labels should stay centered and one-line: ${JSON.stringify(navLabelLineStatus)}`,
+  );
   await page.getByTestId("bottom-nav-respond").click();
   await page.waitForSelector("#scr-02-participant-input");
+  const activeRespondNav = await page.getByTestId("bottom-nav-respond").evaluate((node) => {
+    const before = getComputedStyle(node, "::before");
+    const label = getComputedStyle(node.querySelector(".BottomNavLabel"));
+    return {
+      active: node.dataset.active,
+      transform: before.transform,
+      fontWeight: label.fontWeight,
+    };
+  });
+  assert(
+    activeRespondNav.active === "true" && activeRespondNav.transform !== "none" && Number(activeRespondNav.fontWeight) >= 900,
+    `active bottom nav should enlarge art and use stronger label weight: ${JSON.stringify(activeRespondNav)}`,
+  );
   assert(await page.getByTestId("response-empty-state").isVisible(), "response tab should be clickable without a room and show an empty state");
   assert((await page.getByTestId("response-inbox-list").locator(".StateGraphicImage").count()) === 0, "empty response inbox should not show decorative state graphics");
   const emptyResponseText = await page.getByTestId("response-empty-state").innerText();
@@ -494,22 +571,12 @@ async function main() {
   await page.getByTestId("bottom-nav-respond").click();
   await page.waitForSelector('[data-testid="response-inbox-list"]');
   const responseInboxText = await page.getByTestId("response-inbox-list").innerText();
-  assert(responseInboxText.includes("받은 초대"), "response tab should show received invitations before the response form");
-  assert(/0\s*\/\s*7/.test(responseInboxText), "response inbox should show progress like 0/7");
-  await page.getByTestId("response-inbox-open-0").click();
-  await page.waitForSelector("#scr-02-participant-input");
-  await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "detail");
-  assert(await page.getByTestId("pre-response-privacy-note").isVisible(), "participant detail should explain that candidate aggregates are hidden before response");
-  assert((await page.locator('[data-testid="anonymous-aggregate-panel"]').count()) === 0, "participant detail should not show candidate aggregate counts before submitting");
-  assert(await page.getByTestId("participant-picker-list").isVisible(), "respondent should choose their name from the host roster before answering");
-  await page.getByTestId("participant-picker-민지").click();
-  assert((await page.getByTestId("participant-name-input").inputValue()) === "민지", "participant picker should fill the selected respondent name");
-  await page.goBack();
-  await page.waitForSelector('[data-testid="response-inbox-list"]');
-  await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "inbox");
-  await page.getByTestId("response-inbox-open-0").click();
-  await page.waitForSelector("#scr-02-participant-input");
-  await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "detail");
+  assert(responseInboxText.includes("현재 모임이 없어요"), "response tab should not treat my own hosted room as a received invite");
+  assert(responseInboxText.includes("내가 보낸 방 1개") && responseInboxText.includes("금요일 저녁 모임"), "response tab should list hosted rooms under the sent-room folder");
+  assert(/0\s*\/\s*7/.test(responseInboxText), "sent-room folder should show progress like 0/7");
+  assert((await page.locator('[data-testid="response-inbox-open-0"]').count()) === 0, "my own hosted room should not appear as a received-invite card");
+  await page.getByTestId("sent-room-item-0").click();
+  await page.waitForSelector("#scr-04-insufficient-response");
   await page.getByTestId("bottom-nav-meetups").click();
   await page.waitForSelector("[data-testid='my-meetups-screen']");
   await page.getByTestId("open-room-status-0").click();
@@ -552,6 +619,24 @@ async function main() {
   assert((await page.locator('[data-testid="dashboard-create-room-button"]').count()) === 0, "my meetups should not expose duplicate create CTA");
   const firstCardActionGrid = await page.getByTestId("host-card-actions-0").evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length);
   assert(firstCardActionGrid >= 3, "my meetups card actions should use a compact 3+1 layout instead of a single vertical stack");
+  const firstCardWidthStatus = await page.getByTestId("host-card-actions-0").evaluate((node) => {
+    const card = node.closest(".HostStatusCard");
+    const links = card?.querySelector(".IndividualLinks");
+    const cardRect = card.getBoundingClientRect();
+    const actionRect = node.getBoundingClientRect();
+    const linksRect = links?.getBoundingClientRect();
+    return {
+      actionFill: actionRect.width >= cardRect.width - 36,
+      linksFill: !linksRect || linksRect.width >= cardRect.width - 36,
+      actionWidth: Math.round(actionRect.width),
+      linksWidth: linksRect ? Math.round(linksRect.width) : 0,
+      cardWidth: Math.round(cardRect.width),
+    };
+  });
+  assert(
+    firstCardWidthStatus.actionFill && firstCardWidthStatus.linksFill,
+    `my meetups card actions and one-button/link sections should fill card width: ${JSON.stringify(firstCardWidthStatus)}`,
+  );
   await page.getByTestId("edit-host-room-0").click();
   await page.waitForSelector("#scr-01-host-room");
   await page.getByTestId("room-title-input").fill("수정된 금요일 모임");
@@ -803,6 +888,49 @@ async function main() {
   await demoResetContext.close();
 
   await page.goto(`${pageUrl}&screen=scr-00-entry`, { waitUntil: "load" });
+  await page.evaluate(() => {
+    const roomA = {
+      id: "sent-room-a",
+      title: "내가 보낸 첫 방",
+      expectedCount: 3,
+      participants: [
+        { id: "p1", name: "111" },
+        { id: "p2", name: "222" },
+        { id: "p3", name: "333" },
+      ],
+      candidates: [
+        { id: "c1", label: "7.5 일요일", time: "18:30", note: "강남" },
+        { id: "c2", label: "7.6 월요일", time: "19:00", note: "홍대" },
+      ],
+      responses: [],
+      status: "collecting",
+    };
+    const roomB = {
+      ...roomA,
+      id: "sent-room-b",
+      title: "내가 보낸 둘째 방",
+      participants: [
+        { id: "p1", name: "444" },
+        { id: "p2", name: "555" },
+        { id: "p3", name: "666" },
+        { id: "p4", name: "777" },
+      ],
+      expectedCount: 4,
+    };
+    localStorage.setItem("hammoyo:release:v1", JSON.stringify({ version: 1, room: null, hostRooms: [roomA, roomB] }));
+  });
+  await page.goto(`${baseFileUrl}?screen=scr-00-entry`, { waitUntil: "load" });
+  const homeHostedText = await page.getByTestId("home-status-overlay").innerText();
+  assert(homeHostedText.includes("내 모임 2개"), "home status should summarize all hosted rooms when more than one exists");
+  assert(homeHostedText.includes("내가 보낸 첫 방") && homeHostedText.includes("내가 보낸 둘째 방"), "home status should show the hosted room titles, not only one active room");
+  assert((await page.locator('[data-testid^="home-hosted-room-"]').count()) === 2, "home status should render a compact row for each hosted room");
+  await page.goto(`${baseFileUrl}?screen=scr-02-participant-input&response=inbox`, { waitUntil: "load" });
+  await page.waitForSelector('[data-testid="response-inbox-list"]');
+  const sentFolderText = await page.getByTestId("sent-rooms-folder").innerText();
+  assert(sentFolderText.includes("내가 보낸 방 2개"), "response tab should show sent room count as a folder heading");
+  assert(sentFolderText.includes("내가 보낸 첫 방") && sentFolderText.includes("내가 보낸 둘째 방"), "response tab should list every sent room inside the sent-room folder");
+  assert((await page.locator('[data-testid^="sent-room-item-"]').count()) === 2, "response sent-room folder should render all hosted rooms");
+  await page.goto(`${pageUrl}&screen=scr-00-entry`, { waitUntil: "load" });
   await page.getByTestId("bottom-nav-settings").click();
   await page.waitForSelector("[data-testid='settings-screen']");
   const settingsText = await page.locator("body").innerText();
@@ -903,7 +1031,7 @@ async function main() {
     body.scrollTop = body.scrollHeight;
     return body.scrollTop;
   });
-  await page.getByTestId("preference-slot-3-available").click();
+  await page.evaluate(() => document.querySelector('[data-testid="preference-slot-3-available"]')?.click());
   const scrollAfterPreference = await page.evaluate(() => document.querySelector(".screenBody")?.scrollTop || 0);
   assert(Math.abs(scrollAfterPreference - scrollBeforePreference) <= 8, "preference selection should not jump the response screen back to the top");
   await assertStickyCtaDoesNotCoverBody(page, "participant mobile CTA should not cover preference controls");

@@ -416,3 +416,182 @@ Date: 2026-06-28
 
 - Static GitHub Pages/localStorage still cannot know cross-device response state without Supabase-backed room/response storage.
 - Native browser controls are now blocked in this release HTML, but future projects need the global design preflight and memory note to be read before UI implementation.
+
+## Later Update: Enlarged Animal Bottom Navigation
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 하단 탭 글자를 훨씬 크게 만들기.
+- 탭 사이 영역/경계를 더 분명하게 키우기.
+- 기존 이미지 assets를 90% 불투명 배경으로 넣기.
+- 선택된 탭은 글자를 더 진하게 하고 이미지가 10% 커지게 만들기.
+- 서브에이전트를 활용해서 구현하기.
+
+### Subagent Inputs
+
+- `019f0e8d-ffb1-79c0-b4cc-14c74290c679` read-only review warned that literal 36px text breaks 320px widths, so nav height, screen height calculation, text clamp, image layer, and label plate must be adjusted together.
+- `019f0e8d-bffd-7e71-b1b7-1a01dafc83b9` implemented the initial BottomNav CSS and `data-nav-art` wiring in `docs/release/index.html`; main Codex integrated, corrected letter spacing, added small-width safeguards, synced `docs/index.html`, and updated functional verification.
+
+### Decisions
+
+- Bottom nav height increased and all screen height calculations continue using `--bottom-nav-height`.
+- Non-center tab labels scale up to 30px on wider viewports and use a small-screen override at 320px so labels stay inside each tab.
+- Each tab now has a 90% opacity asset background and a separate label plate to preserve readability.
+- Active tabs use `data-active="true"` to increase asset scale to `1.1`, strengthen label weight, and apply a brand-colored label state.
+- Functional verifier now checks for requested nav art and active-state scale/weight instead of the previous no-art contract.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-functional.mjs`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+
+### Verification
+
+- `npm run build` passed.
+- `git diff --check` passed.
+- Playwright screenshot checks:
+  - `/tmp/hammoyo-bottomnav-wide768.png`
+  - `/tmp/hammoyo-bottomnav-mobile390.png`
+  - `/tmp/hammoyo-bottomnav-narrow320.png`
+- Computed layout checks confirmed labels fit within tab bounds at 320px, 390px, and 768px; active `내 모임` art transforms to `matrix(1.1, 0, 0, 1.1, 0, 0)`.
+
+### Remaining Risks
+
+- The user's "3x" label request is fully reached on wider viewports (`30px` from the previous `12px`), but 320px phones require a smaller responsive label to prevent overlap.
+- The center `모임 만들기` label remains smaller than the side labels because the central plus button and longer label need to coexist in the same fixed bottom navigation.
+
+## Later Update: Home Current Room Title Emphasis
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 홈 현재상태 카드에서 어떤 모임의 상태인지 제목이 너무 작게 보여서, 모임 제목을 더 강조하기.
+
+### Decisions
+
+- `현재 모임 · 제목 · 응답 수`를 작은 문장으로 두지 않고 `HeroStatusContext` 제목 블록으로 분리했다.
+- 모임 제목은 `clamp(22px, 5.9vw, 30px)`와 `font-weight: 950`으로 강조한다.
+- 상태 카드 안에서 제목 블록을 가장 먼저 배치해서 하단 탭에 가려지기 전에 모임 제목이 보이게 했다.
+- hero 이미지 크기는 기존 기능 검증 기준을 유지하면서 제목이 첫 화면에 보이도록 `min(224px, 66%)`로 조정했다.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+
+### Verification
+
+- `npm run build` passed.
+- `git diff --check` passed.
+- Playwright screenshot checked: `/tmp/hammoyo-home-status-title-390-v2.png`.
+- Computed check confirmed demo room title `대학 동기 모임` is `23.01px`, weight `950`, and fully above the bottom nav on 390px viewport.
+
+### Remaining Risks
+
+- On very short screens, the metric cards below the title can still require scroll because the enlarged bottom nav uses more vertical space. The room title itself remains visible before the nav.
+
+## Later Update: Single Poster Scene Home
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 홈 화면이 카드/패널 여러 개로 나뉘어 보이는 문제를 전면 수정.
+- 동물 이미지는 배경화면처럼 깔고, 글자와 현재 상태 정보가 그 위에 떠 있는 구조로 변경.
+- 비밀 투표 문구, 모임 제목, 응답 현황은 유지하되 패널 경계를 줄이기.
+- 서브에이전트를 활용해서 구현.
+
+### Subagent Inputs
+
+- `019f0eac-88cc-7af2-ab86-9a027ccf65c0` read-only review identified nested `HomeHeroPrivacyMessage`, `HomeHeroStatusOverlay`, and `HomeMetricCard` panels as the main cause of the fragmented home feel. It recommended a single poster root with an art layer and floating text/status overlays.
+- `019f0eac-2d41-72d3-9dde-d5e9d2de12ac` implemented the first poster-scene CSS pass in `docs/release/index.html`, converting `HomeHeroAnimals` to an absolute background layer and removing heavy panel borders/shadows from privacy/status areas.
+
+### Decisions
+
+- `HomeHero` now behaves as a single poster scene instead of a card containing multiple cards.
+- `HomeHeroAnimals` is an absolute background art layer behind the copy and status text.
+- Privacy copy and status information use light scrim/blur only, with heavy borders and card shadows removed.
+- Home status metrics remain visible but are visually softened so they read as floating information rather than separate panels.
+- The functional verifier's hero contract now checks for poster composition: background art layer, no privacy/status border, and floating status title.
+- Small-width media rules compress the status block so 320px screens keep the metric row above the enlarged bottom nav.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-functional.mjs`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+
+### Verification
+
+- `npm run build` passed.
+- `git diff --check` passed.
+- Playwright screenshots checked:
+  - `/tmp/hammoyo-poster-v4-mobile390.png`
+  - `/tmp/hammoyo-poster-v4-narrow320.png`
+- Computed 320px check confirmed the status metric row has 11px clearance above the bottom nav.
+
+### Remaining Risks
+
+- The enlarged bottom nav still consumes substantial vertical space on short phones, so the poster scene is tightly composed at 320px.
+- The status metrics keep a light translucent backing for readability; fully removing the backing would reduce contrast over the animal art.
+
+## Later Update: Sent Room Folder And Responsive Width Fix
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 하단 탭 이미지를 기존 단체 이미지를 잘라 쓰는 느낌이 아니라 각 캐릭터 자산으로 보이게 수정.
+- 홈 화면은 패널 안에 갇힌 느낌을 줄이고 화면을 꽉 채우는 poster scene으로 유지.
+- 내 모임 카드의 버튼과 패널이 왼쪽에 쏠리지 않고 가로폭을 채우도록 수정.
+- 작은 글자들을 전반적으로 키워 가독성을 확보.
+- 응답 탭에서는 내가 보낸 방이 여러 개일 때 folder/accordion 형태로 전체 목록과 count를 보여주기.
+- 내가 만든 방은 받은 초대 카드로 보이지 않게 구분.
+
+### Subagent Inputs
+
+- `019f0ebe-9196-7d13-9922-436953acb057` implemented a first pass for bottom tab art, poster layout, and typography; it flagged that browser verification was still needed.
+- `019f0ec2-b4fb-7450-b89c-654b6ebf49fd` read-only review identified duplicate bottom-nav art declarations, `responseInbox()` single-room assumptions, `HostCardActions`/`IndividualLinks` width issues, and small text selectors that needed late overrides.
+
+### Decisions
+
+- Bottom navigation now uses standalone final character assets for every tab: rabbit, penguin, dog, bear, and cat. The center create tab no longer uses the group hero image.
+- `responseInbox()` now renders a reusable `sentRoomsFolder()` based on `appState.hostRooms`, including count, expandable list, room title, response progress, and status chip.
+- Hosted rooms are not shown as received-invite cards. Only `room.isSharedLink` is treated as a received invite; hosted rooms live under the sent-room folder.
+- My-meetups cards, action rows, individual-link panels, and link fields are forced to stretch to full card width.
+- Metric typography remains larger, but host metric values use a responsive no-wrap size to avoid breaking `미응답 3명` across lines.
+- Functional verifier now checks standalone nav assets, sent-room folder count/list behavior, own-room vs received-invite separation, and full-width action/link sections.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-functional.mjs`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+
+### Verification
+
+- `npm run verify:functional` passed after the new failing sent-folder regression test was added and implemented.
+- `npm run build` passed.
+- `git diff --check` passed.
+- `rg -n "mvp|MVP"` over changed release/test/log files returned no matches.
+- Playwright screenshots checked:
+  - `/tmp/hammoyo-latest-home-v2-390.png`
+  - `/tmp/hammoyo-latest-response-folder-v2-390.png`
+  - `/tmp/hammoyo-latest-my-meetups-v2-390.png`
+
+### Remaining Risks
+
+- The bottom navigation is intentionally tall because tab text is now much larger. It fits current 320px and 390px checks but leaves less vertical space on short phones.
+- The home status overlay keeps a translucent scrim for readability over the animal art; removing it entirely would make white title text unstable over the background.
