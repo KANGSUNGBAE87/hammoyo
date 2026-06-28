@@ -1,6 +1,6 @@
 ---
-version: 13
-status: release-picker-and-language-standard-implemented
+version: 14
+status: bottom-tab-calendar-wheel-implemented
 updated: 2026-06-28
 canonical: true
 ---
@@ -11,9 +11,9 @@ canonical: true
 
 이 문서는 조건부 P4 패키지에서 비어 있던 Supabase, 권한, 응답 정책, AI/copy 경계를 닫고 앱 흐름 구현 기준을 유지하기 위한 구현 기획입니다.
 
-현재 기준은 `release-picker-and-language-standard-implemented`입니다. 앱 화면에는 후보 날짜 chip, 낮/저녁/밤 시간 slot, 후보 추가/삭제, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 내가 만든 모임 상태판, 브라우저 기반 host room 목록과 모임 수정/삭제 흐름을 추가했습니다. platform adapter contract, `hammoyo_` Supabase migration, release readiness 문서, `SupabaseBackendAdapter`, 실제 Supabase DB write/read를 수행하는 Edge Function, server-only DeepSeek V4 Pro AI provider proxy, AI copy/coordination policy 검증도 연결되어 있습니다. shared Supabase 한 프로젝트에 여러 앱이 붙는 전제를 반영해 app table/helper/policy prefix는 `hammoyo_`로 고정합니다. 2026-06-28 기준으로 `lookup-room`, `delete-room`, anonymous participant key 기반 `join-room`/`submit-response`, candidate-slot ownership validation, DB trigger hardening, expanded remote smoke path가 구현됐고, 신규 migration과 Edge Function도 원격 shared Supabase에 적용/배포됐습니다. `npm run smoke:remote`는 host 생성, lookup, 익명 join, 익명 응답 수정, signed session plus anonymous key 응답 재사용, candidate ownership rejection, recompute, delete-room, 삭제 후 lookup/write 차단, 삭제 요청 후 세션 차단까지 통과했습니다.
+현재 기준은 `bottom-tab-calendar-wheel-implemented`입니다. 앱 화면에는 keepthis 참고형 하단 5탭, 중앙 `만들기` 탭, iPhone형 월간 캘린더 날짜 선택, Android 알람형 3열 시간 wheel, 후보 추가/삭제, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 내가 만든 모임 상태판, 브라우저 기반 host room 목록과 모임 수정/삭제 흐름을 추가했습니다. platform adapter contract, `hammoyo_` Supabase migration, release readiness 문서, `SupabaseBackendAdapter`, 실제 Supabase DB write/read를 수행하는 Edge Function, server-only DeepSeek V4 Pro AI provider proxy, AI copy/coordination policy 검증도 연결되어 있습니다. shared Supabase 한 프로젝트에 여러 앱이 붙는 전제를 반영해 app table/helper/policy prefix는 `hammoyo_`로 고정합니다. 2026-06-28 기준으로 `lookup-room`, `delete-room`, anonymous participant key 기반 `join-room`/`submit-response`, candidate-slot ownership validation, DB trigger hardening, expanded remote smoke path가 구현됐고, 신규 migration과 Edge Function도 원격 shared Supabase에 적용/배포됐습니다. `npm run smoke:remote`는 host 생성, lookup, 익명 join, 익명 응답 수정, signed session plus anonymous key 응답 재사용, candidate ownership rejection, recompute, delete-room, 삭제 후 lookup/write 차단, 삭제 요청 후 세션 차단까지 통과했습니다.
 
-2026-06-28 추가 기준: 사용자-facing 날짜/시간 입력은 브라우저 native picker를 쓰지 않습니다. 후보 날짜는 chip/radio, 시간은 낮/저녁/밤 segmented control과 slot button으로 선택합니다. 프로젝트 문서와 검증 스크립트는 작은 검증 프레임을 버리고 `최종출시제품`/`release` 기준으로 유지합니다.
+2026-06-28 추가 기준: 사용자-facing 날짜/시간 입력은 브라우저 native picker를 쓰지 않습니다. 후보 날짜는 `IPhoneCalendarPicker` 월간 sheet, 시간은 `ReleaseTimeWheel` 3열 wheel로 선택합니다. 프로젝트 문서와 검증 스크립트는 작은 검증 프레임을 버리고 `최종출시제품`/`release` 기준으로 유지합니다.
 
 2026-06-27부터 다음 구현은 `HAMMOYEO_FINAL_DELIVERY` 기준으로 재정렬합니다. 현재 배포본은 final delivery의 베이스로 충분하지만, 그대로 final/store-ready는 아닙니다. 핵심 불일치는 참여자 익명 응답 모델, `어려워요` 제약 처리, 최소 응답 기준, 서버 invite/status lookup, `negotiating`/`ready_to_confirm` 상태입니다.
 
@@ -85,7 +85,7 @@ backend/
   supabase/migrations/
 ```
 
-현재 `docs/release/index.html`과 `docs/index.html`은 정적 HTML/CSS/JS 앱 화면으로 유지하되, localStorage 기반 방 생성/응답/추천/확정뿐 아니라 날짜/시간 picker, 후보 추가/삭제, 초대 홈 진입, native share 우선 공유, 내가 만든 모임 상태판, 모임 수정/삭제까지 동작합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 구현되어 있으며, Toss login/account 동기화 UI가 붙기 전 GitHub Pages 화면은 브라우저 저장을 우선 사용합니다. GitHub Pages의 삭제 후 링크 무효화는 같은 브라우저의 revoked room id 기준이며, 다른 기기까지 완전하게 막는 정식 동작은 Supabase invite lookup에서 `deleted/expired` 상태를 확인해야 합니다.
+현재 `docs/release/index.html`과 `docs/index.html`은 정적 HTML/CSS/JS 앱 화면으로 유지하되, localStorage 기반 방 생성/응답/추천/확정뿐 아니라 하단 5탭 navigation, custom calendar picker, time wheel picker, 후보 추가/삭제, 초대 홈 진입, native share 우선 공유, 내가 만든 모임 상태판, 모임 수정/삭제까지 동작합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 구현되어 있으며, Toss login/account 동기화 UI가 붙기 전 GitHub Pages 화면은 브라우저 저장을 우선 사용합니다. GitHub Pages의 삭제 후 링크 무효화는 같은 브라우저의 revoked room id 기준이며, 다른 기기까지 완전하게 막는 정식 동작은 Supabase invite lookup에서 `deleted/expired` 상태를 확인해야 합니다.
 
 ## Auth Mapping
 

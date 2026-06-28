@@ -237,22 +237,31 @@ async function main() {
   }
 
   await page.getByTestId("start-create-room").click();
+  assert((await page.locator('input[type="date"], input[type="time"]').count()) === 0, "host setup should not expose browser-native date/time pickers");
+  assert(await page.getByTestId("bottom-nav-create").isVisible(), "release shell should expose bottom create tab");
+  assert(await page.getByTestId("bottom-nav-home").evaluate((node) => node.closest(".BottomNav") !== null), "bottom nav should use the BottomNav shell");
+  await page.getByTestId("bottom-nav-meetups").click();
+  await page.waitForSelector("#scr-08-my-meetups");
+  await page.getByTestId("bottom-nav-create").click();
+  await page.waitForSelector("#scr-01-host-room");
   await page.getByTestId("room-title-input").fill("금요일 저녁 모임");
   await page.getByTestId("expected-count-select").selectOption("7");
   assert(await page.getByTestId("expected-count-select").evaluate((node) => node.closest(".selectShell") !== null), "expected count should use an iOS-like select shell");
-  assert((await page.locator('input[type="date"], input[type="time"]').count()) === 0, "host setup should not expose browser-native date/time pickers");
-  assert(await page.getByTestId("candidate-date-chip-0-2026-07-05").evaluate((node) => node.closest(".ReleaseDateChip") !== null), "candidate dates should use release date chips");
-  assert(await page.getByTestId("candidate-time-slot-0-18:30").evaluate((node) => node.closest(".ReleaseTimeSlot") !== null), "candidate times should use release time slots");
-  await page.getByTestId("candidate-date-chip-0-2026-07-05").click();
-  await page.getByTestId("candidate-time-slot-0-18:30").click();
+  assert(await page.getByTestId("candidate-calendar-trigger-0").evaluate((node) => node.closest(".IPhoneCalendarPicker") !== null), "candidate dates should use the iPhone-like calendar picker");
+  assert(await page.getByTestId("candidate-time-wheel-0").evaluate((node) => node.closest(".ReleaseTimeWheel") !== null), "candidate times should use the alarm-style wheel");
+  await page.getByTestId("candidate-calendar-day-0-2026-07-05").click();
+  await page.getByTestId("candidate-time-hour-0-18").click();
+  await page.getByTestId("candidate-time-minute-0-30").click();
   await page.getByTestId("candidate-note-input-0").fill("강남역 근처");
-  await page.getByTestId("candidate-date-chip-1-2026-07-06").click();
-  await page.getByTestId("candidate-time-slot-1-17:00").click();
+  await page.getByTestId("candidate-calendar-day-1-2026-07-06").click();
+  await page.getByTestId("candidate-time-hour-1-17").click();
+  await page.getByTestId("candidate-time-minute-1-00").click();
   await page.getByTestId("candidate-note-input-1").fill("잠실");
   await page.getByTestId("add-candidate-button").click();
-  assert(await page.getByTestId("candidate-date-chip-3-2026-07-07").isVisible(), "host should be able to add a fourth candidate slot");
-  await page.getByTestId("candidate-date-chip-3-2026-07-07").click();
-  await page.getByTestId("candidate-time-slot-3-19:30").click();
+  assert(await page.getByTestId("candidate-calendar-day-3-2026-07-07").isVisible(), "host should be able to add a fourth candidate slot");
+  await page.getByTestId("candidate-calendar-day-3-2026-07-07").click();
+  await page.getByTestId("candidate-time-hour-3-19").click();
+  await page.getByTestId("candidate-time-minute-3-30").click();
   await page.getByTestId("candidate-note-input-3").fill("성수");
   await page.getByTestId("remove-candidate-2").click();
   assert((await page.locator("[data-testid^='candidate-date-control-']").count()) === 3, "host should be able to remove a candidate slot");
@@ -298,8 +307,9 @@ async function main() {
   await page.waitForSelector("#scr-01-host-room");
   await page.getByTestId("room-title-input").fill("수정된 금요일 모임");
   await page.getByTestId("expected-count-select").selectOption("9");
-  await page.getByTestId("candidate-date-chip-0-2026-07-12").click();
-  await page.getByTestId("candidate-time-slot-0-20:10").click();
+  await page.getByTestId("candidate-calendar-day-0-2026-07-12").click();
+  await page.getByTestId("candidate-time-hour-0-20").click();
+  await page.getByTestId("candidate-time-minute-0-10").click();
   await page.getByTestId("candidate-note-input-0").fill("성수역 근처");
   await page.getByTestId("create-room-button").click();
   await page.waitForSelector("[data-testid='my-meetups-screen']");
@@ -335,8 +345,9 @@ async function main() {
   await page.goto(`${baseFileUrl}?reset=1`, { waitUntil: "load" });
   await page.getByTestId("start-create-room").click();
   await page.getByTestId("room-title-input").fill("다시 만든 금요일 모임");
-  await page.getByTestId("candidate-date-chip-0-2026-07-05").click();
-  await page.getByTestId("candidate-time-slot-0-18:30").click();
+  await page.getByTestId("candidate-calendar-day-0-2026-07-05").click();
+  await page.getByTestId("candidate-time-hour-0-18").click();
+  await page.getByTestId("candidate-time-minute-0-30").click();
   await page.getByTestId("create-room-button").click();
   await page.waitForSelector("#scr-04-insufficient-response");
   await page.getByTestId("topbar-home-button").click();
@@ -576,9 +587,9 @@ async function main() {
     dismissedDirtyDialog = dialog.message().includes("작성 중");
     await dialog.dismiss();
   });
-  await page.getByTestId("topbar-home-button").click();
+  await page.getByTestId("bottom-nav-home").click();
   await page.waitForTimeout(100);
-  assert(dismissedDirtyDialog, "dirty host setup should show an exit confirmation");
+  assert(dismissedDirtyDialog, "dirty host setup should show an exit confirmation from bottom nav");
   assert(await page.locator("#scr-01-host-room").isVisible(), "dismissing dirty exit confirmation should keep the host setup screen");
   page.once("dialog", async (dialog) => {
     await dialog.accept();

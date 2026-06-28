@@ -7,7 +7,7 @@
 - 직접 화면 열기: `docs/release/index.html?screen=scr-00-entry`
 - 데모 데이터 화면 열기: `docs/release/index.html?demo=1&screen=scr-03-result-recommendation`
 - 목적: `HAMMOYEO_FINAL_DELIVERY` 기준의 방 생성, 참여자 응답, 추천/응답 부족/만료/closed/개인정보 흐름 확인
-- 구현된 기능: 방 생성, 모임 이름 자유입력, 예상 인원 선택, 후보 날짜 chip, 낮/저녁/밤 시간 slot, 후보 추가/삭제, 참여자 선호 저장, deterministic 추천, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 약속 확정, closed 상태 보존, 내가 만든 모임 상태 확인/수정/삭제, 설정의 로그인 상태/로그아웃, 로컬 데이터 삭제
+- 구현된 기능: 방 생성, 하단 5탭 이동, 모임 이름 자유입력, 예상 인원 선택, iPhone형 월간 캘린더 날짜 선택, Android 알람형 3열 시간 wheel, 후보 추가/삭제, 참여자 선호 저장, deterministic 추천, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 약속 확정, closed 상태 보존, 내가 만든 모임 상태 확인/수정/삭제, 설정의 로그인 상태/로그아웃, 로컬 데이터 삭제
 - 메인 이미지: `assets/hammoyo-hero-animals.png`
 - 배경 이미지: `assets/hammoyo-animal-background.png`
 - 개별 캐릭터 asset: `assets/characters/`

@@ -1,6 +1,6 @@
 ---
-version: 13
-status: release-picker-redesign-verified
+version: 14
+status: bottom-tab-calendar-wheel-verified
 updated: 2026-06-28
 canonical: true
 ---
@@ -12,13 +12,21 @@ canonical: true
 공식 P4 패키지는 조건부 산출물로는 구조가 갖춰져 있지만, 원본만 기준으로 구현에 바로 넘기기에는 부족했습니다. 2026-06-24 보정으로 구현 전 필수 정책과 디자인 샘플은 현재 프로젝트 문서에 추가되었습니다.
 
 - 최신 판정: `FINAL_DELIVERY_REORDER_READY`
-- 최신 구현 상태: `APP_FLOW_BASE_BUILT_BUT_FINAL_DELIVERY_P0_PENDING`
+- 최신 구현 상태: `BOTTOM_TAB_CALENDAR_WHEEL_RELEASE_FLOW_VERIFIED`
 - 원 리뷰 판정: `BLOCK_FOR_IMPLEMENTATION`
 - 패키지 품질: `CONDITIONAL_P4_PACKAGE_OK`
 - 추가 기획 필요 여부: 2026-06-24 보정 완료. P2/P3/P4 재논의는 필요하지 않습니다.
 - 디자인 판정: 방향은 유지하고, 화면 ID/상태/AI 라벨/출시 화면을 보강했습니다.
 - 기능 판정: 정적 HTML 최종출시제품 안에서 방 생성, 응답 저장, deterministic 추천, 공유 문구 복사, 확정 흐름이 동작합니다.
 - 배포 전 보완 판정: 모바일 홈/개인정보/삭제 경로, 복사 CTA 정합성, template-only AI 고지, expired/closed 상태 가드, demo storage 격리, ko/en 결과/copy payload 전환, preview-only 초대 문구, bilingual privacy summary, 320/390 CTA 가시성을 보강했습니다.
+
+## 2026-06-28 하단 탭 / 날짜 / 시간 선택 리뷰
+
+- keepthis 참고형 하단 5탭 shell을 `홈`, `응답`, 중앙 `만들기`, `내 모임`, `설정`으로 구현했습니다.
+- 방 만들기 후보 날짜는 브라우저 기본 picker 대신 월간 `IPhoneCalendarPicker`로 전환했습니다.
+- 후보 시간은 오전/오후, 시, 분을 나누는 `ReleaseTimeWheel`로 전환했고, 누른 열의 값만 바뀌도록 hidden input 동기화를 검증했습니다.
+- `npm run verify:release`와 `npm run build`가 통과했습니다.
+- 390px/320px Playwright screenshot에서 하단 탭, CTA, calendar/time wheel의 주요 겹침이 없는 것을 확인했습니다.
 
 ## 2026-06-27 Final Delivery 재정렬 리뷰
 

@@ -1,6 +1,6 @@
 ---
-version: 8
-status: release-picker-redesigned
+version: 9
+status: bottom-tab-calendar-wheel-redesigned
 updated: 2026-06-28
 canonical: true
 ---
@@ -27,6 +27,14 @@ canonical: true
 - debug/토큰/화면 점검 패널은 기본 URL에서 숨기고 `?debug=1`에서만 보여줍니다.
 - final delivery split asset은 영어 snake_case 파일명을 유지해 앱 asset으로 복사하고, 한국어 파일명 original board는 reference로만 둡니다.
 - 앱 runtime asset은 `docs/assets/final/`와 `docs/release/assets/final/`에 둡니다.
+
+## 2026-06-28 하단 탭 / 날짜 / 시간 선택 재정렬
+
+- 화면 이동은 keepthis식 하단 5탭 구조를 따른다: `홈`, `응답`, 중앙 `만들기`, `내 모임`, `설정`.
+- SCR 화면들은 개발 검증용 상태 ID로 유지하되, 사용자에게는 주요 탭 아래의 상태 전환으로 보이게 한다.
+- 방 만들기 날짜 선택은 브라우저 기본 picker를 쓰지 않고 iPhone 캘린더 느낌의 월간 sheet로 보여준다.
+- 시간 선택은 Android 알람 설정처럼 오전/오후, 시, 분 3열 wheel로 고른다. 각 열 전체가 터치 영역이고 선택 행만 강조한다.
+- CTA와 하단 탭은 분리한다. CTA는 현재 화면의 완료 행동, 하단 탭은 앱의 주 화면 이동만 담당한다.
 
 ## 디자인 원칙
 
@@ -136,6 +144,7 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 - 2026-06-26부터 초대 문구는 친구 공유 링크를 포함합니다. GitHub Pages/브라우저 경로에서는 공개 후보 정보가 담긴 HTTPS 링크로 참여 화면을 열고, Apps in Toss 빌드에서는 ShareAdapter가 `intoss://...` 딥링크 공유로 전환합니다.
 - 현재 배포본은 `docs/assets/hammoyo-hero-animals.png`와 `docs/assets/hammoyo-animal-background.png`를 사용합니다. 다음 구현에서는 final delivery asset인 `hero_animals_calendar_full_square.png`, `state_insufficient_response_object.png`, `state_expired_link_object.png`, `state_private_negotiation_object.png`, `state_confirmed_object.png`를 우선 적용합니다.
 - 모바일 폭에서는 샘플용 화면 선택/토큰 패널을 숨기고 제품 화면만 표시합니다. 데스크톱 폭에서는 QA용 패널을 유지합니다.
+- 2026-06-28부터 기본 제품 화면은 하단 5탭 shell을 사용합니다. 방 만들기 후보 일정 입력은 `IPhoneCalendarPicker`와 `ReleaseTimeWheel` 기준이며, `input[type=date]`/`input[type=time]`은 금지합니다.
 
 ## React Bits 결정
 
@@ -164,4 +173,4 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 - 2026-06-26: 동물 배경 이미지, 3D 버튼/카드 depth, 초대 홈 진입 카드, native share 우선 공유, 내가 만든 모임 삭제와 로컬 revoked 링크 상태를 반영.
 - 2026-06-27: `HAMMOYEO_FINAL_DELIVERY`를 최종 디자인 source of truth로 재정렬하고, final v12 token/asset/screen sample을 다음 구현 기준으로 승격.
 - 2026-06-27: final delivery docs/tokens/reference/runtime asset subset을 `docs/final-delivery/`, `docs/assets/final/`, `docs/release/assets/final/`로 선별 편입.
-- 2026-06-28: 브라우저 기본 날짜/시간 picker를 제거하고, 후보 날짜 chip과 낮/저녁/밤 시간 slot 컨트롤로 교체했다. 옛 docs 경로와 작은 검증 표현은 출시 기준 `docs/release`/`최종출시제품`으로 정리했다.
+- 2026-06-28: 브라우저 기본 날짜/시간 picker를 제거하고, keepthis 참고형 하단 5탭, iPhone형 calendar sheet, Android 알람형 time wheel로 교체했다. 옛 docs 경로와 작은 검증 표현은 출시 기준 `docs/release`/`최종출시제품`으로 정리했다.

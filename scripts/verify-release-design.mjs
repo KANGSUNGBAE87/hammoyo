@@ -55,9 +55,14 @@ const requiredComponentMarkers = [
   "HostStatusCard",
   "HostRoomEditor",
   "IOSCountSelect",
-  "ReleaseDateChip",
-  "ReleaseTimeSegment",
-  "ReleaseTimeSlot",
+  "BottomNav",
+  "BottomNavItem",
+  "IPhoneCalendarPicker",
+  "ReleaseCalendarSheet",
+  "ReleaseCalendarDay",
+  "ReleaseTimeWheel",
+  "ReleaseTimeWheelColumn",
+  "ReleaseTimeWheelOption",
   "SettingsAccountPanel",
   "IncomingInviteCard",
   "AnimalBackground",
@@ -176,8 +181,20 @@ if (html.includes('type="date"') || html.includes('type="time"')) {
   failures.push("Release candidate controls must not expose browser-native date/time pickers.");
 }
 
-if (!html.includes("ReleaseDateChip") || !html.includes("ReleaseTimeSlot")) {
-  failures.push("Candidate date/time controls should use release chips and time slots.");
+if (html.includes("ReleaseDateChip") || html.includes("ReleaseTimeSlot")) {
+  failures.push("Candidate date/time controls should no longer use compact chip/slot controls.");
+}
+
+if (!html.includes("IPhoneCalendarPicker") || !html.includes("ReleaseCalendarDay")) {
+  failures.push("Candidate date controls should use the iPhone-like calendar picker.");
+}
+
+if (!html.includes("ReleaseTimeWheel") || !html.includes("ReleaseTimeWheelOption")) {
+  failures.push("Candidate time controls should use the vertical alarm-style time wheel.");
+}
+
+if (!html.includes("bottom-nav") || !html.includes("bottom-nav-create")) {
+  failures.push("Release app shell should expose a keepthis-style bottom navigation.");
 }
 
 if (!html.includes("navigator.share")) {

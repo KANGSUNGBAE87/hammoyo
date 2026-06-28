@@ -60,3 +60,54 @@ Date: 2026-06-28
 - Durable preference was recorded as a Codex memory update note:
   `/Users/kangsungbae/.codex/memories/extensions/ad_hoc/notes/2026-06-28-final-release-product-framing.md`
 - No additional shared knowledge-store promotion was made in this session.
+
+## Later Update: Bottom Tabs, Calendar, Time Wheel
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- keepthis 레이아웃을 참고해 하단 중요 탭으로 화면을 전환할 수 있게 전면 개편.
+- 날짜 선택은 브라우저 기본 picker가 아니라 iPhone형 calendar sheet로 구현.
+- 시간 선택은 Android 알람 설정처럼 오전/오후, 시, 분을 위아래 wheel로 고르게 구현.
+- 서브에이전트로 구조를 다시 분석하고 개선 의견을 반영.
+
+### Subagent Inputs
+
+- `code-mapper`: 변경 중심 파일은 `docs/release/index.html`, `scripts/verify-release-design.mjs`, `scripts/verify-release-functional.mjs`라고 분석. 기존 hidden input name과 `readRoomForm` 계약은 보존해야 한다고 권고.
+- `market-ux-researcher`: keepthis의 5탭 shell을 채택하되 SCR 화면 전체를 탭으로 노출하지 말고 `홈`, `응답`, 중앙 `만들기`, `내 모임`, `설정`으로 묶으라고 권고. 날짜는 iPhone형 월간 sheet, 시간은 알람형 wheel이 사용자 요청과 가장 잘 맞는다고 판단.
+
+### Decisions
+
+- 이전 “하단 탭 미채택” 결정은 최신 Owner 지시로 superseded.
+- release 화면에 하단 5탭 shell을 도입하고, SCR 화면은 각 탭 아래의 상태 화면으로 유지.
+- 후보 날짜는 `IPhoneCalendarPicker`, 후보 시간은 `ReleaseTimeWheel`로 전환.
+- 시간 wheel은 버튼이 가진 고정 전체 시간값이 아니라 현재 hidden input 값과 누른 열의 token을 조합해 누적 선택하도록 수정.
+- CTA는 화면 완료 행동으로 유지하고, 하단 탭은 주요 화면 이동만 담당.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-design.mjs`
+- `scripts/verify-release-functional.mjs`
+- `docs/release/README.md`
+- `ai/plans/design-plan.md`
+- `ai/plans/implementation-plan.md`
+- `ai/reviews/review.md`
+
+### Verification
+
+- `npm run verify:release` passed.
+- `npm run build` passed.
+- Playwright screenshots captured:
+  - `/tmp/hammoyo-redesign-390.png`
+  - `/tmp/hammoyo-redesign-320.png`
+  - `/tmp/hammoyo-picker-scroll-390.png`
+  - `/tmp/hammoyo-picker-scroll-320.png`
+
+### Remaining Risks
+
+- GitHub Pages deployment was not run for this later update.
+- Apps in Toss sandbox safe-area/back/share validation remains pending.
