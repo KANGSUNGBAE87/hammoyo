@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-const htmlPath = "docs/mvp/index.html";
+const htmlPath = "docs/release/index.html";
 const deployedHtmlPath = "docs/index.html";
 const tokenPath = "docs/final-delivery/tokens.json";
 
@@ -55,7 +55,9 @@ const requiredComponentMarkers = [
   "HostStatusCard",
   "HostRoomEditor",
   "IOSCountSelect",
-  "AppleDateTimePicker",
+  "ReleaseDateChip",
+  "ReleaseTimeSegment",
+  "ReleaseTimeSlot",
   "SettingsAccountPanel",
   "IncomingInviteCard",
   "AnimalBackground",
@@ -84,7 +86,7 @@ const assertIncludes = (value, label) => {
 };
 
 if (html !== deployedHtml) {
-  failures.push(`${htmlPath} and ${deployedHtmlPath} must stay identical for GitHub Pages and MVP verification.`);
+  failures.push(`${htmlPath} and ${deployedHtmlPath} must stay identical for GitHub Pages and release verification.`);
 }
 
 for (const screen of requiredScreens) {
@@ -109,7 +111,6 @@ for (const forbidden of [
   "#17171c",
   "강한 불가",
   "Converging Orbit",
-  "기능 MVP",
   "앱 준비",
   "General share link",
   "Find a time that works",
@@ -119,6 +120,10 @@ for (const forbidden of [
   if (html.toLowerCase().includes(forbidden.toLowerCase())) {
     failures.push(`Forbidden legacy value/copy remains: ${forbidden}`);
   }
+}
+
+if (/\bm\s*v\s*p\b/i.test(html)) {
+  failures.push("Reduced launch-product wording remains in active release HTML.");
 }
 
 if (!html.includes("new URLSearchParams")) {
@@ -162,8 +167,17 @@ if (!html.includes('data-testid="expected-count-select"')) {
   failures.push("Expected count should use an iOS-like select control.");
 }
 
-if (!html.includes("AppleDateTimePicker")) {
-  failures.push("Candidate date/time controls should use the AppleDateTimePicker visual shell.");
+const legacyPickerMarker = ["Apple", "DateTime", "Picker"].join("");
+if (html.includes(legacyPickerMarker)) {
+  failures.push("Candidate date/time controls must not use the legacy date/time shell.");
+}
+
+if (html.includes('type="date"') || html.includes('type="time"')) {
+  failures.push("Release candidate controls must not expose browser-native date/time pickers.");
+}
+
+if (!html.includes("ReleaseDateChip") || !html.includes("ReleaseTimeSlot")) {
+  failures.push("Candidate date/time controls should use release chips and time slots.");
 }
 
 if (!html.includes("navigator.share")) {

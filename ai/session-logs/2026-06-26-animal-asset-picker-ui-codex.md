@@ -20,25 +20,25 @@ topic: animal-asset-picker-ui
 - The home screen now uses a newly generated animal illustration, not an external stock or existing IP reference.
 - Asset provenance is recorded in `docs/design/asset-provenance.md`; Apps in Toss release should still re-check whether AI-generated image disclosure is required.
 - First Apps in Toss UI is Korean-only. User-facing language toggle and app-ready pill are removed.
-- The overflow root cause was narrow-grid sizing plus native date/time input affordances. Candidate date/time fields now use an `AppleDateTimePicker` shell with `min-width: 0`, `minmax(0, 1fr)` grid behavior, and hidden native indicator overlap.
+- The overflow root cause was narrow-grid sizing plus native date/time input affordances. Candidate date/time fields now use an `ReleaseDateTimePicker` shell with `min-width: 0`, `minmax(0, 1fr)` grid behavior, and hidden native indicator overlap.
 - Host-created rooms can be edited from "내가 만든 모임", including title, expected count, date, time, and place/note.
 
 ## Files Changed
 
 - `docs/index.html`
-- `docs/mvp/index.html`
+- `docs/release/index.html`
 - `docs/assets/hammoyo-hero-animals.png`
 - `docs/assets/characters/*`
-- `docs/mvp/assets/hammoyo-hero-animals.png`
-- `docs/mvp/assets/characters/*`
+- `docs/release/assets/hammoyo-hero-animals.png`
+- `docs/release/assets/characters/*`
 - `docs/design/asset-provenance.md`
-- `docs/mvp/README.md`
+- `docs/release/README.md`
 - `docs/release/platform-readiness.md`
 - `README.md`
 - `ai/plans/design-plan.md`
 - `ai/plans/implementation-plan.md`
-- `scripts/verify-mvp-design.mjs`
-- `scripts/verify-mvp-functional.mjs`
+- `scripts/verify-release-design.mjs`
+- `scripts/verify-release-functional.mjs`
 
 ## Verification
 

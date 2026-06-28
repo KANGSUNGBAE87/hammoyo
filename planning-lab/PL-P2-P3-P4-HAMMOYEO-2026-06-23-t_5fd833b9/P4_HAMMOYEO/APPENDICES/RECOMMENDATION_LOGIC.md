@@ -1,6 +1,6 @@
 # Recommendation Logic
 
-[INFERENCE] MVP scoring should remain explainable rather than “AI black box”.
+[INFERENCE] 최종출시제품 scoring should remain explainable rather than “AI black box”.
 
 ## Suggested first-pass scoring
 

@@ -32,7 +32,7 @@ Claude CLI first-party auth and Antigravity CLI auth were checked before delegat
 - Minimum response threshold is inconsistent or undefined: `2명 이상`, `threshold`, and `최소 4명` appear in different places.
 - Host/participant identity, duplicate response, edit, expiration, and room close policies are missing.
 - AI/copy generation boundary is undefined: template vs LLM vs hybrid, privacy, fallback, labeling, and tests are not specified.
-- Optional location/category constraints appear in product/design/handoff but their MVP role is not defined.
+- Optional location/category constraints appear in product/design/handoff but their 최종출시제품 role is not defined.
 - Design sample inventory is inconsistent with the official screen list.
 - Apps in Toss development gate is incomplete: missing project `CLAUDE.md`, missing shared platform note, missing platform matrix, i18n and Supabase/RLS/privacy plan.
 
@@ -51,7 +51,7 @@ Claude CLI first-party auth and Antigravity CLI auth were checked before delegat
 ## Remaining Risks
 
 - Live external response count remains 0, so recommendation trust, copy acceptance, participant completion, repeat-use, and WTP remain unvalidated.
-- If implementation starts before the missing decisions are fixed, the MVP may validate an engineer's interpretation rather than the intended product hypothesis.
+- If implementation starts before the missing decisions are fixed, the 최종출시제품 may validate an engineer's interpretation rather than the intended product hypothesis.
 
 ## Next Steps
 

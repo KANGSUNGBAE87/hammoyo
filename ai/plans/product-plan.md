@@ -1,7 +1,7 @@
 ---
-version: 3
-status: final-delivery-product-realigned
-updated: 2026-06-27
+version: 4
+status: final-release-language-standard
+updated: 2026-06-28
 canonical: true
 ---
 
@@ -14,11 +14,12 @@ Updated: 2026-06-27
 
 ## 2026-06-27 재정렬 결정
 
-- `HAMMOYEO_FINAL_DELIVERY`는 현재 함모여의 final delivery package로 채택하고, 구현 기준 subset은 `docs/final-delivery/`, `docs/assets/final/`, `docs/mvp/assets/final/`로 승격한다.
+- `HAMMOYEO_FINAL_DELIVERY`는 현재 함모여의 final delivery package로 채택하고, 구현 기준 subset은 `docs/final-delivery/`, `docs/assets/final/`, `docs/release/assets/final/`로 승격한다.
 - 핵심 제품 문장은 “겹치는 시간이 없어도, 약속은 잡히게.”로 재정렬한다.
 - 함모여는 일정 투표 앱이 아니라, 합의가 깨지는 순간에도 관계를 해치지 않고 약속을 확정하게 만드는 모임 합의 엔진이다.
 - 이전 `HAMMOYEO_DESIGN_PACKAGE`와 조건부 P4 패키지는 history/reference이며, 새 구현의 판단 기준은 final delivery 문서/토큰/asset이다.
 - 단, final delivery 기준을 만족하려면 현재 배포본의 localStorage 중심 흐름을 Supabase invite/status lookup 중심으로 바꾸는 P0 구현이 필요하다.
+- 2026-06-28부터 모든 함모여 산출물은 작은 검증물이 아니라 `최종출시제품`/`release` 기준으로 명명한다. 작게 만들더라도 출시 가능한 제품 계약을 낮추지 않는다.
 
 ## 제품 포지셔닝
 
@@ -84,7 +85,7 @@ Owner가 P1 생략 및 P2→P3→P4 산출물 생산을 승인한 뒤, 보정 ta
 - Supabase/권한/응답/AI 구현 기준: `ai/plans/implementation-plan.md`
 - 디자인 보강 기준: `ai/plans/design-plan.md`
 - 이미지 생성문/이미지 기획: `docs/design/image-generation-brief.md`
-- 샘플 MVP: `docs/mvp/index.html`
+- 샘플 최종출시제품: `docs/release/index.html`
 - 조건부 P4 전체 사본: `planning-lab/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/`
 
 구현 착수 시 기본 전제는 Apps in Toss login, Supabase backend, deterministic recommendation, template-first copy, optional AI copy polish입니다.
@@ -105,6 +106,6 @@ Owner가 P1 생략 및 P2→P3→P4 산출물 생산을 승인한 뒤, 보정 ta
 - 2026-06-23 01:54 KST: Owner가 좁은 live pre-P4 validation + 특정 쟁점 재논의 병행을 승인. 상태를 `LIVE_PRE_P4_VALIDATION_ROUTED`로 갱신하고 `planning-lab` task `t_1093f4ab`를 최신 실행으로 기록.
 - 2026-06-23 02:19 KST: task `t_1093f4ab`에서 실제 모집/연락 경로 부재로 live validation을 blocked 처리. 쟁점 재논의와 `live_validation_protocol.md`는 작성 완료. 상태를 `LIVE_PRE_P4_VALIDATION_BLOCKED_RECRUITMENT_NEEDED`로 갱신.
 - 2026-06-23 12:20 KST: corrective task `t_5fd833b9`에서 실제 P2/P3/P4 artifact package를 생성. 상태를 `P4_FINAL_PACKAGE_COMPLETE_CONDITIONAL`로 갱신. Package complete이나 evidence unvalidated, owner unreviewed.
-- 2026-06-24: Supabase/권한/응답/AI/copy와 디자인/이미지/샘플 MVP 보정 기획을 현재 프로젝트에 추가. 상태를 `P4_FINAL_PACKAGE_COMPLETE_CONDITIONAL_WITH_PROJECT_CORRECTION`으로 갱신.
+- 2026-06-24: Supabase/권한/응답/AI/copy와 디자인/이미지/샘플 최종출시제품 보정 기획을 현재 프로젝트에 추가. 상태를 `P4_FINAL_PACKAGE_COMPLETE_CONDITIONAL_WITH_PROJECT_CORRECTION`으로 갱신.
 - 2026-06-27: `HAMMOYEO_FINAL_DELIVERY`를 final implementation source로 채택하고 제품 기준과 다음 구현 우선순위를 재정렬. 상태를 `FINAL_DELIVERY_ACCEPTED_FOR_IMPLEMENTATION_REORDER`로 갱신.
-- 2026-06-27: 원본 `HAMMOYEO_FINAL_DELIVERY/` 전체 대신 canonical docs/reference/runtime asset subset을 `docs/final-delivery/`, `docs/assets/final/`, `docs/mvp/assets/final/`로 선별 편입.
+- 2026-06-27: 원본 `HAMMOYEO_FINAL_DELIVERY/` 전체 대신 canonical docs/reference/runtime asset subset을 `docs/final-delivery/`, `docs/assets/final/`, `docs/release/assets/final/`로 선별 편입.

@@ -12,7 +12,7 @@ status: active
 - 원본 생성 파일: `/Users/kangsungbae/.codex/generated_images/019eeedb-819a-7ba0-8941-1a4bae063edb/ig_0123b7a0a7b49855016a3d7e8e9c2881918a952d16b0b898d6.png`
 - 프로젝트 파일:
   - `docs/assets/hammoyo-hero-animals.png`
-  - `docs/mvp/assets/hammoyo-hero-animals.png`
+  - `docs/release/assets/hammoyo-hero-animals.png`
 
 Prompt summary:
 
@@ -27,11 +27,11 @@ Prompt summary:
 - `docs/assets/characters/hammoyo-character-bear.png`
 - `docs/assets/characters/hammoyo-character-puppy.png`
 - `docs/assets/characters/hammoyo-character-penguin.png`
-- `docs/mvp/assets/characters/hammoyo-character-cat.png`
-- `docs/mvp/assets/characters/hammoyo-character-rabbit.png`
-- `docs/mvp/assets/characters/hammoyo-character-bear.png`
-- `docs/mvp/assets/characters/hammoyo-character-puppy.png`
-- `docs/mvp/assets/characters/hammoyo-character-penguin.png`
+- `docs/release/assets/characters/hammoyo-character-cat.png`
+- `docs/release/assets/characters/hammoyo-character-rabbit.png`
+- `docs/release/assets/characters/hammoyo-character-bear.png`
+- `docs/release/assets/characters/hammoyo-character-puppy.png`
+- `docs/release/assets/characters/hammoyo-character-penguin.png`
 
 ## 동물 배경 이미지
 
@@ -40,7 +40,7 @@ Prompt summary:
 - 원본 생성 파일: `/Users/kangsungbae/.codex/generated_images/019eeedb-819a-7ba0-8941-1a4bae063edb/ig_05b49362a47dbcb5016a3e93359a808191ad91fbef1bfb86da.png`
 - 프로젝트 파일:
   - `docs/assets/hammoyo-animal-background.png`
-  - `docs/mvp/assets/hammoyo-animal-background.png`
+  - `docs/release/assets/hammoyo-animal-background.png`
 
 Prompt summary:
 

@@ -25,7 +25,7 @@ canonical: true
 
 현재 구현된 것으로 간주하는 범위는 다음이다.
 
-- `docs/mvp/index.html`, `docs/index.html` 기반 정적 HTML/CSS/JS 앱 화면
+- `docs/release/index.html`, `docs/index.html` 기반 정적 HTML/CSS/JS 앱 화면
 - iPhone식 날짜/시간 picker
 - 후보 추가/삭제
 - OS/브라우저 native share 우선 공유
@@ -91,7 +91,7 @@ supabase/
   migrations/
   functions/
 docs/
-  mvp/
+  release/
   assets/
 ```
 
@@ -202,7 +202,7 @@ interface BackendAdapter {
 }
 ```
 
-MVP에서 `createNegotiationRequest`, `submitNegotiationAnswer`는 mock 또는 feature flag로 시작할 수 있지만, 데이터 모델에는 미리 자리를 둔다.
+최종출시제품에서 `createNegotiationRequest`, `submitNegotiationAnswer`는 mock 또는 feature flag로 시작할 수 있지만, 데이터 모델에는 미리 자리를 둔다.
 
 ## 9. 데이터 모델 보강
 
@@ -400,7 +400,7 @@ MVP에서 `createNegotiationRequest`, `submitNegotiationAnswer`는 mock 또는 f
 
 ## 17. 완료 정의
 
-다음 조건을 만족하면 Final MVP 구현 완료로 본다.
+다음 조건을 만족하면 Final 최종출시제품 구현 완료로 본다.
 
 - 기본 홈에서 제품 가치가 5초 안에 이해된다.
 - 방 만들기부터 결과 공유까지 1개의 실제 방이 정상 완료된다.

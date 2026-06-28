@@ -1,7 +1,7 @@
 ---
-version: 7
-status: final-delivery-design-realigned
-updated: 2026-06-27
+version: 8
+status: release-picker-redesigned
+updated: 2026-06-28
 canonical: true
 ---
 
@@ -11,7 +11,7 @@ canonical: true
 
 함모여의 앱 화면은 "투표 결과표"가 아니라 "방장이 지금 단톡방에 올릴 수 있는 결정 카드"를 중심으로 설계합니다. 참여자는 10~30초 안에 응답을 끝내고, 방장은 전원 가능 시간이 없어도 관계적으로 안전한 추천안과 공유 문구를 얻어야 합니다.
 
-이번 재정렬은 기존 P4 디자인 기획의 방향을 유지하되, `HAMMOYEO_FINAL_DELIVERY`를 앞으로의 최종 디자인 source of truth로 승격합니다. `HAMMOYEO_DESIGN_PACKAGE`는 이전 MVP 개편 기준으로 보존하되, 새 구현 판단은 final delivery 문서/토큰/asset을 우선합니다.
+이번 재정렬은 기존 P4 디자인 기획의 방향을 유지하되, `HAMMOYEO_FINAL_DELIVERY`를 앞으로의 최종 디자인 source of truth로 승격합니다. `HAMMOYEO_DESIGN_PACKAGE`는 이전 최종출시제품 개편 기준으로 보존하되, 새 구현 판단은 final delivery 문서/토큰/asset을 우선합니다.
 
 - `docs/final-delivery/design-plan.md`
 - `docs/final-delivery/image-asset-plan.md`
@@ -26,7 +26,7 @@ canonical: true
 - 화면당 3D asset은 홈을 제외하면 1개만 강하게 씁니다.
 - debug/토큰/화면 점검 패널은 기본 URL에서 숨기고 `?debug=1`에서만 보여줍니다.
 - final delivery split asset은 영어 snake_case 파일명을 유지해 앱 asset으로 복사하고, 한국어 파일명 original board는 reference로만 둡니다.
-- 앱 runtime asset은 `docs/assets/final/`와 `docs/mvp/assets/final/`에 둡니다.
+- 앱 runtime asset은 `docs/assets/final/`와 `docs/release/assets/final/`에 둡니다.
 
 ## 디자인 원칙
 
@@ -127,10 +127,10 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 
 현재 프로젝트에 정적 앱 화면을 추가했습니다.
 
-- HTML sample: `docs/mvp/index.html`
+- HTML sample: `docs/release/index.html`
 - 목적: 앱 화면 상태와 문구 흐름을 확인하는 design sample.
 - 범위: GitHub Pages 화면은 브라우저 저장과 OS/브라우저 공유 화면 우선 공유를 사용합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 연결되어 있으며, Toss login/account 동기화 UI는 아직 별도 단계입니다.
-- 직접 진입: `docs/mvp/index.html?screen=scr-03-result-recommendation`
+- 직접 진입: `docs/release/index.html?screen=scr-03-result-recommendation`
 - 기본 상태: `AI_COPY_ENABLED=false`, 즉 AI 라벨은 표시하지 않습니다. GitHub Pages 화면은 AI-polished fixture를 제공하지 않으므로 `?ai=on`도 사용자에게 AI 라벨을 노출하지 않습니다.
 - 첫 Apps in Toss 화면은 한국어 단일 UI로 둡니다. 사용자 화면에는 언어 전환 버튼을 두지 않고, 추후 다국어가 필요할 때 locale resource를 다시 여는 방식으로 확장합니다.
 - 2026-06-26부터 초대 문구는 친구 공유 링크를 포함합니다. GitHub Pages/브라우저 경로에서는 공개 후보 정보가 담긴 HTTPS 링크로 참여 화면을 열고, Apps in Toss 빌드에서는 ShareAdapter가 `intoss://...` 딥링크 공유로 전환합니다.
@@ -148,19 +148,20 @@ Image generation prompt와 사용 계획은 `docs/design/image-generation-brief.
 - 추천 근거는 집계값으로만 노출하고 개인을 지목하지 않아야 합니다.
 - AI copy 라벨은 실제 AI 결과가 연결된 뒤에만 공유 문구와 같은 시야에 있어야 합니다. template-only 화면에서는 AI 라벨이 없어야 합니다.
 - primary action은 하단 thumb zone에 가까워야 합니다.
-- `docs/mvp/index.html`은 package token, 9개 화면, query parameter route, sticky CTA, reduced-motion, 한국어 단일 UI, 초대 홈 진입, native share 우선 공유, host dashboard/edit/delete 흐름을 포함해야 합니다.
+- `docs/release/index.html`은 package token, 9개 화면, query parameter route, sticky CTA, reduced-motion, 한국어 단일 UI, 초대 홈 진입, native share 우선 공유, host dashboard/edit/delete 흐름을 포함해야 합니다.
 - final delivery 기준으로는 기본 URL에서 제품 홈만 보이고, screen/debug/token panel은 `?debug=1`로만 접근되어야 합니다.
 - final delivery asset은 홈/상태 화면에 집중 적용하고, 입력/응답/결과 기능 화면에서는 정보 구조를 해치지 않는 보조 요소로만 사용해야 합니다.
 - 구조 검증은 `npm run build`로 실행합니다.
 
 ## Change Log
 
-- 2026-06-24: Supabase/AI 경계 보정과 함께 디자인 계획, 화면 ID, 이미지 계획, 샘플 MVP 위치를 정리.
-- 2026-06-24: `HAMMOYEO_DESIGN_PACKAGE`를 디자인 source of truth로 승격하고, 샘플 MVP를 패키지 토큰/8개 화면/AI 조건부 라벨 기준으로 개편.
-- 2026-06-24: 샘플 MVP 구현과 Chrome/Playwright 360/390/420 QA 통과 결과를 반영해 상태를 `design-mvp-implemented`로 갱신.
-- 2026-06-26: Owner 지시에 따라 MVP 표기를 사용자 화면에서 낮추고, 날짜/시간 picker, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판을 디자인 계약에 반영.
+- 2026-06-24: Supabase/AI 경계 보정과 함께 디자인 계획, 화면 ID, 이미지 계획, 샘플 최종출시제품 위치를 정리.
+- 2026-06-24: `HAMMOYEO_DESIGN_PACKAGE`를 디자인 source of truth로 승격하고, 샘플 출시 화면을 패키지 토큰/8개 화면/AI 조건부 라벨 기준으로 개편.
+- 2026-06-24: 샘플 최종출시제품 구현과 Chrome/Playwright 360/390/420 QA 통과 결과를 반영해 상태를 `design-release-implemented`로 갱신.
+- 2026-06-26: Owner 지시에 따라 최종출시제품 표기를 사용자 화면에서 낮추고, 날짜/시간 picker, 후보 추가/삭제, 일반 공유 링크, 내가 만든 모임 상태판을 디자인 계약에 반영.
 - 2026-06-26: 현재 상태를 `app-flow-implemented`로 갱신하고, GitHub Pages 앱 화면과 원격 Supabase/DeepSeek 경계의 역할을 분리해 문서화.
 - 2026-06-26: 홈 메인 동물 캐릭터 이미지와 개별 캐릭터 asset을 추가하고, 사용자 화면에서 언어 전환/앱 준비 pill을 제거. 날짜/시간 입력 overflow를 막기 위해 iPhone식 dropdown shell과 `minmax(0, 1fr)` grid 기준을 계약에 반영.
 - 2026-06-26: 동물 배경 이미지, 3D 버튼/카드 depth, 초대 홈 진입 카드, native share 우선 공유, 내가 만든 모임 삭제와 로컬 revoked 링크 상태를 반영.
 - 2026-06-27: `HAMMOYEO_FINAL_DELIVERY`를 최종 디자인 source of truth로 재정렬하고, final v12 token/asset/screen sample을 다음 구현 기준으로 승격.
-- 2026-06-27: final delivery docs/tokens/reference/runtime asset subset을 `docs/final-delivery/`, `docs/assets/final/`, `docs/mvp/assets/final/`로 선별 편입.
+- 2026-06-27: final delivery docs/tokens/reference/runtime asset subset을 `docs/final-delivery/`, `docs/assets/final/`, `docs/release/assets/final/`로 선별 편입.
+- 2026-06-28: 브라우저 기본 날짜/시간 picker를 제거하고, 후보 날짜 chip과 낮/저녁/밤 시간 slot 컨트롤로 교체했다. 옛 docs 경로와 작은 검증 표현은 출시 기준 `docs/release`/`최종출시제품`으로 정리했다.

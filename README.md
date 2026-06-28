@@ -45,9 +45,9 @@ Updated: 2026-06-27
 - `ai/plans/planning-status.md` — 현재 진행상황 및 다음 단계
 - `planning-lab/PL-P2-HAMMOYEO-2026-06-22-t_bc2fbb9a/` — Planning Lab P2 원본 산출물 사본
 - `planning-lab/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/` — 조건부 P2/P3/P4 전체 산출물 사본
-- `docs/mvp/index.html` — 디자인 패키지 기반 정적 앱 화면. 날짜/시간 선택, 후보 추가/삭제, 친구 공유 화면, 초대 홈 진입, 로컬 상태 확인, 모임 수정/삭제가 동작합니다. 원격 Supabase/AI는 Edge Function 경계와 smoke 검증이 있으며, GitHub Pages 화면은 Toss login/account 동기화 전까지 브라우저 저장을 우선합니다.
+- `docs/release/index.html` — 디자인 패키지 기반 정적 앱 화면. 날짜/시간 선택, 후보 추가/삭제, 친구 공유 화면, 초대 홈 진입, 로컬 상태 확인, 모임 수정/삭제가 동작합니다. 원격 Supabase/AI는 Edge Function 경계와 smoke 검증이 있으며, GitHub Pages 화면은 Toss login/account 동기화 전까지 브라우저 저장을 우선합니다.
 - `docs/final-delivery/` — `HAMMOYEO_FINAL_DELIVERY`에서 선별 승격한 최종 제품/구현/디자인/이미지/토큰 source. 원본 패키지 전체는 local archive로 유지하고 git/Graphify에서는 제외합니다.
-- `docs/assets/final/`와 `docs/mvp/assets/final/` — final delivery에서 앱 runtime용으로 선별한 hero/state/icon/background/character/communication asset.
+- `docs/assets/final/`와 `docs/release/assets/final/` — final delivery에서 앱 runtime용으로 선별한 hero/state/icon/background/character/communication asset.
 - `docs/assets/hammoyo-hero-animals.png` — 홈 메인 동물 캐릭터 이미지.
 - `docs/assets/hammoyo-animal-background.png` — 화면 배경용 동물 캐릭터 이미지.
 - `docs/assets/characters/` — 메인 이미지에서 분리 저장한 개별 캐릭터 asset.
@@ -84,6 +84,6 @@ Updated: 2026-06-27
 - Backend: Supabase, `BackendAdapter`/Edge Function/server boundary 뒤에 둠.
 - Response policy: 한 사용자당 한 round에 한 active response, close/expired 이후 write/recompute 금지.
 - AI/copy: deterministic recommendation + template-first copy + optional backend AI polish.
-- App screen sample: `docs/mvp/index.html`을 브라우저로 열어 화면 상태를 확인합니다. 첫 Apps in Toss 화면은 한국어 단일 UI로 유지합니다.
+- App screen sample: `docs/release/index.html`을 브라우저로 열어 화면 상태를 확인합니다. 첫 Apps in Toss 화면은 한국어 단일 UI로 유지합니다.
 - Platform scaffold: `npm run verify:platform`으로 adapter/SQL/release gate 산출물을 검증합니다.
 - Backend/AI connection code: `npm run verify:backend-ai`로 SupabaseBackendAdapter, Edge Function DB/AI 연결 코드, DeepSeek V4 Pro model pinning, AI payload allowlist, template fallback을 검증합니다.

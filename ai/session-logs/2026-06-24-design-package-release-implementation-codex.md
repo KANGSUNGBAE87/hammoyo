@@ -1,4 +1,4 @@
-# 함모여 디자인 패키지 MVP 구현 세션
+# 함모여 디자인 패키지 최종출시제품 구현 세션
 
 Date: 2026-06-24
 Actor: codex
@@ -14,13 +14,13 @@ Actor: codex
 ## Subagents Used
 
 - `context-brief`: 디자인 패키지의 토큰, 화면, 상태 정책, 필수 산출물 요약.
-- `code-mapper`: 기존 `docs/mvp/index.html` 구조와 패키지 대비 누락 화면/문구/토큰 gap 확인.
+- `code-mapper`: 기존 `docs/release/index.html` 구조와 패키지 대비 누락 화면/문구/토큰 gap 확인.
 - `reviewer`: 모바일 폭, 내부 용어 노출, AI 라벨 조건, 만료/확정 상태 CTA 위험 점검.
 
 ## Decisions Made
 
 - `HAMMOYEO_DESIGN_PACKAGE`를 현재 함모여 디자인 source of truth로 승격했다.
-- 정적 MVP는 실제 앱 화면 우선으로 재구성하고, 데스크톱 폭에서만 QA용 화면 선택/토큰 패널을 노출한다.
+- 정적 최종출시제품은 실제 앱 화면 우선으로 재구성하고, 데스크톱 폭에서만 QA용 화면 선택/토큰 패널을 노출한다.
 - AI copy는 기본 비활성 상태로 두고 `?ai=on` fixture에서만 AI 라벨을 보여준다.
 - 응답 부족 상태에서는 추천/AI/share CTA를 숨긴다.
 - 만료 링크와 확정 완료 상태에서는 응답 저장, 응답 수정, 추천 재계산 CTA를 제공하지 않는다.
@@ -28,9 +28,9 @@ Actor: codex
 
 ## Files Changed
 
-- `docs/mvp/index.html`
-- `docs/mvp/README.md`
-- `scripts/verify-mvp-design.mjs`
+- `docs/release/index.html`
+- `docs/release/README.md`
+- `scripts/verify-release-design.mjs`
 - `package.json`
 - `ai/plans/design-plan.md`
 - `ai/reviews/review.md`
@@ -47,7 +47,7 @@ Actor: codex
   - Checked every screen route from `SCR-00` through `SCR-06`.
   - Checked no horizontal overflow, no visible legacy/internal copy, visible buttons at least 44px, AI label hidden by default and shown only with `?ai=on`, low-response CTA restrictions, expired/closed CTA restrictions, and hidden mobile sample panel.
 - Visual evidence:
-  - `/tmp/hammoyo-mvp-screens/result-390.png`
+  - `/tmp/hammoyo-release-screens/result-390.png`
 - Graph refresh:
   - `/Users/kangsungbae/.codex/bin/graphify update . --no-cluster`
   - Result: project graph rebuilt successfully.
@@ -55,12 +55,12 @@ Actor: codex
   - Result: `hammoyo` re-registered in `/Users/kangsungbae/.graphify/global-graph.json`.
 - Understand-Anything refresh:
   - Ran deterministic scan/fingerprint refresh with `102` analyzed files.
-  - Added design package/MVP implementation nodes and edges to `.understand-anything/knowledge-graph.json`.
+  - Added design package/최종출시제품 implementation nodes and edges to `.understand-anything/knowledge-graph.json`.
   - Result: UA graph validates with `97 nodes`, `98 edges`, `5 layers`, and `5 tour steps`.
 
 ## Remaining Risks
 
-- This is still a static HTML MVP. It does not prove Supabase, Apps in Toss runtime, Toss login, or AI provider integration.
+- This is still a static HTML 최종출시제품. It does not prove Supabase, Apps in Toss runtime, Toss login, or AI provider integration.
 - Live validation evidence is still 0 responses.
 - The next real implementation should move the same copy/state contract into the app source structure with i18n files and adapters.
 - UA refresh was lightweight/deterministic, not a full 7-phase LLM reanalysis.

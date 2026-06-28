@@ -43,7 +43,7 @@ No stock photo, no party photo, no restaurant photo, no crowd, no real chat app 
 
 ## 사용 위치
 
-- `docs/mvp/index.html`: "이미지 방향" preview panel에서 prompt 요약을 보여줍니다.
+- `docs/release/index.html`: "이미지 방향" preview panel에서 prompt 요약을 보여줍니다.
 - 향후 앱 구현: onboarding 상단 또는 빈 상태에 1개만 사용합니다.
 - 공유 문구 자체에는 생성 이미지를 자동 첨부하지 않습니다. 공유는 텍스트/링크 우선입니다.
 

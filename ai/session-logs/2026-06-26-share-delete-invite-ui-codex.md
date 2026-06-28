@@ -12,7 +12,7 @@ topic: share-delete-invite-ui
 - Deleted meetings should make previously shared invite links unavailable.
 - Invite recipients should land on the same home UI and clearly see that an invite needs a response.
 - Replace copy-only link behavior with a general/native share screen where the user can choose an app or copy.
-- Remove app-ready/MVP feeling from the user-facing UI.
+- Remove app-ready/최종출시제품 feeling from the user-facing UI.
 - Make buttons feel more clickable and 3D.
 - Add a cute animal background matching the existing generated animal assets.
 - Use subagents for implementation review.
@@ -36,17 +36,17 @@ topic: share-delete-invite-ui
 ## Files Changed
 
 - `docs/index.html`
-- `docs/mvp/index.html`
+- `docs/release/index.html`
 - `docs/assets/hammoyo-animal-background.png`
-- `docs/mvp/assets/hammoyo-animal-background.png`
+- `docs/release/assets/hammoyo-animal-background.png`
 - `docs/design/asset-provenance.md`
 - `README.md`
-- `docs/mvp/README.md`
+- `docs/release/README.md`
 - `docs/release/platform-readiness.md`
 - `ai/plans/design-plan.md`
 - `ai/plans/implementation-plan.md`
-- `scripts/verify-mvp-design.mjs`
-- `scripts/verify-mvp-functional.mjs`
+- `scripts/verify-release-design.mjs`
+- `scripts/verify-release-functional.mjs`
 
 ## Verification
 

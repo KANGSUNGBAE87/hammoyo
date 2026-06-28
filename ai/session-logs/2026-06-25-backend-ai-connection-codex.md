@@ -41,7 +41,7 @@ topic: backend-ai-connection
 - `supabase/functions/request-data-deletion/index.ts`
 - `scripts/verify-backend-ai.mjs`
 - `README.md`
-- `docs/mvp/README.md`
+- `docs/release/README.md`
 - `docs/release/platform-readiness.md`
 - `ai/plans/implementation-plan.md`
 - `ai/reviews/review.md`

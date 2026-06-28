@@ -20,7 +20,7 @@ Source: Planning Lab `PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9`
 - 투표 결과가 있어도 “누구를 배려하고 어떤 안으로 확정할지”가 방장에게 남습니다.
 - 참여자는 복잡한 입력이나 반복 질문 때문에 응답을 미룹니다.
 
-## MVP 가설에서 반드시 지켜야 할 것
+## 최종출시제품 가설에서 반드시 지켜야 할 것
 
 1. 약속방 생성 및 초대 링크 공유
 2. 후보 날짜/시간 자동 생성 또는 방장의 빠른 설정
@@ -31,7 +31,7 @@ Source: Planning Lab `PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9`
 7. 특정 참여자를 공개적으로 배제하지 않는 관계 안전 공유 문구
 8. 장소·활동·식사는 상세 추천이 아니라 최소 조건 수집 / 카테고리 수준 제안
 
-## MVP에서 미룰 것
+## 최종출시제품에서 미룰 것
 
 - 정확한 식당·카페·장소 추천
 - 예약, 결제, 지도 경로 최적화
@@ -49,7 +49,7 @@ Source: Planning Lab `PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9`
 - 참여자는 한 response round에 하나의 active response만 가집니다. 방이 닫히거나 만료되면 응답 수정과 재계산을 막습니다.
 - 추천 ranking은 deterministic algorithm으로만 계산합니다.
 - AI는 공유 문구 polish에만 선택적으로 붙이며, template fallback과 AI 라벨이 필수입니다.
-- 정적 디자인 MVP 샘플은 `docs/mvp/index.html`입니다.
+- 정적 디자인 최종출시제품 샘플은 `docs/release/index.html`입니다.
 
 ## P3 결론
 
@@ -92,7 +92,7 @@ Source: Planning Lab `PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9`
 - Official package: `/Users/kangsungbae/Documents/지식저장소/planning-lab/20_RUNS/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/P4_HAMMOYEO`
 - Result: refreshed P2/P3 artifacts plus P4 product plan, design plan, real HTML/SVG/PNG design samples, acceptance criteria, implementation handoff, traceability matrix, evidence log, verifier report.
 - Caveat: live external validation responses remain 0 because no recruitment/contact path existed. `FINAL_APPROVED` is not set.
-- Project correction: 2026-06-24에 현재 프로젝트 사본과 보정 기획이 추가되었습니다. 핵심 기준은 `ai/plans/implementation-plan.md`, `ai/plans/design-plan.md`, `docs/design/image-generation-brief.md`, `docs/mvp/index.html`입니다.
+- Project correction: 2026-06-24에 현재 프로젝트 사본과 보정 기획이 추가되었습니다. 핵심 기준은 `ai/plans/implementation-plan.md`, `ai/plans/design-plan.md`, `docs/design/image-generation-brief.md`, `docs/release/index.html`입니다.
 
 ## P4 전 확인할 질문
 

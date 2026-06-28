@@ -14,16 +14,17 @@
 8. `ai/plans/implementation-plan.md`
 9. `ai/reviews/review.md`
 10. `planning-lab/index.md`
-11. `HAMMOYEO_DESIGN_PACKAGE/HAMMOYEO_CODEX_DESIGN_BRIEF.md`
-12. `HAMMOYEO_DESIGN_PACKAGE/HAMMOYEO_DESIGN_TOKENS.json`
+11. `docs/final-delivery/README.md`
+12. `docs/final-delivery/design-plan.md`
+13. `docs/final-delivery/tokens.json`
 
 ## 현재 상태
 
 - 공식 Planning Lab 단계는 `P4_FINAL_PACKAGE_COMPLETE_CONDITIONAL`입니다.
 - P4 전체 산출물 사본은 현재 프로젝트의 `planning-lab/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/`에 있습니다.
 - 구현 전 보정 기준은 `ai/plans/implementation-plan.md`와 `ai/plans/design-plan.md`입니다.
-- 정적 디자인 샘플 MVP는 `docs/mvp/index.html`입니다.
-- `HAMMOYEO_DESIGN_PACKAGE`가 향후 디자인 source of truth입니다. UI 구현, 샘플, React/Vite 포트는 이 패키지의 design brief/token/task prompt를 우선합니다.
+- 정적 출시 화면은 `docs/release/index.html`입니다.
+- `HAMMOYEO_FINAL_DELIVERY`가 향후 디자인 source of truth입니다. UI 구현, 샘플, React/Vite 포트는 `docs/final-delivery/`와 final delivery token/asset subset을 우선합니다.
 - 공유 platform note는 `/Users/kangsungbae/Documents/지식저장소/projects/hammoyo/platform.md`입니다.
 
 ## 플랫폼 기준
@@ -157,7 +158,7 @@ Rules:
 - For shared server-only AI provider secrets such as DeepSeek, use `/Users/kangsungbae/.config/sungbae/shared-env/ai-secrets.env.local`. Project `.env.server.local` may reference this file. Store `DEEPSEEK_API_KEY` there only as a server-side key; never expose it through `VITE_`, `NEXT_PUBLIC_`, or `PUBLIC_` env names. Client apps must call a backend/Supabase Edge Function/server proxy that owns the secret.
 - Implement i18n from the first app version: Korean (`ko`) is the default, and English (`en`) must be user-selectable.
 - Route UI copy, LLM prompts, notifications, purchase copy, errors, empty states, and onboarding through the active locale instead of hard-coding user-facing strings.
-- Plan MVP stubs for login, ads, and IAP even when the first release does not enable them.
+- Plan release-ready stubs for login, ads, and IAP even when the first release does not enable them.
 - Apps in Toss implementations should use Toss login, Apps in Toss ads, and Apps in Toss IAP.
 - Google Play implementations should use Credential Manager or Play Games Services, AdMob, and Google Play Billing.
 - Verify paid entitlements on a backend. Do not put store secrets, receipt-verification credentials, or LLM API keys in app bundles.

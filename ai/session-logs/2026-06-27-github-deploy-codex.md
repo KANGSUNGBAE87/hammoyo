@@ -26,7 +26,7 @@ Date: 2026-06-27 KST
 - GitHub Pages latest build reported `built` for commit `9b349181dd51a7abc5918531e370fd49e31507f6`.
 - Live URL checked: `https://kangsungbae87.github.io/hammoyo/`.
 - Live HTML contains new markers: `hammoyo-animal-background`, `친구한테 공유하기`, `초대가 도착했어요`.
-- Live HTML no longer contains old markers: `앱 준비`, `기능 MVP`, `Converging Orbit`.
+- Live HTML no longer contains old markers: `앱 준비`, `기능 최종출시제품`, `Converging Orbit`.
 - Live image assets returned HTTP 200 for:
   - `/assets/hammoyo-animal-background.png`
   - `/assets/hammoyo-hero-animals.png`

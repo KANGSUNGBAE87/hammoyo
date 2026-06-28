@@ -12,7 +12,7 @@ Implementation. 범위는 실제 외부 적용이 아니라 Apps in Toss / Supab
 
 ## Subagents
 
-- `planner`: 정적 MVP에서 실서비스 연결을 시작하기 위한 P0/P1/P2 범위와 금지 범위를 정리.
+- `planner`: 정적 최종출시제품에서 실서비스 연결을 시작하기 위한 P0/P1/P2 범위와 금지 범위를 정리.
 - `toss-compliance-auditor`: Apps in Toss, Google Play, Supabase/RLS 기준의 blocker와 구현 제약 확인.
 
 외부 Claude/Antigravity 라우터는 현재 Codex native subagent 도구에서 직접 호출하지 못해 native subagent degraded mode로 진행했습니다.
@@ -35,7 +35,7 @@ Implementation. 범위는 실제 외부 적용이 아니라 Apps in Toss / Supab
   - `core_users`, `authmap_user_identities`, `hm_*` tables, RLS, membership select policy.
 - `docs/release/platform-readiness.md`
   - 원격 Supabase 적용 금지, Apps in Toss share/auth, Google Play privacy/delete blocker 정리.
-- `docs/mvp/contact.html`, `docs/mvp/delete-data.html`
+- `docs/release/contact.html`, `docs/release/delete-data.html`
   - 제출 전 public contact/delete placeholder pages.
 - `.env.example`
   - public URL/contact/delete placeholder, `AI_COPY_ENABLED=false`, `APPS_IN_TOSS_CONSOLE_API_KEY=`.
@@ -46,7 +46,7 @@ Implementation. 범위는 실제 외부 적용이 아니라 Apps in Toss / Supab
 
 ## Decisions Made
 
-- Production app shell migration은 이번 턴에서 하지 않고, 정적 MVP는 reference fixture로 유지.
+- Production app shell migration은 이번 턴에서 하지 않고, 정적 최종출시제품은 reference fixture로 유지.
 - 실제 remote Supabase apply는 하지 않음.
 - ShareAdapter live path는 일반 HTTPS URL이 아니라 공식 `intoss://...` deep link만 허용.
 - raw Toss identifier는 저장하지 않고 `provider_subject_hash`만 사용.
@@ -62,7 +62,7 @@ Implementation. 범위는 실제 외부 적용이 아니라 Apps in Toss / Supab
   - RED: contact/delete placeholder page missing.
   - GREEN: 페이지 추가 후 통과.
 - `npm run build`
-  - `HAMMOYEO MVP design verification passed.`
+  - `HAMMOYEO 최종출시제품 design verification passed.`
   - `[기능 계약 검증기] 통과`
   - `[플랫폼 준비 검증기] 통과`
 
@@ -75,7 +75,7 @@ Implementation. 범위는 실제 외부 적용이 아니라 Apps in Toss / Supab
 - 문서 drift:
   - `rooms.host_user_id`를 `hm_rooms.host_core_user_id`로, `app_users.deleted_at`을 `core_users.deleted_at`으로 수정했다.
 - Policy review should-fix:
-  - `verify-platform-readiness.mjs`가 `docs/mvp/privacy.html`의 preview badge, English summary, data deletion URL caveat, contact/delete links를 직접 확인하게 했다.
+  - `verify-platform-readiness.mjs`가 `docs/release/privacy.html`의 preview badge, English summary, data deletion URL caveat, contact/delete links를 직접 확인하게 했다.
 - Verification after remediation:
   - `npm run verify:platform` 통과.
   - `npm run build` 통과.

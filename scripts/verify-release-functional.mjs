@@ -25,8 +25,8 @@ function loadPlaywright() {
 }
 
 const { chromium } = loadPlaywright();
-const baseFileUrl = pathToFileURL(resolve("docs/mvp/index.html")).href;
-const privacyFileUrl = pathToFileURL(resolve("docs/mvp/privacy.html")).href;
+const baseFileUrl = pathToFileURL(resolve("docs/release/index.html")).href;
+const privacyFileUrl = pathToFileURL(resolve("docs/release/privacy.html")).href;
 const pageUrl = `${baseFileUrl}?reset=1`;
 
 const failures = [];
@@ -121,7 +121,7 @@ async function main() {
   assert(cleanEntryText.includes("현재 상태"), "entry should show a concise current status card");
   assert(cleanEntryText.includes("설정"), "entry should expose settings");
   assert(!cleanEntryText.includes("EN") && !cleanEntryText.includes("앱 준비"), "entry should not expose language or app-ready pills");
-  const cleanEntryStorage = await page.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
+  const cleanEntryStorage = await page.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
   assert(cleanEntryStorage === null, "clean entry should not persist a placeholder room");
   assert(await page.getByTestId("settings-button").isVisible(), "entry should expose a settings button");
   assert((await page.locator('[data-testid="language-toggle-button"]').count()) === 0, "entry should not expose a language switcher");
@@ -240,28 +240,25 @@ async function main() {
   await page.getByTestId("room-title-input").fill("금요일 저녁 모임");
   await page.getByTestId("expected-count-select").selectOption("7");
   assert(await page.getByTestId("expected-count-select").evaluate((node) => node.closest(".selectShell") !== null), "expected count should use an iOS-like select shell");
-  const firstDateType = await page.getByTestId("candidate-date-input-0").getAttribute("type");
-  const firstTimeType = await page.getByTestId("candidate-time-input-0").getAttribute("type");
-  assert(firstDateType === "date", "host setup should use a real date picker for candidate dates");
-  assert(firstTimeType === "time", "host setup should use a real time picker for candidate times");
-  assert(await page.getByTestId("candidate-date-input-0").evaluate((node) => node.closest(".AppleDateTimePicker")?.dataset.kind === "date"), "candidate date should use the AppleDateTimePicker shell");
-  assert(await page.getByTestId("candidate-time-input-0").evaluate((node) => node.closest(".AppleDateTimePicker")?.dataset.kind === "time"), "candidate time should use the AppleDateTimePicker shell");
-  await page.getByTestId("candidate-date-input-0").fill("2026-07-05");
-  await page.getByTestId("candidate-time-input-0").fill("18:30");
+  assert((await page.locator('input[type="date"], input[type="time"]').count()) === 0, "host setup should not expose browser-native date/time pickers");
+  assert(await page.getByTestId("candidate-date-chip-0-2026-07-05").evaluate((node) => node.closest(".ReleaseDateChip") !== null), "candidate dates should use release date chips");
+  assert(await page.getByTestId("candidate-time-slot-0-18:30").evaluate((node) => node.closest(".ReleaseTimeSlot") !== null), "candidate times should use release time slots");
+  await page.getByTestId("candidate-date-chip-0-2026-07-05").click();
+  await page.getByTestId("candidate-time-slot-0-18:30").click();
   await page.getByTestId("candidate-note-input-0").fill("강남역 근처");
-  await page.getByTestId("candidate-date-input-1").fill("2026-07-06");
-  await page.getByTestId("candidate-time-input-1").fill("17:00");
+  await page.getByTestId("candidate-date-chip-1-2026-07-06").click();
+  await page.getByTestId("candidate-time-slot-1-17:00").click();
   await page.getByTestId("candidate-note-input-1").fill("잠실");
   await page.getByTestId("add-candidate-button").click();
-  assert(await page.getByTestId("candidate-date-input-3").isVisible(), "host should be able to add a fourth candidate slot");
-  await page.getByTestId("candidate-date-input-3").fill("2026-07-07");
-  await page.getByTestId("candidate-time-input-3").fill("19:30");
+  assert(await page.getByTestId("candidate-date-chip-3-2026-07-07").isVisible(), "host should be able to add a fourth candidate slot");
+  await page.getByTestId("candidate-date-chip-3-2026-07-07").click();
+  await page.getByTestId("candidate-time-slot-3-19:30").click();
   await page.getByTestId("candidate-note-input-3").fill("성수");
   await page.getByTestId("remove-candidate-2").click();
-  assert((await page.locator("[data-testid^='candidate-date-input-']").count()) === 3, "host should be able to remove a candidate slot");
+  assert((await page.locator("[data-testid^='candidate-date-control-']").count()) === 3, "host should be able to remove a candidate slot");
   await page.getByTestId("create-room-button").click();
 
-  const createdRoom = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const createdRoom = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(createdRoom?.room?.title === "금요일 저녁 모임", "created room should be persisted in localStorage");
   assert(createdRoom?.room?.status === "collecting", "created room should enter collecting status");
   assert(createdRoom?.room?.shareUrl?.includes("join="), "created room should persist a general share link");
@@ -301,12 +298,12 @@ async function main() {
   await page.waitForSelector("#scr-01-host-room");
   await page.getByTestId("room-title-input").fill("수정된 금요일 모임");
   await page.getByTestId("expected-count-select").selectOption("9");
-  await page.getByTestId("candidate-date-input-0").fill("2026-07-12");
-  await page.getByTestId("candidate-time-input-0").fill("20:10");
+  await page.getByTestId("candidate-date-chip-0-2026-07-12").click();
+  await page.getByTestId("candidate-time-slot-0-20:10").click();
   await page.getByTestId("candidate-note-input-0").fill("성수역 근처");
   await page.getByTestId("create-room-button").click();
   await page.waitForSelector("[data-testid='my-meetups-screen']");
-  const editedRoomState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const editedRoomState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(editedRoomState?.room?.title === "수정된 금요일 모임", "editing a hosted room should update the active room title");
   assert(editedRoomState?.room?.expectedCount === 9, "editing a hosted room should update expected count");
   assert(editedRoomState?.room?.candidates?.[0]?.date === "2026-07-12", "editing a hosted room should update candidate date");
@@ -327,7 +324,7 @@ async function main() {
   });
   await page.getByTestId("delete-room-button-0").click();
   await page.waitForSelector("[data-testid='my-meetups-screen']");
-  const deletedRoomState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const deletedRoomState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert((deletedRoomState?.hostRooms || []).length === 0, "deleted room should be removed from my meetups");
   assert(deletedRoomState?.room === null, "deleting the active hosted room should clear the active room");
   assert(deletedRoomState?.revokedRoomIds?.length === 1, "deleted room id should be recorded as revoked");
@@ -338,8 +335,8 @@ async function main() {
   await page.goto(`${baseFileUrl}?reset=1`, { waitUntil: "load" });
   await page.getByTestId("start-create-room").click();
   await page.getByTestId("room-title-input").fill("다시 만든 금요일 모임");
-  await page.getByTestId("candidate-date-input-0").fill("2026-07-05");
-  await page.getByTestId("candidate-time-input-0").fill("18:30");
+  await page.getByTestId("candidate-date-chip-0-2026-07-05").click();
+  await page.getByTestId("candidate-time-slot-0-18:30").click();
   await page.getByTestId("create-room-button").click();
   await page.waitForSelector("#scr-04-insufficient-response");
   await page.getByTestId("topbar-home-button").click();
@@ -352,18 +349,18 @@ async function main() {
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
   await page.getByTestId("participant-name-input").fill("   ");
   await page.getByTestId("submit-response-button").click();
-  const blankAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const blankAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(blankAliasState?.room?.responses?.[0]?.alias === "익명", "blank participant name should be explicitly saved as anonymous");
   await page.getByTestId("edit-response-button").click();
   await page.getByTestId("participant-name-input").fill("민지");
   await page.getByTestId("submit-response-button").click();
-  const editedAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const editedAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(
     editedAliasState?.room?.responses?.length === 1 && editedAliasState.room.responses[0].alias === "민지",
     "editing my response should update the existing response instead of adding a new one",
   );
   await page.evaluate(() => {
-    const key = "hammoyo:mvp:v1";
+    const key = "hammoyo:release:v1";
     const state = JSON.parse(localStorage.getItem(key));
     state.currentParticipant = "";
     state.lastResponseId = null;
@@ -372,7 +369,7 @@ async function main() {
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
   await page.getByTestId("participant-name-input").fill(" ");
   await page.getByTestId("submit-response-button").click();
-  const secondBlankAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const secondBlankAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   const anonymousAliases = secondBlankAliasState?.room?.responses
     ?.map((response) => response.alias)
     .filter((alias) => alias.startsWith("익명"));
@@ -393,7 +390,7 @@ async function main() {
   await page.getByTestId("preference-slot-3-hardNo").click();
   await page.getByTestId("submit-response-button").click();
 
-  const storedAfterResponse = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const storedAfterResponse = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(
     storedAfterResponse?.room?.responses?.some((response) => response.alias === "민지"),
     "participant response should be saved",
@@ -413,11 +410,11 @@ async function main() {
 
   await page.getByTestId("close-room-button").click();
   await page.waitForSelector("#scr-06-room-closed");
-  const closedState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:demo:v1")));
+  const closedState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:demo:v1")));
   assert(closedState?.room?.status === "closed", "close action should persist closed status");
 
   await page.goto(`${pageUrl}&screen=scr-06-room-closed`, { waitUntil: "load" });
-  const stateAfterClosedDirect = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1") || "null"));
+  const stateAfterClosedDirect = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1") || "null"));
   assert(stateAfterClosedDirect?.room?.status !== "closed", "closed screen direct link should not create a closed room outside demo mode");
   await page.getByTestId("topbar-home-button").click();
   await page.waitForSelector("#scr-00-entry");
@@ -425,7 +422,7 @@ async function main() {
 
   await page.goto(`${pageUrl}&demo=1&screen=scr-03-result-recommendation&ai=on`, { waitUntil: "load" });
   const aiLabelText = await page.locator("body").innerText();
-  assert(!aiLabelText.includes("AI로 문장을 다듬었어요"), "template-only MVP must not claim AI-polished copy");
+  assert(!aiLabelText.includes("AI로 문장을 다듬었어요"), "template-only release product must not claim AI-polished copy");
   assert(aiLabelText.includes("친구한테 공유하기"), "result CTA should match friend-share behavior");
   await assertButtonInInitialViewport(page, "copy-share-button", "result copy CTA should be visible on initial mobile viewport");
 
@@ -435,7 +432,7 @@ async function main() {
   assert(responseCompleteText.includes("아직 만든 모임이 없어요"), "response-complete direct link should fall back to the entry state");
 
   await page.goto(`${pageUrl}&screen=scr-05-link-expired`, { waitUntil: "load" });
-  const expiredState = await page.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
+  const expiredState = await page.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
   assert(expiredState === null, "expired preview deep link should not mutate persisted room state");
   assert(await page.getByTestId("topbar-home-button").isVisible(), "expired screen should expose topbar home path");
 
@@ -461,8 +458,8 @@ async function main() {
   await demoIsolationPage.goto(`${baseFileUrl}?reset=1&demo=1&screen=scr-03-result-recommendation`, { waitUntil: "load" });
   await demoIsolationPage.getByTestId("copy-share-button").click();
   await demoIsolationPage.waitForSelector("[data-testid='copy-status']");
-  const normalStorageAfterDemo = await demoIsolationPage.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
-  assert(normalStorageAfterDemo === null, "demo interactions should not write to the normal MVP storage key");
+  const normalStorageAfterDemo = await demoIsolationPage.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
+  assert(normalStorageAfterDemo === null, "demo interactions should not write to the normal release storage key");
   await demoIsolationPage.goto(`${baseFileUrl}?screen=scr-00-entry`, { waitUntil: "load" });
   const normalHomeAfterDemo = await demoIsolationPage.locator("body").innerText();
   assert(!normalHomeAfterDemo.includes("최근 방:"), "demo interactions should not create a normal recent room");
@@ -475,7 +472,7 @@ async function main() {
   await demoResetPage.goto(`${baseFileUrl}?reset=1&screen=scr-00-entry`, { waitUntil: "load" });
   await demoResetPage.evaluate(() => {
     localStorage.setItem(
-      "hammoyo:mvp:v1",
+      "hammoyo:release:v1",
       JSON.stringify({
         version: 1,
         room: {
@@ -502,14 +499,14 @@ async function main() {
     );
   });
   await demoResetPage.goto(`${baseFileUrl}?demo=1&reset=1&screen=scr-03-result-recommendation`, { waitUntil: "load" });
-  const normalAfterDemoReset = await demoResetPage.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const normalAfterDemoReset = await demoResetPage.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(
     normalAfterDemoReset?.room?.title === "보존되어야 하는 일반 모임",
     "demo reset should not delete an existing normal saved room",
   );
   await demoResetPage.goto(`${baseFileUrl}?demo=1&screen=scr-07-settings`, { waitUntil: "load" });
   await demoResetPage.getByTestId("clear-local-data-button").click();
-  const normalAfterDemoClear = await demoResetPage.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:mvp:v1")));
+  const normalAfterDemoClear = await demoResetPage.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(
     normalAfterDemoClear?.room?.title === "보존되어야 하는 일반 모임",
     "demo privacy clear should not delete an existing normal saved room",
@@ -533,8 +530,8 @@ async function main() {
   await page.waitForSelector("[data-testid='copy-status']");
   assert((await page.getByTestId("copy-status").innerText()).includes("로그아웃"), "logout action should show status feedback");
   await page.getByTestId("clear-local-data-button").click();
-  const storageAfterClear = await page.evaluate(() => localStorage.getItem("hammoyo:mvp:v1"));
-  assert(storageAfterClear === null, "clear local data action should remove MVP localStorage");
+  const storageAfterClear = await page.evaluate(() => localStorage.getItem("hammoyo:release:v1"));
+  assert(storageAfterClear === null, "clear local data action should remove release localStorage");
 
   await page.setViewportSize({ width: 320, height: 740 });
   await page.goto(`${pageUrl}&screen=scr-00-entry`, { waitUntil: "load" });
@@ -627,7 +624,7 @@ async function main() {
   assert(!readyReminderText.includes("0명"), "ready reminder copy should not mention zero remaining responses");
   assert(readyReminderText.includes("충분히"), "ready reminder copy should switch to a ready-state message");
 
-  const privacyDocument = readFileSync(resolve("docs/mvp/privacy.html"), "utf8");
+  const privacyDocument = readFileSync(resolve("docs/release/privacy.html"), "utf8");
   assert(privacyDocument.includes("English Summary"), "privacy policy should include an English summary");
   assert(
     privacyDocument.includes("data-deletion") && privacyDocument.includes("request URL must be finalized"),

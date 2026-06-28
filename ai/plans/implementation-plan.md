@@ -1,6 +1,6 @@
 ---
-version: 12
-status: backend-invite-anonymous-hardening-implemented
+version: 13
+status: release-picker-and-language-standard-implemented
 updated: 2026-06-28
 canonical: true
 ---
@@ -11,14 +11,16 @@ canonical: true
 
 이 문서는 조건부 P4 패키지에서 비어 있던 Supabase, 권한, 응답 정책, AI/copy 경계를 닫고 앱 흐름 구현 기준을 유지하기 위한 구현 기획입니다.
 
-현재 기준은 `backend-invite-anonymous-hardening-implemented`입니다. 앱 화면에는 iPhone식 드롭다운 날짜/시간 picker, 후보 추가/삭제, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 내가 만든 모임 상태판, 브라우저 기반 host room 목록과 모임 수정/삭제 흐름을 추가했습니다. platform adapter contract, `hammoyo_` Supabase migration, release readiness 문서, `SupabaseBackendAdapter`, 실제 Supabase DB write/read를 수행하는 Edge Function, server-only DeepSeek V4 Pro AI provider proxy, AI copy/coordination policy 검증도 연결되어 있습니다. shared Supabase 한 프로젝트에 여러 앱이 붙는 전제를 반영해 app table/helper/policy prefix는 `hammoyo_`로 고정합니다. 2026-06-28 기준으로 `lookup-room`, `delete-room`, anonymous participant key 기반 `join-room`/`submit-response`, candidate-slot ownership validation, DB trigger hardening, expanded remote smoke path가 구현됐고, 신규 migration과 Edge Function도 원격 shared Supabase에 적용/배포됐습니다. `npm run smoke:remote`는 host 생성, lookup, 익명 join, 익명 응답 수정, signed session plus anonymous key 응답 재사용, candidate ownership rejection, recompute, delete-room, 삭제 후 lookup/write 차단, 삭제 요청 후 세션 차단까지 통과했습니다.
+현재 기준은 `release-picker-and-language-standard-implemented`입니다. 앱 화면에는 후보 날짜 chip, 낮/저녁/밤 시간 slot, 후보 추가/삭제, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 내가 만든 모임 상태판, 브라우저 기반 host room 목록과 모임 수정/삭제 흐름을 추가했습니다. platform adapter contract, `hammoyo_` Supabase migration, release readiness 문서, `SupabaseBackendAdapter`, 실제 Supabase DB write/read를 수행하는 Edge Function, server-only DeepSeek V4 Pro AI provider proxy, AI copy/coordination policy 검증도 연결되어 있습니다. shared Supabase 한 프로젝트에 여러 앱이 붙는 전제를 반영해 app table/helper/policy prefix는 `hammoyo_`로 고정합니다. 2026-06-28 기준으로 `lookup-room`, `delete-room`, anonymous participant key 기반 `join-room`/`submit-response`, candidate-slot ownership validation, DB trigger hardening, expanded remote smoke path가 구현됐고, 신규 migration과 Edge Function도 원격 shared Supabase에 적용/배포됐습니다. `npm run smoke:remote`는 host 생성, lookup, 익명 join, 익명 응답 수정, signed session plus anonymous key 응답 재사용, candidate ownership rejection, recompute, delete-room, 삭제 후 lookup/write 차단, 삭제 요청 후 세션 차단까지 통과했습니다.
+
+2026-06-28 추가 기준: 사용자-facing 날짜/시간 입력은 브라우저 native picker를 쓰지 않습니다. 후보 날짜는 chip/radio, 시간은 낮/저녁/밤 segmented control과 slot button으로 선택합니다. 프로젝트 문서와 검증 스크립트는 작은 검증 프레임을 버리고 `최종출시제품`/`release` 기준으로 유지합니다.
 
 2026-06-27부터 다음 구현은 `HAMMOYEO_FINAL_DELIVERY` 기준으로 재정렬합니다. 현재 배포본은 final delivery의 베이스로 충분하지만, 그대로 final/store-ready는 아닙니다. 핵심 불일치는 참여자 익명 응답 모델, `어려워요` 제약 처리, 최소 응답 기준, 서버 invite/status lookup, `negotiating`/`ready_to_confirm` 상태입니다.
 
 ## 2026-06-27 재정렬 결정
 
 - `docs/final-delivery/product-plan.md`, `implementation-plan.md`, `design-plan.md`, `image-asset-plan.md`, `tokens.json`을 다음 구현의 우선 기준으로 둡니다.
-- 원본 `HAMMOYEO_FINAL_DELIVERY/` 폴더는 local archive로 유지하고 git/Graphify에서 제외합니다. 구현 기준 subset은 `docs/final-delivery/`, `docs/assets/final/`, `docs/mvp/assets/final/`로 승격했습니다.
+- 원본 `HAMMOYEO_FINAL_DELIVERY/` 폴더는 local archive로 유지하고 git/Graphify에서 제외합니다. 구현 기준 subset은 `docs/final-delivery/`, `docs/assets/final/`, `docs/release/assets/final/`로 승격했습니다.
 - 이전 `HAMMOYEO_DESIGN_PACKAGE` 기준 구현은 history/reference입니다.
 - 다음 코딩 순서는 UI asset 적용보다 recommendation/auth/link-state 계약 정렬을 우선합니다. UI만 먼저 바꾸면 final delivery의 핵심인 합의 엔진이 맞지 않습니다.
 
@@ -27,7 +29,7 @@ canonical: true
 ### P0: Final delivery 계약 정렬
 
 1. 완료: 제품 홈을 final delivery sample 기준으로 정리하고 debug/토큰/화면 점검 UI는 `?debug=1` 전용으로 유지합니다.
-2. 완료: `docs/assets/final`과 `docs/mvp/assets/final`의 hero/state/icon/background/character assets를 실제 화면에 연결합니다.
+2. 완료: `docs/assets/final`과 `docs/release/assets/final`의 hero/state/icon/background/character assets를 실제 화면에 연결합니다.
 3. 완료: `hardNo`를 점수에서 제거하고 후보 자격 조건으로 분리합니다.
 4. 완료: 최소 응답 기준을 `max(3, ceil(expected_count * 0.6))`로 프론트/백엔드/검증기에서 통일합니다.
 5. 원격 적용 완료: 공유 링크의 정식 서버 경로는 `invite_slug` + `lookup-room` status lookup으로 판단합니다. GitHub Pages preview는 서버 env가 없으므로 base64 snapshot fallback을 유지합니다.
@@ -83,7 +85,7 @@ backend/
   supabase/migrations/
 ```
 
-현재 `docs/mvp/index.html`과 `docs/index.html`은 정적 HTML/CSS/JS 앱 화면으로 유지하되, localStorage 기반 방 생성/응답/추천/확정뿐 아니라 날짜/시간 picker, 후보 추가/삭제, 초대 홈 진입, native share 우선 공유, 내가 만든 모임 상태판, 모임 수정/삭제까지 동작합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 구현되어 있으며, Toss login/account 동기화 UI가 붙기 전 GitHub Pages 화면은 브라우저 저장을 우선 사용합니다. GitHub Pages의 삭제 후 링크 무효화는 같은 브라우저의 revoked room id 기준이며, 다른 기기까지 완전하게 막는 정식 동작은 Supabase invite lookup에서 `deleted/expired` 상태를 확인해야 합니다.
+현재 `docs/release/index.html`과 `docs/index.html`은 정적 HTML/CSS/JS 앱 화면으로 유지하되, localStorage 기반 방 생성/응답/추천/확정뿐 아니라 날짜/시간 picker, 후보 추가/삭제, 초대 홈 진입, native share 우선 공유, 내가 만든 모임 상태판, 모임 수정/삭제까지 동작합니다. 원격 Supabase/DeepSeek 경계는 `src/platform/*`와 `supabase/functions/*`에 구현되어 있으며, Toss login/account 동기화 UI가 붙기 전 GitHub Pages 화면은 브라우저 저장을 우선 사용합니다. GitHub Pages의 삭제 후 링크 무효화는 같은 브라우저의 revoked room id 기준이며, 다른 기기까지 완전하게 막는 정식 동작은 Supabase invite lookup에서 `deleted/expired` 상태를 확인해야 합니다.
 
 ## Auth Mapping
 
@@ -267,7 +269,7 @@ APPS_IN_TOSS_CONSOLE_API_KEY=agent-or-ci-only
 
 ## 구현 순서
 
-1. final delivery home/asset 기준을 `docs/index.html`과 `docs/mvp/index.html`에 반영합니다.
+1. final delivery home/asset 기준을 `docs/index.html`과 `docs/release/index.html`에 반영합니다.
 2. recommendation v2를 pure function으로 먼저 고정하고, `docs/*`와 `supabase/functions/_shared/hammoyo/recommendation.ts`를 같은 계약으로 맞춥니다.
 3. 완료: Supabase migration을 추가해 `deleted_at`, anonymous participant fields, final room status, candidate ownership constraints를 보강했습니다. `negotiation/event` tables는 P1 scope로 남깁니다.
 4. 부분 완료: `lookup-room`, `delete-room`, anonymous `join-room`, candidate ownership `submit-response`를 구현했습니다. `update-room`은 P1 host dashboard server-backed 전환에 포함합니다.
@@ -298,7 +300,7 @@ APPS_IN_TOSS_CONSOLE_API_KEY=agent-or-ci-only
 ## Change Log
 
 - 2026-06-24: Supabase, 권한, 응답, AI/copy 경계를 보정해 최초 작성.
-- 2026-06-24: `docs/mvp/index.html`에 localStorage 기반 방 생성, 참여자 응답, deterministic 추천, 공유 문구 복사, 약속 확정 흐름을 구현하고 상태를 `static-functional-mvp-implemented`로 갱신.
+- 2026-06-24: `docs/release/index.html`에 localStorage 기반 방 생성, 참여자 응답, deterministic 추천, 공유 문구 복사, 약속 확정 흐름을 구현하고 상태를 `static-functional-release-implemented`로 갱신.
 - 2026-06-24: platform adapter contract, Apps in Toss auth/share skeleton, preview adapters, Supabase `hammoyo_` migration, release readiness 문서, contact/delete placeholder, `verify:platform` 검증을 추가하고 상태를 `platform-connection-scaffold-implemented`로 갱신.
 - 2026-06-25: `SupabaseBackendAdapter`, `supabase/functions/*` runtime connection code, AI provider proxy, AI copy policy, `verify:backend-ai` 검증을 추가하고 상태를 `backend-ai-runtime-connection-code-implemented`로 갱신.
 - 2026-06-25: server-only AI provider proxy의 기본 provider/model을 `deepseek` / `deepseek-v4-pro`로 고정하고 `verify:backend-ai`가 deprecated `deepseek-chat` fallback을 거부하도록 갱신.
@@ -308,5 +310,6 @@ APPS_IN_TOSS_CONSOLE_API_KEY=agent-or-ci-only
 - 2026-06-26: 홈 메인 동물 캐릭터 이미지와 개별 캐릭터 asset을 추가하고, 언어 전환/앱 준비 pill을 사용자 화면에서 제거. 날짜/시간 선택은 iPhone식 dropdown shell로 보강하고, 후보 카드 grid overflow를 막도록 입력 wrapper와 grid width 기준을 수정했다.
 - 2026-06-26: 동물 배경 이미지와 3D 버튼/카드 depth를 추가. 공유는 `navigator.share` 우선, clipboard fallback으로 변경. 초대 링크는 홈 초대 카드로 진입하고, 내가 만든 모임에서 삭제하면 같은 브라우저의 기존 링크를 revoked 처리한다.
 - 2026-06-27: `HAMMOYEO_FINAL_DELIVERY`를 다음 구현 기준으로 채택하고, P0/P1/P2 실행 순서, recommendation v2, server invite/status lookup, anonymous participant, negotiation scope를 중심으로 구현 순서를 재정렬했다.
-- 2026-06-27: 원본 `HAMMOYEO_FINAL_DELIVERY/`는 local archive로 유지하고, canonical docs/tokens/reference/runtime asset subset을 `docs/final-delivery/`, `docs/assets/final/`, `docs/mvp/assets/final/`로 선별 편입했다.
+- 2026-06-27: 원본 `HAMMOYEO_FINAL_DELIVERY/`는 local archive로 유지하고, canonical docs/tokens/reference/runtime asset subset을 `docs/final-delivery/`, `docs/assets/final/`, `docs/release/assets/final/`로 선별 편입했다.
 - 2026-06-28: `lookup-room`, `delete-room`, anonymous participant key 기반 `join-room`/`submit-response`, candidate-slot ownership validation, `deleted` canonical status, DB trigger hardening, expanded remote smoke contract를 구현했다. 신규 migration과 Edge Function을 원격 shared Supabase에 적용/배포했고, `npm run build`와 `npm run smoke:remote`가 통과했다. Apps in Toss sandbox smoke와 P1 `negotiating`/`ready_to_confirm` 범위 결정은 남긴다.
+- 2026-06-28: 브라우저 native date/time picker를 release chip/slot UI로 교체하고, 옛 docs 경로를 `docs/release`로 승격했다. `verify:release`/`npm run build`가 날짜/시간 native picker, legacy storage key, 작은 검증 표현 재도입을 차단한다.

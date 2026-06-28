@@ -27,12 +27,12 @@ Status: curated subset promoted on 2026-06-27.
 
 | Source folder | Tracked destination | Use |
 | --- | --- | --- |
-| `images/split_assets/hero/` selected files | `docs/assets/final/hero/`, `docs/mvp/assets/final/hero/` | Home hero and wordmark |
-| `images/split_assets/states/*_object.png` | `docs/assets/final/states/`, `docs/mvp/assets/final/states/` | Empty/result state illustrations |
-| `images/split_assets/icons/*_object.png` | `docs/assets/final/icons/`, `docs/mvp/assets/final/icons/` | Small functional icon objects |
-| `images/split_assets/backgrounds/` selected files | `docs/assets/final/backgrounds/`, `docs/mvp/assets/final/backgrounds/` | Home and result decoration |
-| `images/split_assets/characters/*_character_only_crop.png` | `docs/assets/final/characters/`, `docs/mvp/assets/final/characters/` | Anonymous avatars and mascot use |
-| `images/split_assets/communication/` selected files | `docs/assets/final/communication/`, `docs/mvp/assets/final/communication/` | Share, reminder, privacy, and message states |
+| `images/split_assets/hero/` selected files | `docs/assets/final/hero/`, `docs/release/assets/final/hero/` | Home hero and wordmark |
+| `images/split_assets/states/*_object.png` | `docs/assets/final/states/`, `docs/release/assets/final/states/` | Empty/result state illustrations |
+| `images/split_assets/icons/*_object.png` | `docs/assets/final/icons/`, `docs/release/assets/final/icons/` | Small functional icon objects |
+| `images/split_assets/backgrounds/` selected files | `docs/assets/final/backgrounds/`, `docs/release/assets/final/backgrounds/` | Home and result decoration |
+| `images/split_assets/characters/*_character_only_crop.png` | `docs/assets/final/characters/`, `docs/release/assets/final/characters/` | Anonymous avatars and mascot use |
+| `images/split_assets/communication/` selected files | `docs/assets/final/communication/`, `docs/release/assets/final/communication/` | Share, reminder, privacy, and message states |
 
 ## Kept Only In Local Archive
 

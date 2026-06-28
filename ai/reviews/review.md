@@ -1,7 +1,7 @@
 ---
-version: 12
-status: final-delivery-reorder-reviewed
-updated: 2026-06-27
+version: 13
+status: release-picker-redesign-verified
+updated: 2026-06-28
 canonical: true
 ---
 
@@ -16,8 +16,8 @@ canonical: true
 - 원 리뷰 판정: `BLOCK_FOR_IMPLEMENTATION`
 - 패키지 품질: `CONDITIONAL_P4_PACKAGE_OK`
 - 추가 기획 필요 여부: 2026-06-24 보정 완료. P2/P3/P4 재논의는 필요하지 않습니다.
-- 디자인 판정: 방향은 유지하고, 화면 ID/상태/AI 라벨/샘플 MVP를 보강했습니다.
-- 기능 판정: 정적 HTML MVP 안에서 방 생성, 응답 저장, deterministic 추천, 공유 문구 복사, 확정 흐름이 동작합니다.
+- 디자인 판정: 방향은 유지하고, 화면 ID/상태/AI 라벨/출시 화면을 보강했습니다.
+- 기능 판정: 정적 HTML 최종출시제품 안에서 방 생성, 응답 저장, deterministic 추천, 공유 문구 복사, 확정 흐름이 동작합니다.
 - 배포 전 보완 판정: 모바일 홈/개인정보/삭제 경로, 복사 CTA 정합성, template-only AI 고지, expired/closed 상태 가드, demo storage 격리, ko/en 결과/copy payload 전환, preview-only 초대 문구, bilingual privacy summary, 320/390 CTA 가시성을 보강했습니다.
 
 ## 2026-06-27 Final Delivery 재정렬 리뷰
@@ -30,7 +30,7 @@ canonical: true
 - `HAMMOYEO_FINAL_DELIVERY/docs/03_FINAL_DESIGN_PLAN.md`
 - `HAMMOYEO_FINAL_DELIVERY/docs/04_FINAL_IMAGE_ASSET_PLAN.md`
 - `HAMMOYEO_FINAL_DELIVERY/tokens/hammoyo_design_tokens_final_v12.json`
-- 현재 `docs/index.html`, `docs/mvp/index.html`, `supabase/functions/*`, `supabase/migrations/20260624_hammoyo_backend.sql`
+- 현재 `docs/index.html`, `docs/release/index.html`, `supabase/functions/*`, `supabase/migrations/20260624_hammoyo_backend.sql`
 
 사용한 검토 축:
 
@@ -57,7 +57,7 @@ Findings:
 
 Reordered next steps:
 
-1. `docs/final-delivery/`, `docs/assets/final/`, `docs/mvp/assets/final/`에 승격한 source/asset을 다음 구현 기준으로 사용한다.
+1. `docs/final-delivery/`, `docs/assets/final/`, `docs/release/assets/final/`에 승격한 source/asset을 다음 구현 기준으로 사용한다.
 2. final delivery home/asset 기준을 적용하되, 동시에 recommendation/auth/link-state 계약을 손본다.
 3. recommendation v2를 프론트/백엔드/검증기에서 통일한다.
 4. Supabase migration/Edge Function을 server invite status lookup, deleted state, anonymous participant, candidate ownership 기준으로 확장한다.
@@ -121,7 +121,7 @@ Reordered next steps:
    - 공유 문구가 템플릿인지, LLM 생성인지, 둘의 혼합인지 정해져 있지 않습니다.
    - LLM을 쓰면 어떤 데이터가 외부 모델로 나가는지, 실패 fallback, 고지/라벨, 테스트 방식이 필요합니다.
 
-4. MVP 범위가 새고 있습니다.
+4. 최종출시제품 범위가 새고 있습니다.
    - 장소/활동/식사 optional constraint가 제품, 디자인, handoff에 나오지만 실제 역할이 없습니다.
    - 추천 점수에 반영하는지, 필터인지, copy context인지, 단순 메모인지 결정해야 합니다.
 
@@ -165,46 +165,46 @@ Reordered next steps:
    - `planning-lab/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/P4_HAMMOYEO/09_CORRECTION_PLAN.md`
    - `ai/plans/design-plan.md`
    - `docs/design/image-generation-brief.md`
-   - `docs/mvp/index.html`
+   - `docs/release/index.html`
 
 ## 최종 권고
 
 정책/디자인 해석이 비어 있어서 바로 구현하면 위험했던 상태는 해소됐습니다.
 
-다음 순서는 정적 MVP 샘플을 기준으로 live 연결/배포 착수 여부를 결정하는 것입니다. 실제 원격 연결은 Supabase SQL 적용, Edge Function 배포, Toss app id/deep link, Toss server credential/mTLS 위치, DeepSeek V4 Pro 호출 예산을 정한 뒤 시작해야 합니다.
+다음 순서는 정적 최종출시제품 샘플을 기준으로 live 연결/배포 착수 여부를 결정하는 것입니다. 실제 원격 연결은 Supabase SQL 적용, Edge Function 배포, Toss app id/deep link, Toss server credential/mTLS 위치, DeepSeek V4 Pro 호출 예산을 정한 뒤 시작해야 합니다.
 
 ## 2026-06-24 디자인 패키지 구현 QA
 
-`HAMMOYEO_DESIGN_PACKAGE`를 현재 디자인 source of truth로 승격하고 정적 MVP 샘플을 전체 개편했습니다.
+`HAMMOYEO_DESIGN_PACKAGE`를 현재 디자인 source of truth로 승격하고 정적 최종출시제품 샘플을 전체 개편했습니다.
 
 반영 내용:
 
-- `docs/mvp/index.html`을 Converging Orbit 톤의 모바일 우선 화면으로 재구성.
+- `docs/release/index.html`을 Converging Orbit 톤의 모바일 우선 화면으로 재구성.
 - `SCR-00`부터 `SCR-06`까지 직접 query route로 열 수 있게 정리.
 - 추천 결과, 응답 부족, 링크 만료, 방 확정 상태별 CTA와 AI 라벨 노출 조건을 분리.
 - 디자인 토큰, 상태 라벨, 44px 이상 터치 타깃, reduced motion, Apps in Toss 기준 모바일 폭을 반영.
 - 모바일 폭에서는 샘플용 디자인/토큰 패널을 숨겨 실제 제품 화면만 보이게 조정.
-- `package.json`과 `scripts/verify-mvp-design.mjs`를 추가해 이후 구현이 패키지 화면/토큰 계약에서 벗어나면 `npm run build`로 잡히게 함.
+- `package.json`과 `scripts/verify-release-design.mjs`를 추가해 이후 구현이 패키지 화면/토큰 계약에서 벗어나면 `npm run build`로 잡히게 함.
 
 검증 결과:
 
 - `npm run build` 통과.
 - 시스템 Chrome + Playwright로 `360`, `390`, `420` 폭에서 전체 화면 route QA 통과.
 - QA 확인 항목: 가로 overflow 없음, visible internal term 없음, 버튼 터치 영역 44px 이상, template-only 상태에서 AI 라벨 미노출, 응답 부족 상태에서 AI CTA 없음, 만료/확정 상태에서 금지 CTA 없음.
-- 대표 스크린샷: `/tmp/hammoyo-mvp-screens/result-390.png`.
+- 대표 스크린샷: `/tmp/hammoyo-release-screens/result-390.png`.
 
-## 2026-06-24 정적 기능 MVP 구현 QA
+## 2026-06-24 정적 기능 최종출시제품 구현 QA
 
-디자인 MVP를 localStorage 기반 기능 MVP로 확장했습니다. 실제 Apps in Toss SDK, Supabase, AI provider는 연결하지 않았고, P4 조건부 범위에 맞춰 mock/browser-only adapter 상태로 유지했습니다.
+디자인 최종출시제품을 localStorage 기반 기능 최종출시제품로 확장했습니다. 실제 Apps in Toss SDK, Supabase, AI provider는 연결하지 않았고, P4 조건부 범위에 맞춰 mock/browser-only adapter 상태로 유지했습니다.
 
 반영 내용:
 
-- `docs/mvp/index.html`에 방 생성 form, 후보 시간 입력, 참여자 별명, 4단계 선호 선택, 응답 저장 흐름을 구현.
+- `docs/release/index.html`에 방 생성 form, 후보 시간 입력, 참여자 별명, 4단계 선호 선택, 응답 저장 흐름을 구현.
 - `minimum_responses = min(4, max(3, ceil(expected_count * 0.5)))`, hard-no 제외 규칙, tie-breaker, confidence 계산을 deterministic 함수로 구현.
 - `scr-03` 추천 결과는 실제 응답 집계에서 계산한 1순위와 차선 후보를 표시.
 - 공유 문구는 template-first로 생성하고, 복사 실패 시 DOM fallback을 사용.
 - `closed` 상태에서 확정 결과를 고정하고, 이후 응답 입력 CTA는 비활성화 경계를 유지.
-- `scripts/verify-mvp-functional.mjs`를 추가하고 `npm run build`가 디자인/기능 계약을 모두 검증하도록 갱신.
+- `scripts/verify-release-functional.mjs`를 추가하고 `npm run build`가 디자인/기능 계약을 모두 검증하도록 갱신.
 
 검증 결과:
 
@@ -214,15 +214,15 @@ Reordered next steps:
 
 ## 2026-06-24 배포 전 기능 보완 QA
 
-정적 기능 MVP를 Apps in Toss / Google Play 출시 전 기준에 가깝게 보강했습니다. 실제 Toss login, Supabase, AI provider, ShareAdapter, 광고, IAP는 여전히 연결하지 않았고, 현재 범위는 browser-only MVP입니다.
+정적 기능 최종출시제품을 Apps in Toss / Google Play 출시 전 기준에 가깝게 보강했습니다. 실제 Toss login, Supabase, AI provider, ShareAdapter, 광고, IAP는 여전히 연결하지 않았고, 현재 범위는 browser-only 최종출시제품입니다.
 
 반영 내용:
 
 - 모바일 상단바에 `홈`과 `개인정보` 진입 버튼을 추가했습니다.
 - `SCR-07 개인정보` 화면을 추가해 localStorage 저장 범위, 서버 전송 없음, 로컬 데이터 삭제 경로를 설명했습니다.
-- `로컬 데이터 지우기`가 `hammoyo:mvp:v1` localStorage 값을 실제 삭제하도록 구현했습니다.
+- `로컬 데이터 지우기`가 `hammoyo:release:v1` localStorage 값을 실제 삭제하도록 구현했습니다.
 - 공유/초대/확정 CTA를 실제 클립보드 복사 동작에 맞춰 `공유 문구 복사하기`, `초대 문구 복사하기`, `확정 문구 복사하기`로 낮췄습니다.
-- template-only MVP에서는 `?ai=on`이 있어도 `AI로 문장을 다듬었어요` 라벨이 노출되지 않게 했습니다.
+- template-only 최종출시제품에서는 `?ai=on`이 있어도 `AI로 문장을 다듬었어요` 라벨이 노출되지 않게 했습니다.
 - 응답 완료/응답 부족 화면의 `샘플 응답으로 결과 보기`는 기본 사용자 경로에서 숨기고 `?demo=1`에서만 노출되게 격리했습니다.
 - 만료/확정 deep link 진입 시 `expired`/`closed` 상태를 저장하고, 이후 직접 응답 화면으로 우회해도 입력/제출이 닫히도록 했습니다.
 - 응답은 충분하지만 모든 후보가 hard-no로 제외된 경우를 `새 후보 필요` 상태로 분리했습니다.
@@ -234,13 +234,13 @@ Reordered next steps:
 - `SCR-02B` 직접 진입은 실제 제출 기록이나 `?demo=1`이 없으면 성공 화면을 보여주지 않도록 막았습니다.
 - 복사 API와 fallback이 모두 실패하면 `복사하지 못했어요` 상태를 보여주도록 바꿨습니다.
 - `locale-ko`/`locale-en` resource와 상단 언어 전환 버튼을 추가했습니다.
-- `docs/mvp/privacy.html`을 추가하고 개인정보 화면에서 정적 정책 문서, 보관/삭제/문의 기준으로 이동할 수 있게 했습니다.
-- `docs/mvp/privacy.html`은 정적 preview 전용임을 명시하고, 공개 문의 이메일/외부 privacy URL/데이터 삭제 요청 URL은 제출 전 placeholder로 남겼습니다.
-- `demo=1` 상호작용은 일반 저장소 `hammoyo:mvp:v1` 대신 `hammoyo:mvp:demo:v1`에만 저장되도록 격리했습니다.
+- `docs/release/privacy.html`을 추가하고 개인정보 화면에서 정적 정책 문서, 보관/삭제/문의 기준으로 이동할 수 있게 했습니다.
+- `docs/release/privacy.html`은 정적 preview 전용임을 명시하고, 공개 문의 이메일/외부 privacy URL/데이터 삭제 요청 URL은 제출 전 placeholder로 남겼습니다.
+- `demo=1` 상호작용은 일반 저장소 `hammoyo:release:v1` 대신 `hammoyo:release:demo:v1`에만 저장되도록 격리했습니다.
 - `demo=1`의 `reset=1`과 개인정보 화면 삭제도 demo 저장소만 정리하도록 제한해 일반 저장소 삭제 오염을 막았습니다.
 - 추천/초대/확정 copy payload와 demo fixture를 locale template로 이동해 `lang=en` 결과 화면과 copy payload가 영어로 나오고, 데모 모임명/요일/장소에도 한글이 섞이지 않도록 했습니다.
-- `docs/mvp/privacy.html`에 English summary와 data-deletion URL 제출 전 caveat를 추가했습니다.
-- `docs/mvp/privacy.html`의 모바일 overflow를 CSS와 자동 검증으로 막았습니다.
+- `docs/release/privacy.html`에 English summary와 data-deletion URL 제출 전 caveat를 추가했습니다.
+- `docs/release/privacy.html`의 모바일 overflow를 CSS와 자동 검증으로 막았습니다.
 - `privacy.html`에도 data favicon link를 추가해 최종 live QA에서 보인 favicon 404를 제거했습니다.
 - 데스크톱 1024x768에서도 결과 화면의 주요 CTA가 첫 뷰포트 안에 들어오도록 phone preview를 내부 스크롤/sticky 컨테이너로 조정했습니다.
 
@@ -254,25 +254,25 @@ Reordered next steps:
 
 - 실제 Apps in Toss shell의 back/close/safe-area 동작은 아직 실기기/토스앱에서 검증하지 않았습니다.
 - 실제 공유 링크, Toss login, Supabase/RLS, Google Play build, AI 문구 생성은 아직 미구현입니다. 현재 초대 문구는 의도적으로 preview-only입니다.
-- 현재 `docs/mvp/privacy.html`은 preview용 정적 정책입니다. Google Play/Apps in Toss 제출 전에는 실제 공개 URL, 운영자 연락처, 계정/데이터 삭제 접수 경로를 확정해야 합니다.
+- 현재 `docs/release/privacy.html`은 preview용 정적 정책입니다. Google Play/Apps in Toss 제출 전에는 실제 공개 URL, 운영자 연락처, 계정/데이터 삭제 접수 경로를 확정해야 합니다.
 - 언어 전환은 핵심 screen copy, 결과/metric/copy 상태, 주요 privacy 안내 중심입니다. 다음 production app 전환에서는 남은 세부 form label과 demo fixture/date label도 locale resource로 이동해야 합니다.
 
 ## Change Log
 
 - 2026-06-24: Codex + 4개 서브에이전트 리뷰 결과를 통합해 최초 작성.
-- 2026-06-24: Supabase/권한/응답/AI/copy, 디자인 보강, 이미지 생성문, 정적 MVP 샘플 보정 반영. 상태를 `corrected-planning-ready`로 갱신.
-- 2026-06-24: `HAMMOYEO_DESIGN_PACKAGE` 기준으로 정적 MVP 전체 화면을 재구성하고 Chrome/Playwright QA 증거를 추가. 상태를 `design-mvp-implemented`로 갱신.
-- 2026-06-24: 정적 MVP에 localStorage 기능 흐름과 자동 기능 검증을 추가. 상태를 `static-functional-mvp-implemented`로 갱신.
-- 2026-06-24: 배포 전 기능 보완으로 모바일 홈/개인정보/삭제, CTA 정합성, AI 라벨, expired/closed 가드, 데모 시드 격리, 모바일 CTA 가시성을 보강. 상태를 `predeploy-mvp-hardened`로 갱신.
+- 2026-06-24: Supabase/권한/응답/AI/copy, 디자인 보강, 이미지 생성문, 정적 최종출시제품 샘플 보정 반영. 상태를 `corrected-planning-ready`로 갱신.
+- 2026-06-24: `HAMMOYEO_DESIGN_PACKAGE` 기준으로 정적 최종출시제품 전체 화면을 재구성하고 Chrome/Playwright QA 증거를 추가. 상태를 `design-release-implemented`로 갱신.
+- 2026-06-24: 정적 최종출시제품에 localStorage 기능 흐름과 자동 기능 검증을 추가. 상태를 `static-functional-release-implemented`로 갱신.
+- 2026-06-24: 배포 전 기능 보완으로 모바일 홈/개인정보/삭제, CTA 정합성, AI 라벨, expired/closed 가드, 데모 시드 격리, 모바일 CTA 가시성을 보강. 상태를 `predeploy-release-hardened`로 갱신.
 - 2026-06-24: 서브에이전트 사후 리뷰 지적에 따라 기본 빈 상태, 초대/추천/확정 copy payload 분기, 개인정보 정책 문서, `SCR-06` 직접 진입 가드, 데스크톱 CTA 가시성을 추가 보강.
-- 2026-06-24: 2개 리뷰 페어 지적을 반영해 truly empty 기본 상태, preview-only 초대 문구, `SCR-05`/`SCR-02B` direct-route guard, 복사 실패 상태, ko/en 언어 전환, privacy preview/release 경계를 보강. 상태를 `predeploy-mvp-duo-review-remediated`로 갱신.
-- 2026-06-24: 사후 리뷰에서 누락된 demo storage 쓰기/삭제 오염 방지, English result/copy payload/fixture, bilingual privacy summary와 privacy 모바일 overflow 검증을 추가하고 상태를 `predeploy-mvp-final-review-remediated`로 갱신.
+- 2026-06-24: 2개 리뷰 페어 지적을 반영해 truly empty 기본 상태, preview-only 초대 문구, `SCR-05`/`SCR-02B` direct-route guard, 복사 실패 상태, ko/en 언어 전환, privacy preview/release 경계를 보강. 상태를 `predeploy-release-duo-review-remediated`로 갱신.
+- 2026-06-24: 사후 리뷰에서 누락된 demo storage 쓰기/삭제 오염 방지, English result/copy payload/fixture, bilingual privacy summary와 privacy 모바일 overflow 검증을 추가하고 상태를 `predeploy-release-final-review-remediated`로 갱신.
 - 2026-06-25: SupabaseBackendAdapter, Edge Function scaffold, AI copy policy, `verify:backend-ai`를 추가하고 상태를 `backend-ai-connection-scaffold-reviewed`로 갱신.
 - 2026-06-25: Owner 지적 후 Edge Function placeholder를 Supabase DB write/read와 server-only AI provider proxy 코드로 교체하고 상태를 `backend-ai-runtime-connection-code-reviewed`로 갱신.
 
 ## 2026-06-24 플랫폼 연결 스캐폴드 QA
 
-정적 MVP를 production runtime으로 승격하지 않고, 실서비스 연결을 시작할 수 있는 adapter/SQL/release artifact를 추가했습니다. 원격 Supabase 적용, 실제 Toss credential 연결, GitHub Pages 재배포, 실제 공개 URL 확정은 수행하지 않았습니다.
+정적 최종출시제품을 production runtime으로 승격하지 않고, 실서비스 연결을 시작할 수 있는 adapter/SQL/release artifact를 추가했습니다. 원격 Supabase 적용, 실제 Toss credential 연결, GitHub Pages 재배포, 실제 공개 URL 확정은 수행하지 않았습니다.
 
 반영 내용:
 
@@ -283,7 +283,7 @@ Reordered next steps:
 - `supabase/migrations/20260624_hammoyo_backend.sql`에 `hammoyo_` prefix app tables, `core_users`, `authmap_user_identities`, RLS ON, membership select policy를 추가했습니다.
 - RLS 하위 조회는 host/member 모두를 허용하는 `hammoyo_can_read_room(room_id)` helper를 통해 닫았습니다.
 - `hammoyo_rooms.status`에는 canonical state machine의 `draft` 상태를 포함했습니다.
-- `docs/release/platform-readiness.md`, `docs/mvp/contact.html`, `docs/mvp/delete-data.html`을 추가했습니다.
+- `docs/release/platform-readiness.md`, `docs/release/contact.html`, `docs/release/delete-data.html`을 추가했습니다.
 - `.env.example`에 public privacy/contact/delete placeholder, `AI_COPY_ENABLED=false`, `APPS_IN_TOSS_CONSOLE_API_KEY=`를 추가했습니다. server secret public prefix는 추가하지 않았습니다.
 - `scripts/verify-platform-readiness.mjs`와 `npm run verify:platform`을 추가하고 `npm run build`에 포함했습니다. 이 검증은 adapter/SQL/env/release 문서뿐 아니라 privacy/contact/delete placeholder도 직접 확인합니다.
 

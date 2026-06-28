@@ -19,7 +19,7 @@ Status: `PROJECT_COPY_CORRECTED`
 - 구현 기준: `/Users/kangsungbae/Documents/hammoyo/ai/plans/implementation-plan.md`
 - 디자인 기준: `/Users/kangsungbae/Documents/hammoyo/ai/plans/design-plan.md`
 - platform 기준: `/Users/kangsungbae/Documents/지식저장소/projects/hammoyo/platform.md`
-- 정적 MVP sample: `/Users/kangsungbae/Documents/hammoyo/docs/mvp/index.html`
+- 정적 최종출시제품 sample: `/Users/kangsungbae/Documents/hammoyo/docs/release/index.html`
 - 이미지 생성문: `/Users/kangsungbae/Documents/hammoyo/docs/design/image-generation-brief.md`
 
 ## 핵심 결정

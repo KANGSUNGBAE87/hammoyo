@@ -33,7 +33,7 @@ and share boxes in code.
 Runtime-ready assets promoted from the final package live in:
 
 - `../assets/final/`
-- `../mvp/assets/final/`
+- `../release/assets/final/`
 
 These include selected hero, state, icon, background, character, and
 communication assets that can be referenced by the static app or future app

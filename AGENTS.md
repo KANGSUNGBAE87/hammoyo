@@ -15,8 +15,9 @@
 7. `ai/plans/implementation-plan.md`
 8. `ai/reviews/review.md`
 9. `planning-lab/index.md`
-10. `HAMMOYEO_DESIGN_PACKAGE/HAMMOYEO_CODEX_DESIGN_BRIEF.md`
-11. `HAMMOYEO_DESIGN_PACKAGE/HAMMOYEO_DESIGN_TOKENS.json`
+10. `docs/final-delivery/README.md`
+11. `docs/final-delivery/design-plan.md`
+12. `docs/final-delivery/tokens.json`
 
 ## 현재 단계 경계
 
@@ -26,8 +27,8 @@
 - P3 결과는 `AI_GRADE_B / AI_RECOMMEND_PRE_P4_VALIDATION`이었습니다.
 - pre-P4 결과는 `AI_GRADE_B` 유지이나 `AI_RECOMMEND_NARROWER_PRE_P4_VALIDATION`, `P4_HOLD`입니다.
 - P4 최종 기획문, 디자인 기획문, 샘플은 task `t_5fd833b9`에서 실제 생성됐습니다. 공식 경로는 `/Users/kangsungbae/Documents/지식저장소/planning-lab/20_RUNS/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/P4_HAMMOYEO`입니다. 구현/Production Studio 전달과 `FINAL_APPROVED`는 아직 승인되지 않았습니다.
-- 2026-06-24 Codex 보정으로 Supabase/권한/응답/AI/copy/디자인 샘플 기준이 프로젝트에 추가됐습니다. 현재 구현 전 기준은 `ai/plans/implementation-plan.md`, `ai/plans/design-plan.md`, `docs/mvp/index.html`입니다.
-- 2026-06-24 Owner 지시로 `HAMMOYEO_DESIGN_PACKAGE`가 향후 디자인 source of truth가 되었습니다. 모든 UI 구현과 샘플 개선은 이 패키지의 design brief/token/task prompt를 먼저 따릅니다.
+- 2026-06-24 Codex 보정으로 Supabase/권한/응답/AI/copy/디자인 샘플 기준이 프로젝트에 추가됐습니다. 현재 구현 전 기준은 `ai/plans/implementation-plan.md`, `ai/plans/design-plan.md`, `docs/release/index.html`입니다.
+- 2026-06-27 Owner 지시로 `HAMMOYEO_FINAL_DELIVERY`가 향후 디자인 source of truth가 되었습니다. 모든 UI 구현과 샘플 개선은 `docs/final-delivery/`와 final delivery token/asset subset을 먼저 따릅니다.
 
 ## 최신 함모여 해석
 
@@ -36,8 +37,8 @@
 - 최신 조건부 P4 패키지는 `/Users/kangsungbae/Documents/지식저장소/planning-lab/20_RUNS/PL-P2-P3-P4-HAMMOYEO-2026-06-23-t_5fd833b9/P4_HAMMOYEO`에 있습니다. fallback 관계 안전성/외부 링크 전환/WTP·반복 세그먼트 재논의와 validation protocol은 완료됐지만 실제 응답은 0건이므로, 패키지는 `EVIDENCE_UNVALIDATED`와 `IMPLEMENTATION_CONDITIONAL`로 표기되어 있습니다.
 - 로그인은 Apps in Toss `appLogin()` 기준입니다. Supabase는 기본 backend로 준비하되 앱/domain 로직에서는 직접 import하지 않고 adapter/server boundary 뒤에 둡니다.
 - AI는 추천 ranking이 아니라 공유 문구 polish에만 선택적으로 사용합니다. Template fallback과 AI 라벨은 필수입니다.
-- 디자인 구현 기준은 `HAMMOYEO_DESIGN_PACKAGE/HAMMOYEO_CODEX_DESIGN_BRIEF.md`와 `HAMMOYEO_DESIGN_PACKAGE/HAMMOYEO_DESIGN_TOKENS.json`입니다.
-- 정적 샘플 MVP는 `docs/mvp/index.html`이며 `npm run build`로 디자인 계약 검증을 실행합니다.
+- 디자인 구현 기준은 `docs/final-delivery/design-plan.md`와 `docs/final-delivery/tokens.json`입니다.
+- 정적 출시 화면은 `docs/release/index.html`이며 `npm run build`로 디자인/기능/플랫폼 계약 검증을 실행합니다.
 - 앞으로 구현되는 화면은 `SCR-00`, `SCR-01`, `SCR-02`, `SCR-02B`, `SCR-03`, `SCR-04`, `SCR-05`, `SCR-06` 흐름과 package token을 유지합니다.
 
 ## 원본과 작업 루트
@@ -151,7 +152,7 @@ Rules:
 - For shared server-only AI provider secrets such as DeepSeek, use `/Users/kangsungbae/.config/sungbae/shared-env/ai-secrets.env.local`. Project `.env.server.local` may reference this file. Store `DEEPSEEK_API_KEY` there only as a server-side key; never expose it through `VITE_`, `NEXT_PUBLIC_`, or `PUBLIC_` env names. Client apps must call a backend/Supabase Edge Function/server proxy that owns the secret.
 - Implement i18n from the first app version: Korean (`ko`) is the default, and English (`en`) must be user-selectable.
 - Route UI copy, LLM prompts, notifications, purchase copy, errors, empty states, and onboarding through the active locale instead of hard-coding user-facing strings.
-- Plan MVP stubs for login, ads, and IAP even when the first release does not enable them.
+- Plan release-ready stubs for login, ads, and IAP even when the first release does not enable them.
 - Apps in Toss implementations should use Toss login, Apps in Toss ads, and Apps in Toss IAP.
 - Google Play implementations should use Credential Manager or Play Games Services, AdMob, and Google Play Billing.
 - Verify paid entitlements on a backend. Do not put store secrets, receipt-verification credentials, or LLM API keys in app bundles.

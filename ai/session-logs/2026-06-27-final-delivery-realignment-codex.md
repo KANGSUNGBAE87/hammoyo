@@ -20,7 +20,7 @@ Date: 2026-06-27 KST
 - `HAMMOYEO_FINAL_DELIVERY/tokens/hammoyo_design_tokens_final_v12.json`
 - `HAMMOYEO_FINAL_DELIVERY/images/contact_sheets/screen_samples_contact_sheet.png`
 - `HAMMOYEO_FINAL_DELIVERY/images/contact_sheets/split_assets_contact_sheet.png`
-- Current `docs/index.html`, `docs/mvp/index.html`, `supabase/functions/*`, and `supabase/migrations/20260624_hammoyo_backend.sql`
+- Current `docs/index.html`, `docs/release/index.html`, `supabase/functions/*`, and `supabase/migrations/20260624_hammoyo_backend.sql`
 
 ## Subagent Review Summary
 
@@ -33,7 +33,7 @@ Date: 2026-06-27 KST
 - `HAMMOYEO_FINAL_DELIVERY` is accepted as the next implementation source of truth.
 - Existing app flow remains the working base, but final delivery requires a P0 reorder before more polish.
 - Previous `HAMMOYEO_DESIGN_PACKAGE` is history/reference; final delivery docs/tokens/assets now take priority.
-- The local `HAMMOYEO_FINAL_DELIVERY/` archive was left untracked. The implementation subset was promoted into `docs/final-delivery/`, `docs/assets/final/`, and `docs/mvp/assets/final/`.
+- The local `HAMMOYEO_FINAL_DELIVERY/` archive was left untracked. The implementation subset was promoted into `docs/final-delivery/`, `docs/assets/final/`, and `docs/release/assets/final/`.
 
 ## Files Changed
 
@@ -47,14 +47,14 @@ Date: 2026-06-27 KST
 - `ai/session-logs/2026-06-27-final-delivery-realignment-codex.md`
 - `docs/final-delivery/`
 - `docs/assets/final/`
-- `docs/mvp/assets/final/`
+- `docs/release/assets/final/`
 
 ## Reordered Next Work
 
 ### P0
 
 1. Productize the default home and keep debug/token/screen panels behind `?debug=1`.
-2. Apply final delivery hero/state/icon assets from `docs/assets/final/` and `docs/mvp/assets/final/`.
+2. Apply final delivery hero/state/icon assets from `docs/assets/final/` and `docs/release/assets/final/`.
 3. Change `hardNo` from score to eligibility constraint.
 4. Change minimum responses to `max(3, ceil(expected_count * 0.6))`.
 5. Move share links to `invite_slug` plus server room status lookup.
@@ -97,7 +97,7 @@ Tracked source/reference:
 Runtime assets:
 
 - `docs/assets/final/`
-- `docs/mvp/assets/final/`
+- `docs/release/assets/final/`
 
 Local archive only:
 
@@ -110,8 +110,8 @@ and `.graphifyignore`.
 
 ## Verification
 
-- `find docs/final-delivery docs/assets/final docs/mvp/assets/final -type f | wc -l` returned 95 files.
-- `du -sh docs/final-delivery docs/assets/final docs/mvp/assets/final` returned 3.8M, 5.4M, and 5.4M.
+- `find docs/final-delivery docs/assets/final docs/release/assets/final -type f | wc -l` returned 95 files.
+- `du -sh docs/final-delivery docs/assets/final docs/release/assets/final` returned 3.8M, 5.4M, and 5.4M.
 - `npm run build` passed after final delivery source/asset promotion.
 - `git diff --check` passed after final delivery source/asset promotion.
 - `/Users/kangsungbae/.codex/bin/graphify update . --no-cluster` ran and updated `graphify-out/graph.json`; output reported code graph refresh and noted doc/image semantic extraction needs a full `/graphify --update` pass.
@@ -135,8 +135,8 @@ Subagents used:
 
 Implemented:
 
-- Applied final delivery token values and final PNG hero/background/state assets to `docs/index.html` and `docs/mvp/index.html`.
-- Kept `docs/index.html` and `docs/mvp/index.html` byte-identical after each screen implementation change.
+- Applied final delivery token values and final PNG hero/background/state assets to `docs/index.html` and `docs/release/index.html`.
+- Kept `docs/index.html` and `docs/release/index.html` byte-identical after each screen implementation change.
 - Replaced the old visual state object with final delivery assets for confirmed, expired, insufficient, and private negotiation states.
 - Changed the recommendation algorithm to deterministic v2 in both frontend and Supabase shared backend helper:
   - `hardNo` is now an eligibility constraint instead of a negative score.
@@ -152,7 +152,7 @@ Implemented:
   - added `RecommendationHeroContent`.
   - changed `.screenBody` to a flex column.
   - set `.screenBody > * { flex-shrink: 0; }`.
-- Stabilized Playwright verification by removing the hardcoded system Chrome executable path from `scripts/verify-mvp-functional.mjs`; it now uses Playwright-managed Chromium by default, with optional `HAMMOYEO_PLAYWRIGHT_CHROME_PATH` override.
+- Stabilized Playwright verification by removing the hardcoded system Chrome executable path from `scripts/verify-release-functional.mjs`; it now uses Playwright-managed Chromium by default, with optional `HAMMOYEO_PLAYWRIGHT_CHROME_PATH` override.
 - Added `"type": "module"` to `package.json` to remove Node module-type warnings during backend/AI verification.
 
 Verification:
@@ -160,7 +160,7 @@ Verification:
 - Browser layout check on `docs/index.html?screen=scr-03-result-recommendation&demo=1` at 390x740 confirmed the recommendation card height is 544px and content no longer overflows the card.
 - `npm run build` passed with no warnings.
 - `git diff --check` passed.
-- `cmp -s docs/index.html docs/mvp/index.html` returned `0`.
+- `cmp -s docs/index.html docs/release/index.html` returned `0`.
 
 Remaining next steps:
 

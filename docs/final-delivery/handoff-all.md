@@ -44,7 +44,7 @@ canonical: true
 - 여행 전 사전 모임
 - 일정 조율을 매번 맡는 총무/방장
 
-초기 MVP는 2명 약속, 대규모 행사, 예약/결제/장소 추천까지 포함한 모임 운영 도구를 목표로 하지 않는다.
+초기 최종출시제품은 2명 약속, 대규모 행사, 예약/결제/장소 추천까지 포함한 모임 운영 도구를 목표로 하지 않는다.
 
 ## 5. 핵심 가치 제안
 
@@ -105,7 +105,7 @@ canonical: true
 
 최소 참석 인원을 충족하는 후보 중 가장 빠른 시간을 우선한다. 번개, 가벼운 식사, 스터디 보충 모임에 적합하다.
 
-MVP에서는 기본값을 **전원 참석 모드**로 두고, 결과 화면에서 “일부 참석으로 보기”를 선택적으로 제공한다.
+최종출시제품에서는 기본값을 **전원 참석 모드**로 두고, 결과 화면에서 “일부 참석으로 보기”를 선택적으로 제공한다.
 
 ## 9. 추천 상태
 
@@ -161,9 +161,9 @@ AI는 결정을 대신하지 않는다.
 - AI에는 이름, 연락처, raw id, 자유 텍스트, hard-no 사유를 보내지 않는다.
 - AI 실패 시 항상 template copy로 fallback한다.
 
-MVP에서는 AI 문구가 없어도 제품이 작동해야 한다.
+최종출시제품에서는 AI 문구가 없어도 제품이 작동해야 한다.
 
-## 13. MVP 범위
+## 13. 최종출시제품 범위
 
 ### 반드시 포함
 
@@ -249,7 +249,7 @@ canonical: true
 
 현재 구현된 것으로 간주하는 범위는 다음이다.
 
-- `docs/mvp/index.html`, `docs/index.html` 기반 정적 HTML/CSS/JS 앱 화면
+- `docs/release/index.html`, `docs/index.html` 기반 정적 HTML/CSS/JS 앱 화면
 - iPhone식 날짜/시간 picker
 - 후보 추가/삭제
 - OS/브라우저 native share 우선 공유
@@ -315,7 +315,7 @@ supabase/
   migrations/
   functions/
 docs/
-  mvp/
+  release/
   assets/
 ```
 
@@ -426,7 +426,7 @@ interface BackendAdapter {
 }
 ```
 
-MVP에서 `createNegotiationRequest`, `submitNegotiationAnswer`는 mock 또는 feature flag로 시작할 수 있지만, 데이터 모델에는 미리 자리를 둔다.
+최종출시제품에서 `createNegotiationRequest`, `submitNegotiationAnswer`는 mock 또는 feature flag로 시작할 수 있지만, 데이터 모델에는 미리 자리를 둔다.
 
 ## 9. 데이터 모델 보강
 
@@ -624,7 +624,7 @@ MVP에서 `createNegotiationRequest`, `submitNegotiationAnswer`는 mock 또는 f
 
 ## 17. 완료 정의
 
-다음 조건을 만족하면 Final MVP 구현 완료로 본다.
+다음 조건을 만족하면 Final 최종출시제품 구현 완료로 본다.
 
 - 기본 홈에서 제품 가치가 5초 안에 이해된다.
 - 방 만들기부터 결과 공유까지 1개의 실제 방이 정상 완료된다.

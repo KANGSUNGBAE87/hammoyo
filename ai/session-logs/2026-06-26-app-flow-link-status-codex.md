@@ -8,14 +8,14 @@ topic: app-flow-link-status
 
 ## User Request
 
-- 함모여는 더 이상 MVP 앱이 아니므로 모든 버튼과 날짜 선택이 동작해야 한다.
+- 함모여는 더 이상 최종출시제품 앱이 아니므로 모든 버튼과 날짜 선택이 동작해야 한다.
 - 새 모임 생성/설정 후 일반 공유 링크를 바로 공유할 수 있어야 한다.
 - 내가 만든 모임 상태를 항상 체크할 수 있어야 한다.
 - Supabase와 AI 연동 상태를 확인해야 한다.
 
 ## Decisions
 
-- Public GitHub Pages UI remains browser-first until Toss login/account sync is added, but user-facing copy no longer presents the app as a static MVP preview.
+- Public GitHub Pages UI remains browser-first until Toss login/account sync is added, but user-facing copy no longer presents the app as a static 최종출시제품 preview.
 - General share links encode a public room snapshot for recipient entry into the participant response screen.
 - Host-created rooms are tracked in browser state as `hostRooms`, with a dedicated "내가 만든 모임" status dashboard.
 - Supabase and DeepSeek V4 Pro remain server-side only. Remote smoke confirmed Supabase Edge Functions and AI coordination without exposing secrets to the client.
@@ -23,19 +23,19 @@ topic: app-flow-link-status
 ## Files Changed
 
 - `docs/index.html`
-- `docs/mvp/index.html`
+- `docs/release/index.html`
 - `docs/privacy.html`
-- `docs/mvp/privacy.html`
+- `docs/release/privacy.html`
 - `docs/contact.html`
-- `docs/mvp/contact.html`
+- `docs/release/contact.html`
 - `docs/delete-data.html`
-- `docs/mvp/delete-data.html`
+- `docs/release/delete-data.html`
 - `README.md`
 - `ai/plans/design-plan.md`
 - `ai/plans/implementation-plan.md`
 - `docs/release/platform-readiness.md`
-- `scripts/verify-mvp-design.mjs`
-- `scripts/verify-mvp-functional.mjs`
+- `scripts/verify-release-design.mjs`
+- `scripts/verify-release-functional.mjs`
 - `scripts/verify-platform-readiness.mjs`
 
 ## Verification

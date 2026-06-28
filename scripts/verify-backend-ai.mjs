@@ -330,8 +330,9 @@ for (const token of [
 }
 
 assert(
-  implementationPlan.includes("backend-invite-anonymous-hardening-implemented"),
-  "implementation plan status should mention backend-invite-anonymous-hardening-implemented",
+  implementationPlan.includes("release-picker-and-language-standard-implemented") ||
+    implementationPlan.includes("backend-invite-anonymous-hardening-implemented"),
+  "implementation plan status should mention the current release implementation status",
 );
 assert(envExample.includes("AI_PROVIDER="), ".env.example should include AI_PROVIDER placeholder");
 assert(envExample.includes("AI_MODEL_COPY="), ".env.example should include AI_MODEL_COPY placeholder");

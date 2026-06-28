@@ -17,9 +17,9 @@ const previewAdaptersPath = "src/platform/preview-adapters.mjs";
 const tossAdaptersPath = "src/platform/toss-adapters.mjs";
 const migrationsDir = "supabase/migrations";
 const releaseDocPath = "docs/release/platform-readiness.md";
-const privacyPath = "docs/mvp/privacy.html";
-const contactPath = "docs/mvp/contact.html";
-const deleteDataPath = "docs/mvp/delete-data.html";
+const privacyPath = "docs/release/privacy.html";
+const contactPath = "docs/release/contact.html";
+const deleteDataPath = "docs/release/delete-data.html";
 
 const contractsSource = read(contractsPath);
 const previewSource = read(previewAdaptersPath);

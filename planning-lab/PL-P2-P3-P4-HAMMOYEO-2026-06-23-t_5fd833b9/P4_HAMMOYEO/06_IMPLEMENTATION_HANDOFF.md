@@ -17,7 +17,7 @@
 
 ## Integrations
 
-- [INFERENCE] Required for MVP: clipboard/share sheet only.
+- [INFERENCE] Required for 최종출시제품: clipboard/share sheet only.
 - [FACT] KakaoTalk deep integration, calendar sync, maps, payment, reservation are out of scope.
 
 ## Performance
@@ -27,7 +27,7 @@
 ## Privacy
 
 - [INFERENCE] Do not expose individual hard-no reasons in shared copy.
-- [INFERENCE] Avoid collecting phone numbers or Kakao identifiers in MVP.
+- [INFERENCE] Avoid collecting phone numbers or Kakao identifiers in 최종출시제품.
 - [INFERENCE] Room links should be unguessable and expire.
 
 ## Viewport support

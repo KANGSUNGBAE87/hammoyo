@@ -5,7 +5,7 @@ Status: `backend-invite-anonymous-remote-smoke-passed`
 
 ## 범위
 
-함모여는 이제 디자인 샘플이 아니라 앱 흐름으로 다룹니다. `docs/mvp/index.html`과 `docs/index.html`은 iPhone식 날짜/시간 선택, 후보 추가/삭제, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 내가 만든 모임 상태판과 모임 수정/삭제를 제공하고, 원격 실서비스 연결은 아래 경계 파일과 검증 계약으로 관리합니다.
+함모여는 이제 디자인 샘플이 아니라 앱 흐름으로 다룹니다. `docs/release/index.html`과 `docs/index.html`은 iPhone식 날짜/시간 선택, 후보 추가/삭제, OS/브라우저 공유 화면 우선 공유, 초대 홈 진입, 내가 만든 모임 상태판과 모임 수정/삭제를 제공하고, 원격 실서비스 연결은 아래 경계 파일과 검증 계약으로 관리합니다.
 
 - `AuthAdapter`: Apps in Toss `appLogin()` 결과를 서버 교환으로 넘기는 경계
 - `BackendAdapter`: Supabase/Edge Function/server API만 호출하는 경계
@@ -117,7 +117,7 @@ AI가 제외 후보를 고르거나 존재하지 않는 후보를 만들면 dete
 
 ## 개인정보 / 제출 전 blocker
 
-현재 `docs/mvp/privacy.html`은 브라우저 저장 앱 화면 정책입니다. 제출 전 아래 값을 확정해야 합니다.
+현재 `docs/release/privacy.html`은 브라우저 저장 앱 화면 정책입니다. 제출 전 아래 값을 확정해야 합니다.
 
 - 공개 개인정보처리방침 URL
 - 공개 문의 이메일

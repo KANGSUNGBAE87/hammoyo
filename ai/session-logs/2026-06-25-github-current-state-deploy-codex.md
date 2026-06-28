@@ -8,13 +8,13 @@ Actor: codex
 
 ## Actions
 
-- Verified the current MVP with `npm run build`.
+- Verified the current 최종출시제품 with `npm run build`.
 - Verified deployed Supabase Edge Functions with `npm run smoke:remote`.
 - Scanned commit candidates for obvious secret/credential patterns without printing secret values.
 - Committed and pushed the project source to `origin/main`.
-- Deployed the static MVP preview to GitHub Pages.
+- Deployed the static 최종출시제품 preview to GitHub Pages.
 - Switched GitHub Pages source to `main` / `/docs` after the existing `gh-pages` legacy build got stuck/errored.
-- Mirrored `docs/mvp/*.html` to `docs/*.html` so the Pages root and public policy/contact/delete paths resolve directly.
+- Mirrored `docs/release/*.html` to `docs/*.html` so the Pages root and public policy/contact/delete paths resolve directly.
 
 ## Verification
 

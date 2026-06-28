@@ -784,14 +784,12 @@
         gap: 8px;
       }
 
-      .IOSCountSelect,
-      .AppleDateTimePicker input {
+      .IOSCountSelect {
         appearance: none;
         -webkit-appearance: none;
       }
 
-      .selectShell,
-      .AppleDateTimePicker {
+      .selectShell {
         position: relative;
         min-width: 0;
         border: 1px solid var(--border);
@@ -805,8 +803,7 @@
         overflow: hidden;
       }
 
-      .selectShell:focus-within,
-      .AppleDateTimePicker:focus-within {
+      .selectShell:focus-within {
         border-color: rgba(90, 70, 242, 0.58);
         box-shadow: 0 0 0 4px rgba(90, 70, 242, 0.1);
       }
@@ -823,8 +820,7 @@
         line-height: 1;
       }
 
-      .IOSCountSelect,
-      .AppleDateTimePicker input {
+      .IOSCountSelect {
         min-height: var(--touch-target);
         width: 100%;
         min-width: 0;
@@ -832,28 +828,6 @@
         border: 0;
         color: var(--text-primary);
         background: transparent;
-      }
-
-      .AppleDateTimePicker input::-webkit-calendar-picker-indicator {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-      }
-
-      .AppleDateTimePicker::after {
-        content: "⌄";
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-56%);
-        color: var(--text-tertiary);
-        pointer-events: none;
-        font-size: 16px;
-        font-weight: 800;
-        line-height: 1;
       }
 
       .candidateInputCard {
@@ -867,6 +841,101 @@
           0 8px 0 rgba(152, 162, 179, 0.08),
           0 16px 26px rgba(28, 39, 63, 0.08),
           inset 0 1px 0 rgba(255, 255, 255, 0.98);
+      }
+
+      .ReleaseDateControl,
+      .ReleaseTimeControl {
+        display: grid;
+        gap: 8px;
+      }
+
+      .ReleaseDateChipGroup,
+      .ReleaseTimeSlotGroup {
+        display: grid;
+        gap: 8px;
+      }
+
+      .ReleaseDateChipGroup {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .ReleaseTimeSegment {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        padding: 4px;
+        border-radius: var(--radius-pill);
+        background: var(--brand-soft);
+      }
+
+      .ReleaseTimeSegment span {
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-pill);
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 18px;
+        font-weight: 800;
+      }
+
+      .ReleaseTimeSegment span[data-active="true"] {
+        color: var(--surface);
+        background: var(--brand);
+        box-shadow: 0 8px 18px rgba(91, 70, 242, 0.24);
+      }
+
+      .ReleaseTimeSlotGroup {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .ReleaseDateChip,
+      .ReleaseTimeSlot {
+        min-height: 44px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 251, 255, 0.98) 100%);
+        box-shadow: inset 0 -1px 0 rgba(17, 24, 39, 0.04);
+        font-size: 13px;
+        line-height: 18px;
+        font-weight: 800;
+        transition:
+          transform var(--motion-fast) var(--ease-standard),
+          border-color var(--motion-fast) var(--ease-standard),
+          background var(--motion-fast) var(--ease-standard),
+          box-shadow var(--motion-fast) var(--ease-standard);
+      }
+
+      .ReleaseDateChip {
+        display: grid;
+        align-content: center;
+        gap: 2px;
+        padding: 8px 6px;
+      }
+
+      .ReleaseDateChip small {
+        color: var(--text-secondary);
+        font-size: 11px;
+        line-height: 14px;
+        font-weight: 700;
+      }
+
+      .ReleaseDateChip[data-selected="true"],
+      .ReleaseTimeSlot[data-selected="true"] {
+        color: var(--surface);
+        border-color: var(--brand);
+        background: linear-gradient(180deg, var(--brand) 0%, var(--brand-pressed) 100%);
+        box-shadow: var(--shadow-floating);
+      }
+
+      .ReleaseDateChip[data-selected="true"] small {
+        color: rgba(255, 255, 255, 0.82);
+      }
+
+      .ReleaseDateChip:active,
+      .ReleaseTimeSlot:active {
+        transform: scale(0.98);
       }
 
       .heroAnimalImage {
@@ -1284,10 +1353,10 @@
 
         <aside class="tabsPanel" aria-label="샘플 화면 선택">
           <div class="tabsIntro">
-            <p class="eyebrow">HAMMOYEO_DESIGN_PACKAGE</p>
+            <p class="eyebrow">HAMMOYEO_FINAL_DELIVERY</p>
             <h2>함모여 화면 점검</h2>
             <p>
-              토큰, 카피, 상태 정책은 패키지 문서를 기준으로 재구성했습니다.
+              토큰, 카피, 상태 정책은 최종출시제품 문서를 기준으로 재구성했습니다.
               각 화면은 query parameter로 직접 열 수 있습니다.
             </p>
           </div>
@@ -1514,8 +1583,8 @@
       const screenRoot = document.getElementById("screen-root");
       const tabsRoot = document.getElementById("screen-tabs");
       const appRoot = document.querySelector(".app");
-      const STORAGE_KEY = "hammoyo:mvp:v1";
-      const DEMO_STORAGE_KEY = "hammoyo:mvp:demo:v1";
+      const STORAGE_KEY = "hammoyo:release:v1";
+      const DEMO_STORAGE_KEY = "hammoyo:release:demo:v1";
       const APP_VERSION = 1;
       let activeLocale = "ko";
       let locale = locales.ko;
@@ -1557,6 +1626,15 @@
 
       const defaultCandidates = demoFixtures.ko.candidates;
       const MAX_CANDIDATES = 8;
+      const releaseDateValues = [
+        "2026-07-05",
+        "2026-07-06",
+        "2026-07-07",
+        "2026-07-12",
+        "2026-07-13",
+        "2026-07-14",
+      ];
+      const releaseTimeValues = ["17:00", "18:30", "19:00", "19:30", "20:10", "21:00"];
 
       function localizedDemoFixture() {
         return demoFixtures[activeLocale] || demoFixtures.ko;
@@ -1612,6 +1690,67 @@
         if (Number.isNaN(date.getTime())) return "";
         const weekdays = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
         return `${date.getMonth() + 1}.${date.getDate()} ${weekdays[date.getDay()]}`;
+      }
+
+      function releaseDateOptions(selectedDate, index) {
+        const rotated = [
+          ...releaseDateValues.slice(index % releaseDateValues.length),
+          ...releaseDateValues.slice(0, index % releaseDateValues.length),
+        ];
+        const values = [selectedDate, ...rotated].filter(Boolean);
+        return [...new Set(values)].slice(0, 6);
+      }
+
+      function releaseTimePeriod(timeValue) {
+        const hour = Number.parseInt(String(timeValue || "18:00").split(":")[0], 10);
+        if (hour < 17) return "낮";
+        if (hour < 20) return "저녁";
+        return "밤";
+      }
+
+      function renderReleaseDateControl(candidate, index) {
+        const selectedDate = candidate.date || releaseDateValues[index % releaseDateValues.length];
+        const options = releaseDateOptions(selectedDate, index);
+        return `
+          <div class="ReleaseDateControl" data-testid="candidate-date-control-${index}">
+            <input type="hidden" name="candidate-date-${index}" value="${escapeHtml(selectedDate)}" />
+            <div class="ReleaseDateChipGroup" role="radiogroup" aria-label="후보 ${index + 1} 날짜">
+              ${options
+                .map((dateValue) => {
+                  const selected = dateValue === selectedDate;
+                  const label = weekdayLabel(dateValue) || dateValue;
+                  const [monthDay, weekday = ""] = label.split(" ");
+                  return `<button class="ReleaseDateChip" type="button" role="radio" aria-checked="${selected}" data-selected="${selected}" data-action="set-candidate-date" data-candidate-index="${index}" data-value="${escapeHtml(dateValue)}" data-testid="candidate-date-chip-${index}-${escapeHtml(dateValue)}">
+                    <span>${escapeHtml(monthDay)}</span><small>${escapeHtml(weekday)}</small>
+                  </button>`;
+                })
+                .join("")}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderReleaseTimeControl(candidate, index) {
+        const selectedTime = candidate.time || releaseTimeValues[index % releaseTimeValues.length];
+        const activePeriod = releaseTimePeriod(selectedTime);
+        return `
+          <div class="ReleaseTimeControl" data-testid="candidate-time-control-${index}">
+            <input type="hidden" name="candidate-time-${index}" value="${escapeHtml(selectedTime)}" />
+            <div class="ReleaseTimeSegment" aria-label="시간대">
+              ${["낮", "저녁", "밤"]
+                .map((period) => `<span data-active="${period === activePeriod}">${period}</span>`)
+                .join("")}
+            </div>
+            <div class="ReleaseTimeSlotGroup" role="radiogroup" aria-label="후보 ${index + 1} 시간">
+              ${releaseTimeValues
+                .map((timeValue) => {
+                  const selected = timeValue === selectedTime;
+                  return `<button class="ReleaseTimeSlot" type="button" role="radio" aria-checked="${selected}" data-selected="${selected}" data-action="set-candidate-time" data-candidate-index="${index}" data-value="${escapeHtml(timeValue)}" data-testid="candidate-time-slot-${index}-${escapeHtml(timeValue)}">${escapeHtml(timeValue)}</button>`;
+                })
+                .join("")}
+            </div>
+          </div>
+        `;
       }
 
       function createShareSnapshot(room) {
@@ -2359,15 +2498,11 @@
               <div class="formGrid dateTimeGrid">
                 <label class="inputGroup">
                   <span class="inputLabel">날짜</span>
-                  <span class="AppleDateTimePicker" data-kind="date">
-                    <input type="date" data-testid="candidate-date-input-${index}" name="candidate-date-${index}" value="${escapeHtml(candidate.date || "")}" />
-                  </span>
+                  ${renderReleaseDateControl(candidate, index)}
                 </label>
                 <label class="inputGroup">
                   <span class="inputLabel">시간</span>
-                  <span class="AppleDateTimePicker" data-kind="time">
-                    <input type="time" data-testid="candidate-time-input-${index}" name="candidate-time-${index}" value="${escapeHtml(candidate.time)}" />
-                  </span>
+                  ${renderReleaseTimeControl(candidate, index)}
                 </label>
               </div>
               <label class="inputGroup">
@@ -2818,7 +2953,7 @@
       function readRoomForm() {
         const form = screenRoot.querySelector("[data-room-form]");
         const fallbackCandidates = localizedDefaultCandidates();
-        const candidateNodes = [...(form?.querySelectorAll("[data-testid^='candidate-date-input-']") || [])];
+        const candidateNodes = [...(form?.querySelectorAll("[data-testid^='candidate-date-control-']") || [])];
         const candidateInputs = candidateNodes.slice(0, MAX_CANDIDATES).map((node, index) => {
           const date = form?.querySelector(`[name="candidate-date-${index}"]`)?.value || "";
           const fallback = fallbackCandidates[index] || fallbackCandidates[0];
@@ -2922,6 +3057,29 @@
         }));
         hasUnsavedEdits = true;
         render("scr-01-host-room");
+      }
+
+      function setCandidateChoice(target, field) {
+        const form = screenRoot.querySelector("[data-room-form]");
+        const index = Number(target.dataset.candidateIndex || 0);
+        const value = target.dataset.value || "";
+        const input = form?.querySelector(`[name="candidate-${field}-${index}"]`);
+        if (!input || !value) return;
+        input.value = value;
+        const group = target.closest('[role="radiogroup"]');
+        group?.querySelectorAll("[data-selected]").forEach((button) => {
+          const selected = button === target;
+          button.dataset.selected = String(selected);
+          button.setAttribute("aria-checked", String(selected));
+        });
+        if (field === "time") {
+          const segment = target.closest(".ReleaseTimeControl")?.querySelector(".ReleaseTimeSegment");
+          const activePeriod = releaseTimePeriod(value);
+          segment?.querySelectorAll("span").forEach((item) => {
+            item.dataset.active = String(item.textContent === activePeriod);
+          });
+        }
+        hasUnsavedEdits = true;
       }
 
       function submitResponse() {
@@ -3163,6 +3321,8 @@
         if (action === "create-room") createRoomFromForm();
         if (action === "add-candidate") addCandidateToDraft();
         if (action === "remove-candidate") removeCandidateFromDraft(Number(target.dataset.candidateIndex || 0));
+        if (action === "set-candidate-date") setCandidateChoice(target, "date");
+        if (action === "set-candidate-time") setCandidateChoice(target, "time");
         if (action === "open-room-status") {
           const room = (appState.hostRooms || []).find((savedRoom) => savedRoom.id === target.dataset.roomId);
           if (!room) return;

@@ -4,11 +4,11 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "node scripts/verify-mvp-design.mjs && node scripts/verify-mvp-functional.mjs && node scripts/verify-platform-readiness.mjs && node scripts/verify-backend-ai.mjs",
-    "verify:app": "node scripts/verify-mvp-design.mjs && node scripts/verify-mvp-functional.mjs",
-    "verify:mvp": "node scripts/verify-mvp-design.mjs && node scripts/verify-mvp-functional.mjs",
-    "verify:design": "node scripts/verify-mvp-design.mjs",
-    "verify:functional": "node scripts/verify-mvp-functional.mjs",
+    "build": "node scripts/verify-release-design.mjs && node scripts/verify-release-functional.mjs && node scripts/verify-platform-readiness.mjs && node scripts/verify-backend-ai.mjs",
+    "verify:app": "node scripts/verify-release-design.mjs && node scripts/verify-release-functional.mjs",
+    "verify:release": "node scripts/verify-release-design.mjs && node scripts/verify-release-functional.mjs",
+    "verify:design": "node scripts/verify-release-design.mjs",
+    "verify:functional": "node scripts/verify-release-functional.mjs",
     "verify:platform": "node scripts/verify-platform-readiness.mjs",
     "verify:backend-ai": "node scripts/verify-backend-ai.mjs",
     "smoke:remote": "node scripts/smoke-remote-functions.mjs"

@@ -16,7 +16,7 @@ Updated: 2026-06-24
 - P4 판단: 조건부 P4 패키지 생성 완료; `FINAL_APPROVED`는 산출물 검토 후 별도 Owner 승인 필요
 - 현재 Owner 상태: `OWNER_UNREVIEWED_AFTER_CONDITIONAL_P4_PACKAGE`
 - 현재 결론: 실제 방장/참여자 모집·연락 경로 부재로 live 응답 0건 caveat를 보존한 조건부 P4 패키지가 생성되었습니다. Package는 COMPLETE이나 evidence는 UNVALIDATED입니다.
-- 2026-06-24 결론: Supabase/권한/응답/AI/copy/디자인 샘플 보정 기획이 현재 프로젝트에 추가되었습니다. 구현 준비 기준은 `ai/plans/implementation-plan.md`, `ai/plans/design-plan.md`, `docs/mvp/index.html`입니다.
+- 2026-06-24 결론: Supabase/권한/응답/AI/copy/디자인 샘플 보정 기획이 현재 프로젝트에 추가되었습니다. 구현 준비 기준은 `ai/plans/implementation-plan.md`, `ai/plans/design-plan.md`, `docs/release/index.html`입니다.
 
 ## 현재 폴더 상태
 
@@ -142,4 +142,4 @@ P4 HOLD 이유:
 
 ## 금지선
 
-P4 최종 제품기획문, 디자인 기획문, 샘플 제작은 보정 task `t_5fd833b9`에서 실제 생성되었습니다. 2026-06-24 프로젝트 보정으로 구현 전 정책과 샘플 MVP도 추가됐습니다. 다만 live evidence 0건 caveat는 여전히 유지하며, 배포/출시/비용 발생/secret 연결/Production Studio 전달은 별도 명시 승인이 필요합니다.
+P4 최종 제품기획문, 디자인 기획문, 샘플 제작은 보정 task `t_5fd833b9`에서 실제 생성되었습니다. 2026-06-24 프로젝트 보정으로 구현 전 정책과 샘플 최종출시제품도 추가됐습니다. 다만 live evidence 0건 caveat는 여전히 유지하며, 배포/출시/비용 발생/secret 연결/Production Studio 전달은 별도 명시 승인이 필요합니다.

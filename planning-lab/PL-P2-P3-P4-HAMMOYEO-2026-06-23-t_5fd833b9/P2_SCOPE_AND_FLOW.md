@@ -9,7 +9,7 @@
 5. [INFERENCE] 전원 가능 시간이 없거나 선호가 갈리면 fallback 후보 1~2개와 추천 이유를 제시합니다.
 6. [INFERENCE] 방장은 관계 안전 공유 문구를 복사해 단톡방에 붙여넣습니다.
 
-## MVP Must Include
+## 최종출시제품 Must Include
 
 - [INFERENCE] 방장용 약속방 생성.
 - [INFERENCE] 후보 날짜/시간 빠른 설정.
@@ -19,7 +19,7 @@
 - [INFERENCE] 추천 이유: 가능/선호/조정 가능/강한 불가를 집계형으로 표시.
 - [INFERENCE] 카카오톡 공유용 관계 안전 문구.
 
-## MVP Should Defer
+## 최종출시제품 Should Defer
 
 - [FACT] 프로젝트 브리프는 정확한 식당·카페·장소 추천, 예약/결제, 지도 경로 최적화, 캘린더 양방향 연동, 자연어/AI 입력 core, 취향 기반 추천, 정산/출석/복잡 권한을 미루도록 정리했습니다.
 

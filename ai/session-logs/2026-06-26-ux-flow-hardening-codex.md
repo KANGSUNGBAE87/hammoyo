@@ -26,14 +26,14 @@ Actor: codex
 ## Files Changed
 
 - `docs/index.html`
-- `docs/mvp/index.html`
+- `docs/release/index.html`
 - `docs/privacy.html`
-- `docs/mvp/privacy.html`
+- `docs/release/privacy.html`
 - `docs/contact.html`
-- `docs/mvp/contact.html`
+- `docs/release/contact.html`
 - `docs/delete-data.html`
-- `docs/mvp/delete-data.html`
-- `scripts/verify-mvp-functional.mjs`
+- `docs/release/delete-data.html`
+- `scripts/verify-release-functional.mjs`
 - `scripts/verify-platform-readiness.mjs`
 
 ## Verification
