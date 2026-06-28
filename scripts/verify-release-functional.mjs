@@ -133,8 +133,12 @@ async function main() {
   await page.setViewportSize({ width: 1024, height: 768 });
   await page.goto(baseFileUrl, { waitUntil: "load" });
   assert(!(await page.locator(".tabsPanel").isVisible()), "desktop debug screen panel should be hidden by default");
+  const defaultDesktopPhone = await page.locator(".phone").boundingBox();
+  assert(defaultDesktopPhone?.width >= 980, "default desktop product shell should fill the available viewport instead of staying capped at 430px");
   await page.goto(`${baseFileUrl}?debug=1`, { waitUntil: "load" });
   assert(await page.locator(".tabsPanel").isVisible(), "desktop debug screen panel should be visible only with debug=1");
+  const debugDesktopPhone = await page.locator(".phone").boundingBox();
+  assert(debugDesktopPhone?.width <= 432, "debug desktop preview should keep the constrained phone frame");
   await page.setViewportSize({ width: 390, height: 740 });
   await page.goto(pageUrl, { waitUntil: "load" });
 
@@ -251,17 +255,31 @@ async function main() {
   await page.getByTestId("room-title-input").fill("금요일 저녁 모임");
   await page.getByTestId("expected-count-select").selectOption("7");
   assert(await page.getByTestId("expected-count-select").evaluate((node) => node.closest(".selectShell") !== null), "expected count should use an iOS-like select shell");
+  await page.waitForSelector('[data-testid="participant-name-input-6"]');
+  assert((await page.locator('[data-testid^="participant-name-input-"]').count()) === 7, "host setup should require one participant name field per expected person");
+  await page.getByTestId("create-room-button").click();
+  assert((await page.getByTestId("host-form-error").innerText()).includes("참여자"), "host setup should block sharing until participant names are filled");
+  const participantNames = ["성배", "민지", "준호", "수연", "지훈", "하린", "도윤"];
+  for (const [index, name] of participantNames.entries()) {
+    await page.getByTestId(`participant-name-input-${index}`).fill(name);
+  }
   assert(await page.getByTestId("candidate-calendar-trigger-0").evaluate((node) => node.closest(".IPhoneCalendarPicker") !== null), "candidate dates should use the iPhone-like calendar picker");
   assert(await page.getByTestId("candidate-time-wheel-0").evaluate((node) => node.closest(".ReleaseTimeWheel") !== null), "candidate times should use the alarm-style wheel");
+  assert((await page.getByTestId("candidate-calendar-sheet-0").isVisible()) === false, "candidate calendar should stay closed until the date button is pressed");
+  await page.getByTestId("candidate-calendar-trigger-0").click();
+  assert(await page.getByTestId("candidate-calendar-sheet-0").isVisible(), "candidate calendar should open as an overlay sheet from the date button");
   await page.getByTestId("candidate-calendar-day-0-2026-07-05").click();
+  assert((await page.getByTestId("candidate-calendar-sheet-0").isVisible()) === false, "candidate calendar should close after selecting a date");
   await page.getByTestId("candidate-time-hour-0-18").click();
   await page.getByTestId("candidate-time-minute-0-30").click();
   await page.getByTestId("candidate-note-input-0").fill("강남역 근처");
+  await page.getByTestId("candidate-calendar-trigger-1").click();
   await page.getByTestId("candidate-calendar-day-1-2026-07-06").click();
   await page.getByTestId("candidate-time-hour-1-17").click();
   await page.getByTestId("candidate-time-minute-1-00").click();
   await page.getByTestId("candidate-note-input-1").fill("잠실");
   await page.getByTestId("add-candidate-button").click();
+  await page.getByTestId("candidate-calendar-trigger-3").click();
   assert(await page.getByTestId("candidate-calendar-day-3-2026-07-07").isVisible(), "host should be able to add a fourth candidate slot");
   await page.getByTestId("candidate-calendar-day-3-2026-07-07").click();
   await page.getByTestId("candidate-time-hour-3-19").click();
@@ -273,6 +291,8 @@ async function main() {
 
   const createdRoom = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(createdRoom?.room?.title === "금요일 저녁 모임", "created room should be persisted in localStorage");
+  assert(createdRoom?.room?.participants?.length === 7, "created room should persist the required participant roster");
+  assert(createdRoom?.room?.participants?.every((participant) => participant.name), "created participant roster should keep each required name");
   assert(createdRoom?.room?.status === "collecting", "created room should enter collecting status");
   assert(createdRoom?.room?.shareUrl?.includes("join="), "created room should persist a general share link");
   assert(createdRoom?.hostRooms?.length === 1, "created room should be listed in my meetups");
@@ -292,6 +312,9 @@ async function main() {
   await page.getByTestId("response-inbox-open-0").click();
   await page.waitForSelector("#scr-02-participant-input");
   await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "detail");
+  assert(await page.getByTestId("participant-picker-list").isVisible(), "respondent should choose their name from the host roster before answering");
+  await page.getByTestId("participant-picker-민지").click();
+  assert((await page.getByTestId("participant-name-input").inputValue()) === "민지", "participant picker should fill the selected respondent name");
   await page.goBack();
   await page.waitForSelector('[data-testid="response-inbox-list"]');
   await page.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "inbox");
@@ -317,6 +340,9 @@ async function main() {
   await invitePage.getByTestId("response-inbox-open-0").click();
   await invitePage.waitForSelector("#scr-02-participant-input");
   await invitePage.waitForFunction(() => new URLSearchParams(window.location.search).get("response") === "detail");
+  assert(await invitePage.getByTestId("participant-picker-list").isVisible(), "shared invite response should ask the respondent to choose a roster name");
+  await invitePage.getByTestId("participant-picker-준호").click();
+  assert((await invitePage.getByTestId("participant-name-input").inputValue()) === "준호", "shared invite respondent should select their own name from the roster");
   await inviteContext.close();
   await page.getByTestId("copy-invite-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
@@ -331,11 +357,18 @@ async function main() {
   const dashboardText = await page.locator("body").innerText();
   assert(dashboardText.includes("내가 만든 모임") && dashboardText.includes("금요일 저녁 모임"), "my meetups dashboard should show the created room");
   assert(dashboardText.includes("0명 응답"), "my meetups dashboard should show the current response count");
+  assert(dashboardText.includes("미응답 7명"), "my meetups dashboard should summarize unanswered roster members");
   assert((await page.locator('[data-testid="dashboard-create-room-button"]').count()) === 0, "my meetups should not expose duplicate create CTA");
+  const firstCardActionGrid = await page.getByTestId("host-card-actions-0").evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length);
+  assert(firstCardActionGrid >= 3, "my meetups card actions should use a compact 3+1 layout instead of a single vertical stack");
   await page.getByTestId("edit-host-room-0").click();
   await page.waitForSelector("#scr-01-host-room");
   await page.getByTestId("room-title-input").fill("수정된 금요일 모임");
   await page.getByTestId("expected-count-select").selectOption("9");
+  await page.waitForSelector('[data-testid="participant-name-input-8"]');
+  await page.getByTestId("participant-name-input-7").fill("서윤");
+  await page.getByTestId("participant-name-input-8").fill("태오");
+  await page.getByTestId("candidate-calendar-trigger-0").click();
   await page.getByTestId("candidate-calendar-day-0-2026-07-12").click();
   await page.getByTestId("candidate-time-hour-0-20").click();
   await page.getByTestId("candidate-time-minute-0-10").click();
@@ -373,6 +406,10 @@ async function main() {
   await page.goto(`${baseFileUrl}?reset=1`, { waitUntil: "load" });
   await page.getByTestId("bottom-nav-create").click();
   await page.getByTestId("room-title-input").fill("다시 만든 금요일 모임");
+  for (const [index, name] of participantNames.entries()) {
+    await page.getByTestId(`participant-name-input-${index}`).fill(name);
+  }
+  await page.getByTestId("candidate-calendar-trigger-0").click();
   await page.getByTestId("candidate-calendar-day-0-2026-07-05").click();
   await page.getByTestId("candidate-time-hour-0-18").click();
   await page.getByTestId("candidate-time-minute-0-30").click();
@@ -386,17 +423,23 @@ async function main() {
   await page.waitForSelector("#scr-04-insufficient-response");
 
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
-  await page.getByTestId("participant-name-input").fill("   ");
   await page.getByTestId("submit-response-button").click();
-  const blankAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
-  assert(blankAliasState?.room?.responses?.[0]?.alias === "익명", "blank participant name should be explicitly saved as anonymous");
+  assert((await page.getByTestId("response-form-error").innerText()).includes("명단"), "roster-based response should require choosing my name first");
+  await page.getByTestId("participant-picker-성배").click();
+  await page.getByTestId("submit-response-button").click();
+  const firstRosterResponseState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
+  assert(
+    firstRosterResponseState?.room?.responses?.[0]?.alias === "성배" &&
+      firstRosterResponseState?.room?.responses?.[0]?.participantId === "participant-1",
+    "selected roster participant should be saved with a stable participant id",
+  );
   await page.getByTestId("edit-response-button").click();
-  await page.getByTestId("participant-name-input").fill("민지");
+  await page.getByTestId("participant-picker-성배").click();
   await page.getByTestId("submit-response-button").click();
   const editedAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(
-    editedAliasState?.room?.responses?.length === 1 && editedAliasState.room.responses[0].alias === "민지",
-    "editing my response should update the existing response instead of adding a new one",
+    editedAliasState?.room?.responses?.length === 1 && editedAliasState.room.responses[0].alias === "성배",
+    "editing my response should update the existing roster response instead of adding a new one",
   );
   await page.evaluate(() => {
     const key = "hammoyo:release:v1";
@@ -406,16 +449,14 @@ async function main() {
     localStorage.setItem(key, JSON.stringify(state));
   });
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
-  await page.getByTestId("participant-name-input").fill(" ");
+  await page.getByTestId("participant-picker-민지").click();
   await page.getByTestId("submit-response-button").click();
-  const secondBlankAliasState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
-  const anonymousAliases = secondBlankAliasState?.room?.responses
-    ?.map((response) => response.alias)
-    .filter((alias) => alias.startsWith("익명"));
+  const secondRosterState = await page.evaluate(() => JSON.parse(localStorage.getItem("hammoyo:release:v1")));
   assert(
-    secondBlankAliasState?.room?.responses?.some((response) => response.alias === "민지") &&
-      anonymousAliases?.length === 1,
-    "a new blank participant should not overwrite an existing named response",
+    secondRosterState?.room?.responses?.some((response) => response.alias === "성배") &&
+      secondRosterState?.room?.responses?.some((response) => response.alias === "민지") &&
+      secondRosterState?.room?.responses?.length === 2,
+    "a second roster participant should add a separate response without overwriting another person",
   );
   await page.getByTestId("copy-reminder-button").click();
   await page.waitForSelector("[data-testid='copy-status']");
@@ -423,7 +464,7 @@ async function main() {
   assert(reminderCopyStatus.includes("공유 화면"), "response-complete reminder action should open the native share sheet");
 
   await page.goto(`${baseFileUrl}?screen=scr-02-participant-input`, { waitUntil: "load" });
-  await page.getByTestId("participant-name-input").fill("민지");
+  await page.getByTestId("participant-picker-민지").click();
   await page.getByTestId("preference-slot-1-prefer").click();
   await page.getByTestId("preference-slot-2-available").click();
   await page.getByTestId("preference-slot-3-hardNo").click();

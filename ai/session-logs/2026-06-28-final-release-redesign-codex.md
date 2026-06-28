@@ -169,3 +169,95 @@ Date: 2026-06-28
 
 - GitHub Pages deployment was not run in this implementation pass.
 - Apps in Toss sandbox safe-area/back/share validation remains pending.
+
+## Later Update: Responsive Product Shell Inspection
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 데스크톱/넓은 화면에서 앱이 옆으로 늘어나지 않는 문제 확인.
+- 우선 폭 고정 문제는 고치고, 이미지/상태/하단 탭/캘린더/시간 휠/내 모임 카드 개편은 서브에이전트 분석 후 구현 방향을 확인.
+
+### Subagent Inputs
+
+- `market-ux-researcher`: 기본 데스크톱의 가상 단말 프레임, 사진처럼 들어간 hero/state asset, 상시 노출 calendar, 좁은 time wheel, 내 모임 버튼 1열 스택을 주요 UX 문제로 진단. 권장 우선순위는 frame 제거, hero/title 통합, calendar overlay, time wheel 폭/행간 조정, 내 모임 3+1 액션 압축.
+- `code-mapper`: 폭 제한의 직접 원인은 `.phone { max-width: 430px; }`, `body:not([data-debug-panels="true"]) .layout { grid-template-columns: minmax(320px, 430px); }`, desktop default의 820px 높이 cap이라고 확인. debug mode만 430px phone frame을 유지하는 패치 경로를 제안.
+
+### Decisions
+
+- 기본 제품 URL은 실제 앱 화면으로 보고 viewport 전체 폭/높이를 사용한다.
+- `?debug=1`에서만 기존 430px phone-frame preview와 화면 점검 패널을 유지한다.
+- 나머지 디자인 개편은 별도 구현 묶음으로 확인 후 진행한다.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-functional.mjs`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+
+### Verification
+
+- `npm run verify:release` passed.
+- `npm run build` passed.
+- Playwright measurement:
+  - 390px default: `.phone` width 390.
+  - 1024px default: `.phone` width 1024.
+  - 1536px default: `.phone` width 1536.
+  - 1024px `?debug=1`: `.phone` width 430.
+- Visual QA screenshot captured: `/tmp/hammoyo-responsive-1024-settled.png`.
+
+### Remaining Risks
+
+- Full-width shell exposes the next design issue more clearly: hero/state images still feel like inserted photos, and status/my-meetups information density needs redesign.
+- GitHub Pages deployment was not run for this responsive shell patch.
+
+## Later Update: Roster-Based Final Product Redesign Implementation
+
+Actor: codex
+Date: 2026-06-28
+
+### User Request
+
+- 지금까지 논의한 전면 개편 전체를 서브에이전트와 함께 구현 시작.
+- 참여자 인원수에 맞춰 사람 이름을 필수 입력하고, 응답자는 명단에서 자기 이름을 선택하도록 변경.
+- 고급 개인별 링크는 UI 복잡도를 낮추는 숨김 패널로 제공.
+- 홈 hero/status, 하단 탭, 캘린더/시간 선택, 내 모임 카드 레이아웃을 최종출시제품 기준으로 재정리.
+
+### Subagent Inputs
+
+- `code-mapper`: `docs/release/index.html`의 생성/공유/응답/캘린더/내 모임 경로와 검증 스크립트 변경 지점을 맵핑.
+- `reviewer`: 공유 링크에 roster가 포함되지 않으면 새 브라우저에서 이름 선택이 깨지고, alias 문자열 기준 응답 저장은 중복/덮어쓰기 위험이 있다고 차단 의견 제시.
+
+### Decisions
+
+- 방 생성 전 참여자 명단은 예상 인원수만큼 필수 입력한다.
+- 응답 저장은 `participantId` 기준으로 같은 사람의 응답을 수정하고, 다른 사람 응답을 덮어쓰지 않는다.
+- 일반 공유 링크에는 전체 roster를 포함하고, 개인별 링크는 `details` disclosure 안에 숨겨 기본 UI를 복잡하게 만들지 않는다.
+- 날짜 선택은 기본 닫힘 상태이며 버튼을 누르면 화면 위 fixed calendar sheet로 열린다.
+- 시간 선택은 한 후보 카드 안에서 날짜 아래 full-width wheel로 유지한다.
+
+### Files Changed
+
+- `docs/release/index.html`
+- `docs/index.html`
+- `scripts/verify-release-functional.mjs`
+- `ai/session-logs/2026-06-28-final-release-redesign-codex.md`
+
+### Verification
+
+- `npm run verify:functional` passed.
+- `npm run verify:release` passed.
+- `npm run build` passed.
+- Playwright visual QA screenshots:
+  - `/tmp/hammoyo-home-390-v2.png`
+  - `/tmp/hammoyo-create-calendar-390-v2.png`
+  - `/tmp/hammoyo-my-meetups-390-v2.png`
+  - `/tmp/hammoyo-home-1024-settled-v2.png`
+
+### Remaining Risks
+
+- GitHub Pages deployment was not run in this implementation pass.
+- Supabase-backed multi-device roster and per-person link tracking remain future backend work; current release page still stores state in browser storage and share payloads.
